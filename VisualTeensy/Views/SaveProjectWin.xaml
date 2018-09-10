@@ -1,0 +1,144 @@
+﻿<Window x:Class="Board2Make.SaveProjectWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Board2Make"
+        xmlns:vm ="clr-namespace:ViewModel"
+        mc:Ignorable="d"
+        Title="VisualTeensy" Height="450" Width="800"
+        Background="LightGray"
+        >
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <!--<Window.DataContext>
+        <vm:SaveWinVM/>
+    </Window.DataContext>-->
+
+    <Border Grid.Column="0" Grid.Row="1" BorderThickness="2" BorderBrush="DarkGray" Margin="15" Padding="10" CornerRadius="10" Background="White" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock Text="Generate Project" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                <StackPanel Orientation="Horizontal" >
+                    <TextBlock x:Name="desc"  Text="Project Folder:" Width="110" FontWeight="Medium"/>
+                    <TextBlock x:Name="action" Text="{Binding projectFolder.action}" Width="80"/>
+                    <TextBlock x:Name="txt" Text="{Binding projectFolder.text}" Width="400"/>
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding projectFolder.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Makefile:" FontWeight="Medium" Width="{Binding ActualWidth, ElementName=desc}"/>
+                    <TextBlock Text="{Binding makefilePath.action}" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding makefilePath.text}" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding makefilePath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Build Tasks:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding buildTaskPath.action}" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding buildTaskPath.text}" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding buildTaskPath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Intellisense:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding intellisensePath.action}" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding intellisensePath.text}" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}"/>
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding intellisensePath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Core Libraries:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding coreBase.action }" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding coreBase.text }" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding coreBase.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                    <ProgressBar Value="{Binding perc}" Minimum="0" Maximum="100" Width="100" Visibility="{Binding showProg, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="40,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5" Visibility="{Binding copyCore, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="copy to" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding coreTarget.text}" Width="300"/>                    
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="main.cpp:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding mainCppPath.action}" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding mainCppPath.text }" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding mainCppPath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding copyBoardTxt, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Board definition:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="{Binding boardDefintionPath.action}" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding boardDefintionPath.text}" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding boardDefintionPath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Visibility="{Binding copyBoardTxt, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                    <TextBlock Text="" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="copy to" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding boardDefintionTarget.OK}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="Compiler:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="use" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding compilerBase.text}" Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}" />
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding compilerBase.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="make.exe:" Width="{Binding ActualWidth, ElementName=desc}" FontWeight="Medium"/>
+                    <TextBlock Text="use" Width="{Binding ActualWidth, ElementName=action, Mode=OneWay}"/>
+                    <TextBlock Text="{Binding makeExePath.text}"  Width="{Binding ActualWidth, ElementName=txt, Mode=OneWay}"/>
+                    <Canvas>
+                        <Ellipse Width="18" Height="18" Stroke="DarkGray" StrokeThickness="2"/>
+                        <TextBlock Text="{Binding makeExePath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
+                    </Canvas>
+                </StackPanel>
+
+
+
+
+
+            </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">                
+                <Button Content="Generate or Update"  Command="{Binding cmdSave}" Padding="5,0"/>
+                <Button Content="Close"  Width="70"  Margin="5,0,0,0" Click="CloseClick"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</Window>
