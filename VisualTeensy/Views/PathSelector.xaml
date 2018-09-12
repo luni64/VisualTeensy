@@ -15,7 +15,7 @@
         <TextBox x:Name="SelectedPathTxtBox"  Margin="0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" 
                  Text="{Binding SelectedPath, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Height="20"  />
         <Button Grid.Column="1" Margin="5,0,0,0" Background="Transparent" Click="OpenInput">
-            <Image Source="/Board2Make;component/img/folder-open.png"   Width="22" />
+            <Image Source="/VisualTeensy;component/img/folder-open.png"   Width="22" />
         </Button>
 
     </Grid>
