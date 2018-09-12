@@ -84,7 +84,7 @@ namespace Board2Make.Model
             }
 
         }
-        public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : coreBase;
+        public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : compilerBase;
 
         public string makeExePath { get; set; }
         public string makeExePathError

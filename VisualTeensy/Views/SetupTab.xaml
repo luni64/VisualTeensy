@@ -16,46 +16,34 @@
                 <ColumnDefinition Width="400"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            
             <StackPanel Width="auto" Margin="0,0,0,0" HorizontalAlignment="Stretch"  >
-                <!--<TextBlock TextWrapping="Wrap">
-                   <Bold> Standard Project Folder </Bold> <LineBreak/>
-                    Select a folder for your projects. Leave empty to default to the last used folder. 
-                </TextBlock>
-
-                -->
-                <!--<Label   Content="Path to GNU Make (required)" FontSize="10" Padding="0" Margin="0,5,0,0" />-->
-                <!--
-                <local:PSelector SelectedPath="{Binding projectBaseDefault  , ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />-->
-
-
                 <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" >
                    <Run FontSize="16" FontWeight="Bold">  GNU Make </Run><LineBreak/>
-                    The project setup uses GNU Make for Windows to build the project. You can download it from e.g. <Hyperlink>here</Hyperlink>.
+                    The project setup uses GNU Make for Windows to build the project. You can download it from e.g. here:
+                    <Hyperlink NavigateUri="http://www.equation.com/servlet/equation.cmd?fa=make" RequestNavigate="Hyperlink_RequestNavigate" >
+                       http://www.equation.com/servlet/equation.cmd?fa=make
+                    </Hyperlink>
                 </TextBlock>
 
                 <Label   Content="Path to GNU Make (required)" FontSize="10" Padding="0" Margin="0,5,0,0" />
-                <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />
-                <!--<TextBlock FontSize="10">
-                    (You can download GNU Make
-                    <Hyperlink Command="{Binding cmdDownloadMake}">here</Hyperlink>)
-                </TextBlock>-->
+                <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />              
 
                 <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" TextAlignment="Justify">
                    <Run FontSize="16" FontWeight="Bold">  Uploading </Run><LineBreak/>
                     To upload firmware to the controller, VisualTeensy supports the PJRC Teensy Uploader and TyCommander. TyCommander includes a serial 
                     terminal and can handle uploads to more than one Controller. (Note: The path to the PJRC Teensy uploader is required for 'Expert Setups' only)
-                    (You can download TyTools <Hyperlink> here </Hyperlink>
+                    (You can download TyTools here:
+                    <Hyperlink NavigateUri="https://github.com/Koromix/tytools" RequestNavigate="Hyperlink_RequestNavigate" >
+                        https://github.com/Koromix/tytools
+                    </Hyperlink>
                 </TextBlock>
 
                 <Label   Content="Path to the Teensy Uploader" FontSize="10" Padding="0" Margin="0,10,0,0" />
                 <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
 
-                <Label   Content="Path to TyCommander (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-                <!--<TextBlock FontSize="10">
-                    You can download TyCommander here
-                    <Hyperlink Command="{Binding cmdDownloadMake}">here</Hyperlink>
-                </TextBlock>-->
+                <Label   Content="Path to the TyTools (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
+                <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />              
             </StackPanel>
 
         </Grid>
