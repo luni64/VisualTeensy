@@ -11,6 +11,7 @@ VisualTeensy is a small Windows utility which fully automates the generation of 
 ## Usage
 ### Quick Start
 - Enter the path to GNU Make in the setup tab. You can leave the uploader settings empty for the time being. 
+
 ![Setup](/media/setup.PNG)
 
 - Open the Project tab and select Quick Setup.Enter a project name (this will define the name for the output files), and a path to the project folder. 
@@ -18,9 +19,11 @@ VisualTeensy is a small Windows utility which fully automates the generation of 
 - Enter the path to your Arduino Installation. (Make sure that you have Teensyduino installed)
 
 - Select the used Teensy board and the corresponding settings from the dropdown lists. 
+
 ![Quickstart](/media/guickSetupExample.PNG)
 
 - Press the "Generate / Upload Project" Button. This will open a summary of the actions and allows for generating the project. 
+
 ![Generate](/media/generateDialog.PNG)
 
 - Open the project folder with VisualCode (File|Open Folder)
