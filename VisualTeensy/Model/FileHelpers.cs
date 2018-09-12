@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Board2Make.Model
 {
@@ -11,7 +9,10 @@ namespace Board2Make.Model
     {
         public static string getBoardFromArduino(string arduinoPath)
         {
-            if (arduinoPath == null) return null;
+            if (arduinoPath == null)
+            {
+                return null;
+            }
 
             string boardPath = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "boards.txt");
             return File.Exists(boardPath) ? boardPath : null;
@@ -19,7 +20,10 @@ namespace Board2Make.Model
 
         public static string getToolsFromArduino(string arduinoPath)
         {
-            if (String.IsNullOrWhiteSpace(arduinoPath)) return null;
+            if (String.IsNullOrWhiteSpace(arduinoPath))
+            {
+                return null;
+            }
 
             string path = Path.Combine(arduinoPath, "hardware", "tools");
             return Directory.Exists(path) ? path : null;
@@ -27,14 +31,14 @@ namespace Board2Make.Model
 
         public static string getCoreFromArduino(string arduinoPath)
         {
-            if (arduinoPath == null) return null;
+            if (arduinoPath == null)
+            {
+                return null;
+            }
 
             string path = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "cores", "teensy3");
             return Directory.Exists(path) ? path : null;
         }
-
-       
-
 
 
         /// <summary>
@@ -110,5 +114,21 @@ namespace Board2Make.Model
 
             return stringBuilder.ToString();
         }
+
+        [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
+
+        public static string getShortPath(string longPath)
+        {
+            const int maxPath = 255;
+
+            StringBuilder shortPath = new StringBuilder(maxPath);
+            GetShortPathName(longPath, shortPath, maxPath);
+            return shortPath.ToString();
+
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
     }
 }

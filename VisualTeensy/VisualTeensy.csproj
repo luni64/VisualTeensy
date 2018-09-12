@@ -86,10 +86,15 @@
     <Compile Include="Model\OptionSet.cs" />
     <Compile Include="Model\PropertiesJson.cs" />
     <Compile Include="Model\SetupData.cs" />
+    <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\ValidatedPath.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\SetupTabVM.cs" />
+    <Compile Include="Views\SetupTab.xaml.cs">
+      <DependentUpon>SetupTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\BoardVM.cs" />
     <Compile Include="ViewModel\OptionSetVM.cs" />
@@ -97,6 +102,9 @@
     <Compile Include="ViewModel\ViewModel.cs" />
     <Compile Include="Views\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProjectTab.xaml.cs">
+      <DependentUpon>ProjectTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SaveProjectWin.xaml.cs">
       <DependentUpon>SaveProjectWin.xaml</DependentUpon>
@@ -118,7 +126,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\MiscRessources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SetupTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\PathSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProjectTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

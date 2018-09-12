@@ -12,68 +12,21 @@ namespace ViewModel
 {
     public class ViewModel : BaseViewModel, IDataErrorInfo
     {
+        public SetupTabVM setupTabVM { get; }
+
+
         public RelayCommand cmdGenerate { get; private set; }
         void doGenerate(object o)
         {
             Message("Generate");
-
-            //if (model.data.projectBaseError == null)
-            //{
-            //    string projectPath = model.data.projectBase;
-            //    string settingsPath = Path.Combine(projectPath, ".vscode");
-            //    string srcPath = Path.Combine(projectPath, "src");
-
-            //    Directory.CreateDirectory(settingsPath);
-            //    Directory.CreateDirectory(srcPath);
-
-            //    string makefilePath = Path.Combine(projectPath, "makefile");
-            //    using (TextWriter writer = new StreamWriter(makefilePath))
-            //    {
-            //        writer.Write(makefile);
-            //    }
-
-            //    string taskFilePath = Path.Combine(settingsPath, "tasks.json");
-            //    using (TextWriter writer = new StreamWriter(taskFilePath))
-            //    {
-            //        writer.Write(taskFile);
-            //    }
-
-            //    string propFilePath = Path.Combine(settingsPath, "c_cpp_properties.json");
-            //    using (TextWriter writer = new StreamWriter(propFilePath))
-            //    {
-            //        writer.Write(propFile);
-            //    }
-
-            //    string mainPath = Path.Combine(srcPath, "main.cpp");
-
-            //    using (TextWriter writer = new StreamWriter(mainPath))
-            //    {
-            //        writer.Write(mainCpp);
-            //    }
-            //}
         }
 
         public RelayCommand cmdClose { get; private set; }
         void doClose(object o)
         {
             model.saveSettings();
-        }
-
-
-
-        const string mainCpp =
-            "#include \"arduino.h\"\n\n" +
-            "void setup()\n" +
-            "{\n" +
-            "\tpinMode(LED_BUILTIN,OUTPUT);\n" +
-            "}\n\n" +
-
-            "void loop()\n" +
-            "{\n" +
-                "\tdigitalWriteFast(LED_BUILTIN,!digitalReadFast(LED_BUILTIN));\n" +
-                "\tdelay(250);\n" +
-            "}\n";
-
+        }        
+        
 
         #region IDataErrorInfo ------------------------------------------------
 
@@ -177,7 +130,7 @@ namespace ViewModel
             }
         }
 
-        public String arduinoPath
+        public String arduinoBase
         {
             get => model.data.arduinoBase;
             set
@@ -257,40 +210,7 @@ namespace ViewModel
                 }
             }
         }
-        public String makePath
-        {
-            get => model.data.makeExePath;
-            set
-            {
-                if (value != model.data.makeExePath)
-                {
-                    model.data.makeExePath = value.Trim();
-                    OnPropertyChanged();
-                    updateFiles();
-                }
-            }
-        }
-
-
-        public String uploadTyPath
-        {
-            get => model.data.uplTyBase;
-            set
-            {
-                if (value != model.data.uplTyBase)
-                {
-                    model.data.uplTyBase = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public String uploadPjrcPath
-        {
-            get => _uploadPjrcPath;
-            set => SetProperty(ref _uploadPjrcPath, value);
-        }
-        string _uploadPjrcPath;
+        
 
         public bool quickSetup
         {
@@ -346,7 +266,6 @@ namespace ViewModel
 
         public void updateFiles()
         {
-
             model.generateFiles(selectedBoard?.board);
             OnPropertyChanged("makefile");
             OnPropertyChanged("propFile");
@@ -382,6 +301,10 @@ namespace ViewModel
 
         public ViewModel()
         {
+            setupTabVM = new SetupTabVM(model.data);
+
+            setupTabVM.PropertyChanged += (s, e) => updateFiles();
+
             if (Debugger.IsAttached)
             {
                 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
@@ -395,6 +318,7 @@ namespace ViewModel
             updateBoards();
         }
 
+        
 
         public event EventHandler<string> MessageHandler;
         protected void Message(string message)

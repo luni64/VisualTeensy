@@ -124,7 +124,7 @@ namespace ViewModel
             {
                 using (TextWriter writer = new StreamWriter(mainCppPath))
                 {
-                    writer.Write(mainCpp);
+                    writer.Write(Strings.mainCpp);
 
                 }
             }
@@ -133,37 +133,6 @@ namespace ViewModel
         public AsyncCommand cmdSave { get; private set; }
         
 
-        //   public RelayCommand cmdSave { get; private set; }
-        void doSave(object o)
-        {
-            Directory.CreateDirectory(Path.Combine(data.projectBase, ".vscode"));
-            Directory.CreateDirectory(Path.Combine(data.projectBase, "src"));
-            projectFolder.status = true;
-            //Thread.Sleep(200);
-
-
-            //Thread.Sleep(200);
-
-            writeMainCpp();
-            mainCppPath.status = true;
-            //Thread.Sleep(200);
-
-            if (!data.fromArduino && data.copyBoardTxt)
-            {
-                copyBoardFile();
-            }
-            boardDefintionPath.status = true;
-
-            if (!data.fromArduino && data.copyCore)
-            {
-                copyCoreFiles();
-            }
-            coreBase.status = true;
-
-            compilerBase.status = true;
-            makeExePath.status = true;
-        }
-        
 
         async System.Threading.Tasks.Task doSSave()
         {
@@ -251,20 +220,7 @@ namespace ViewModel
 
         SetupData data;
 
-        const string mainCpp =
-            "#include \"Arduino.h\"\n\n" +
-
-            "void setup()\n" +
-            "{\n" +
-            "  pinMode(LED_BUILTIN,OUTPUT);\n" +
-            "}\n\n" +
-
-            "void loop()\n" +
-            "{\n" +
-            "  digitalWriteFast(LED_BUILTIN,!digitalReadFast(LED_BUILTIN));\n" +
-            "  delay(100);\n" +
-            "}\n";
-
+        
 
 
     }

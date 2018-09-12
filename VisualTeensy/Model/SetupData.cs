@@ -41,6 +41,16 @@ namespace Board2Make.Model
 
         }
 
+        public string projectBaseDefault { get; set; }
+        public string projectBaseDefaultError
+        {
+            get
+            {
+                return (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
+            }
+
+        }
+        
         public string boardTxtPath
         {
             get => fromArduino ? FileHelpers.getBoardFromArduino(arduinoBase) : _boardTxt;
@@ -74,6 +84,7 @@ namespace Board2Make.Model
             }
 
         }
+        public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : coreBase;
 
         public string makeExePath { get; set; }
         public string makeExePathError
@@ -99,6 +110,7 @@ namespace Board2Make.Model
             }
         }
         public bool copyCore { get; set; }
+        public string coreBaseShort => coreBase.Contains(" ") ? FileHelpers.getShortPath(coreBase) : coreBase;
 
         public string uplPjrcBase
         {
@@ -106,6 +118,14 @@ namespace Board2Make.Model
             set => _uplPjrcBase = value;
         }
         string _uplPjrcBase;
+        public string uplPjrcBaseError
+        {
+            get
+            {
+                return (!String.IsNullOrEmpty(uplPjrcBase) && (Directory.Exists(uplPjrcBase)) ?  null : "error");
+            }
+        }
+        public string uplPjrcBaseShort => uplPjrcBase.Contains(" ") ? FileHelpers.getShortPath(uplPjrcBase) : uplPjrcBase;
 
         public string uplTyBase { get; set; }
         public string uplTyBaseError
@@ -115,6 +135,7 @@ namespace Board2Make.Model
                 return String.IsNullOrEmpty(uplTyBase) ? null : (Directory.Exists(uplTyBase) ? null : "error");
             }
         }
+        public string uplTyBaseShort => uplTyBase.Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
 
 
         public string makefile { get; set; }
@@ -129,6 +150,7 @@ namespace Board2Make.Model
             uplPjrcBase = Settings.Default.uplPjrcBase;
             uplTyBase = Settings.Default.uplTyBase;
             projectBase = Settings.Default.projectBase;
+            projectBaseDefault = Settings.Default.projectBaseDefault;
             boardTxtPath = Settings.Default.boardsTxtPath;
             coreBase = Settings.Default.coreBase;
             compilerBase = Settings.Default.compilerBase;
@@ -144,6 +166,7 @@ namespace Board2Make.Model
             Settings.Default.uplPjrcBase = uplPjrcBase;
             Settings.Default.uplTyBase = uplTyBase;
             Settings.Default.projectBase = projectBase;
+            Settings.Default.projectBaseDefault = projectBaseDefault;
             Settings.Default.boardsTxtPath = boardTxtPath;
             Settings.Default.coreBase = coreBase;
             Settings.Default.compilerBase = compilerBase;
