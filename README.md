@@ -20,7 +20,7 @@ VisualTeensy is a small Windows utility which fully automates the generation of 
 
 - Select the used Teensy board and the corresponding settings from the dropdown lists. 
 
-![Quickstart](/media/guickSetupExample.PNG)
+![Quickstart](/media/quickSetupExample.PNG)
 
 - Press the "Generate / Upload Project" Button. This will open a summary of the actions and allows for generating the project. 
 
