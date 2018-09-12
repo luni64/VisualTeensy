@@ -5,8 +5,11 @@
 VisualTeensy is a small Windows utility which fully automates the generation of Teensy projects for VisualCode. 
 
 ## Prerequisites
-- VisualTeensy uses GNU Make to build your sketches. You can download a standalone version for Windows from e.g. here: [http://www.equation.com/servlet/equation.cmd?fa=make](http://www.equation.com/servlet/equation.cmd?fa=make) (copy the downloaded file to some convenient location, no installation required).
-- While not strictly necessary, for a quick start it is convenient to have Arduino and Teensiduino installated on your system. 
+- **VisualCode** including the standard <em>"C/C++ IntelliSense, debugging, and code browsing"</em> extension for developping c++ programs. 
+
+- **GNU Make:** VisualTeensy uses GNU Make to build your sketches. You can download a standalone version for Windows from e.g. here: [http://www.equation.com/servlet/equation.cmd?fa=make](http://www.equation.com/servlet/equation.cmd?fa=make) (just copy the downloaded file to some convenient location, no installation required).
+
+- While not strictly necessary, for a quick start it is convenient to have **Arduino and Teensiduino** installated on your system. 
 
 ## Usage
 ### Quick Start
@@ -22,11 +25,15 @@ VisualTeensy is a small Windows utility which fully automates the generation of 
 
 ![Quickstart](/media/quickSetupExample.PNG)
 
+
 - Press the "Generate / Upload Project" Button. This will open a summary of the actions and allows for generating the project. 
+
 
 ![Generate](/media/generateDialog.PNG)
 
+
 - Open the project folder with VisualCode (File|Open Folder)
+
 ![Generate](/media/folderView.PNG)
 
 
@@ -35,6 +42,16 @@ TBD
 
 ## Compiling
 For compiling you can use the Build Tasks (Terminal | Run Build Task or CTRL+SHIFT+B)
+
+The following build options are available: 
+- **Build** Standard build procedure of the project. Only changed or new files will be compiled and linked. Similar to the Arduino Sketch|verify compile action. 
+- **Rebuild user files** rebuilds all user files but keeps the Teensiduino core libraries. 
+- **Clean** Removes all generated binaries
+- **Upload (Teensy Uploader)** uploads to the connected board using the standard PJRC uploader. Builds the project first if necessary
+- **Upload (TyCommander)** uploads using TyCommander from the TyTools. Builds the project first if necessary
+
 ![Build](/media/build.PNG)
+
+
 
 # To be continued
