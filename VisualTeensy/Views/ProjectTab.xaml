@@ -55,15 +55,15 @@
                     <StackPanel Width="auto" Margin="0,20,0,0"  HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
                         <TextBlock Text="Details:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
                         <Label   Content="Path to boards.txt" FontSize="10" Padding="0" />
-                        <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" />
+                        <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
                         <CheckBox Content="Copy to project folder? (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>
 
                         <Label   Content="Path to Teensy Core Library" FontSize="10" Padding="0" Margin="0,15,0,0" />
-                        <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" isFolderDialog="True"  />
+                        <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True"  />
                         <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyCore}"/>
 
                         <Label   Content="Compiler Folder" FontSize="10" Padding="0" Margin="0,15,0,0" />
-                        <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" isFolderDialog="True" />
+                        <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
                     </StackPanel>
 
                     <!--Quick Setup ____________________________________ -->
@@ -71,7 +71,7 @@
                     <StackPanel Width="auto" Margin="0,20,0,0" HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton}" x:Name="Quick_Settings">
                         <TextBlock Text="Arduino:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
                         <Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" />
-                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" />
+                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
                     </StackPanel>
 
                     <TextBlock Text="Board Properties:" FontWeight="Bold" FontSize="11" Margin="0,20,0,5"/>

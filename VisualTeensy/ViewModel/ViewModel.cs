@@ -12,6 +12,8 @@ namespace ViewModel
 {
     public class ViewModel : BaseViewModel, IDataErrorInfo
     {
+
+
         public SetupTabVM setupTabVM { get; }
 
 
@@ -25,8 +27,8 @@ namespace ViewModel
         void doClose(object o)
         {
             model.saveSettings();
-        }        
-        
+        }
+
 
         #region IDataErrorInfo ------------------------------------------------
 
@@ -50,7 +52,7 @@ namespace ViewModel
                         error = model.data.projectNameError;
                         break;
 
-                    case "arduinoPath":
+                    case "arduinoBase":
                         error = quickSetup ? model.data.arduinoBaseError : null;
                         break;
 
@@ -68,10 +70,6 @@ namespace ViewModel
 
                     case "makePath":
                         error = model.data.makeExePathError;
-                        break;
-
-                    case "uploadTyPath":
-                        error = model.data.uplTyBaseError;
                         break;
 
                     case "boardVMs":
@@ -112,6 +110,7 @@ namespace ViewModel
                     OnPropertyChanged("makeFileName");
                     OnPropertyChanged("propFileName");
                     OnPropertyChanged("taskFileName");
+                    updateFiles();
                 }
             }
         }
@@ -121,9 +120,14 @@ namespace ViewModel
             get => model.data.projectName;
             set
             {
+                if (String.IsNullOrWhiteSpace(value))
+                {
+                    value = "newProject";
+                }
                 if (value != model.data.projectName)
                 {
                     model.data.projectName = value.Trim().Replace(" ", "_");
+
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -210,7 +214,7 @@ namespace ViewModel
                 }
             }
         }
-        
+
 
         public bool quickSetup
         {
@@ -242,7 +246,15 @@ namespace ViewModel
         }
         String _outputFilename;
 
-        public String Title => "lunOptics - VisualTeensy V0.1";
+        public String Title
+        {
+            get
+            {
+                var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return $"lunOptics - VisualTeensy v{v.Major}.{v.Minor}";
+            }
+        }
+
 
         public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
 
@@ -310,7 +322,7 @@ namespace ViewModel
                 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             }
 
-            cmdGenerate = new RelayCommand(doGenerate,o=>model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.propsFile));
+            cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.propsFile));
             cmdClose = new RelayCommand(doClose);
 
 
@@ -318,7 +330,7 @@ namespace ViewModel
             updateBoards();
         }
 
-        
+
 
         public event EventHandler<string> MessageHandler;
         protected void Message(string message)

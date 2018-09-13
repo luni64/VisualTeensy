@@ -123,8 +123,8 @@ namespace Board2Make.Model
             const int maxPath = 255;
 
             StringBuilder shortPath = new StringBuilder(maxPath);
-            GetShortPathName(longPath, shortPath, maxPath);
-            return shortPath.ToString();
+            int i = GetShortPathName(longPath, shortPath, maxPath);
+            return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
 
         }
 

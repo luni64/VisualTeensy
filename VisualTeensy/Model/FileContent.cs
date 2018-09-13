@@ -11,6 +11,8 @@ namespace Board2Make.Model
         {
             IEnumerable<Board> boards = Enumerable.Empty<Board>();
             IEnumerable<Menu> menus = Enumerable.Empty<Menu>();
+
+            if (!File.Exists(fileName)) return boards;
            
             try
             {

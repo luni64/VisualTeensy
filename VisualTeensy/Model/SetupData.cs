@@ -1,10 +1,6 @@
 ﻿using Board2Make.Properties;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Board2Make.Model
 {
@@ -13,66 +9,52 @@ namespace Board2Make.Model
         public bool fromArduino { get; set; }
 
         public string projectName { get; set; }
-        public string projectNameError
-        {
-            get
-            {
-                return String.IsNullOrWhiteSpace(projectName) ? "Error" : null;
-            }
-        }
+        public string projectNameError => String.IsNullOrWhiteSpace(projectName) ? "Error" : null;
 
         public string arduinoBase { get; set; }
         public string arduinoBaseError
         {
             get
             {
-                return arduinoBase != null ? (Directory.Exists(arduinoBase) ? null : "Error") : "Error";
-            }
+                if (String.IsNullOrEmpty(arduinoBase) || !Directory.Exists(arduinoBase))
+                {
+                    return "Folder doesn't exist";
+                }
 
+                string arduinoExe = Path.Combine(arduinoBase, "arduino.exe");
+                if (!File.Exists(arduinoExe))
+                {
+                    return "Folder doesn't contain arduino.exe. Not a valid arduino folder";
+                }
+
+                string teensyduino = Path.Combine(arduinoBase, "hardware", "teensy");
+                if (!Directory.Exists(teensyduino))
+                {
+                    return "Arduino folder doesn't contain a ./hardware/teensy folder. Looks like Teensyduino is not installed";
+                }
+
+                return null;
+            }
         }
 
         public string projectBase { get; set; }
-        public string projectBaseError
-        {
-            get
-            {
-                return (!String.IsNullOrWhiteSpace(projectBase) && (Directory.Exists(projectBase)) ? null : "Error");
-            }
-
-        }
+        public string projectBaseError => (!String.IsNullOrWhiteSpace(projectBase) && (Directory.Exists(projectBase)) ? null : "Error");
 
         public string projectBaseDefault { get; set; }
-        public string projectBaseDefaultError
-        {
-            get
-            {
-                return (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
-            }
+        public string projectBaseDefaultError => (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
 
-        }
-        
         public string boardTxtPath
         {
             get => fromArduino ? FileHelpers.getBoardFromArduino(arduinoBase) : _boardTxt;
             set => _boardTxt = value;
         }
         string _boardTxt;
-        public string boardTxtPathError
-        {
-            get
-            {
-                return (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
-            }
-        }
+        public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
         public bool copyBoardTxt { get; set; }
 
         public string compilerBase
         {
-            get
-            {
-                if (arduinoBaseError != null) return null;
-                return fromArduino ? Path.Combine(FileHelpers.getToolsFromArduino(arduinoBase), "arm") : _compilerPath;
-            }
+            get => fromArduino ? Path.Combine(FileHelpers.getToolsFromArduino(arduinoBase)??"", "arm") : _compilerPath;
             set => _compilerPath = value;
         }
         string _compilerPath;
@@ -80,21 +62,23 @@ namespace Board2Make.Model
         {
             get
             {
-                return compilerBase != null ? (Directory.Exists(compilerBase) ? null : "Error") : "Error";
+                if (!String.IsNullOrEmpty(compilerBase) && (Directory.Exists(compilerBase)))
+                {
+                    string gcc = Path.Combine(compilerBase, @"bin\arm-none-eabi-gcc.exe");
+                    if (File.Exists(gcc))
+                    {
+                        return null;
+                    }
+                    return @".\bin\arm-none-eabi-gcc.exe not found in the specified directory. Please select a valid arm-none-eabi gcc folder";
+                }
+                return "Folder doesn't exist";
             }
-
         }
+
         public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : compilerBase;
 
         public string makeExePath { get; set; }
-        public string makeExePathError
-        {
-            get
-            {
-                return makeExePath != null ? (File.Exists(makeExePath) ? null : "Error") : "Error";
-            }
-
-        }
+        public string makeExePathError => makeExePath != null ? (File.Exists(makeExePath) ? null : "Error") : "Error";
 
         public string coreBase
         {
@@ -106,37 +90,71 @@ namespace Board2Make.Model
         {
             get
             {
-                return coreBase != null ? (Directory.Exists(coreBase) ? null : "Error") : "Error";
+                if (!String.IsNullOrEmpty(coreBase) && (Directory.Exists(coreBase)))
+                {
+                    string uploader = Path.Combine(coreBase, "Arduino.h");
+                    if (File.Exists(uploader))
+                    {
+                        return null;
+                    }
+                    return "Arduino.h not found in the specified folder. Doesn't seem to be valid arduino core";
+                }
+                return "Folder doesn't exist";
             }
         }
+
         public bool copyCore { get; set; }
         public string coreBaseShort => coreBase.Contains(" ") ? FileHelpers.getShortPath(coreBase) : coreBase;
 
-        public string uplPjrcBase
-        {
-            get => fromArduino ? FileHelpers.getToolsFromArduino(arduinoBase) : _uplPjrcBase;
-            set => _uplPjrcBase = value;
-        }
-        string _uplPjrcBase;
+        public string uplPjrcBase { get; set; }
         public string uplPjrcBaseError
         {
             get
             {
-                return (!String.IsNullOrEmpty(uplPjrcBase) && (Directory.Exists(uplPjrcBase)) ?  null : "error");
+                if (!String.IsNullOrEmpty(uplPjrcBase) && (Directory.Exists(uplPjrcBase)))
+                {
+                    string uploader = Path.Combine(uplPjrcBase, "teensy.exe");
+                    if (File.Exists(uploader))
+                    {
+                        return null;
+                    }
+                    return "Teensy.exe not found in the specified directory";
+                }
+                return "Folder doesn't exist";
             }
         }
-        public string uplPjrcBaseShort => uplPjrcBase.Contains(" ") ? FileHelpers.getShortPath(uplPjrcBase) : uplPjrcBase;
+
+        public string uplPjrcBaseShort
+        {
+            get
+            {
+                string path = fromArduino ? FileHelpers.getToolsFromArduino(arduinoBase) : uplPjrcBase;
+                return path.Contains(" ") ? FileHelpers.getShortPath(path) : path;
+            }
+        }
 
         public string uplTyBase { get; set; }
         public string uplTyBaseError
         {
             get
             {
-                return String.IsNullOrEmpty(uplTyBase) ? null : (Directory.Exists(uplTyBase) ? null : "error");
+                if (String.IsNullOrEmpty(uplTyBase)) return null; // setting is optional
+
+                if (Directory.Exists(uplTyBase))
+                {
+                    string uploader = Path.Combine(uplTyBase, "TyCommanderC.exe");
+                    string gui = Path.Combine(uplTyBase, "TyCommander.exe");
+                    if (File.Exists(uploader) && File.Exists(gui))
+                    {
+                        return null;
+                    }
+                    return "TyCommanderC.exe or TyCommander.exe not found in the specified folder";
+                }
+                return "Folder doesn't exist";
             }
         }
-        public string uplTyBaseShort => uplTyBase.Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
 
+        public string uplTyBaseShort => (uplTyBase??"").Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
 
         public string makefile { get; set; }
         public string tasks_json { get; set; }
@@ -150,7 +168,7 @@ namespace Board2Make.Model
             uplPjrcBase = Settings.Default.uplPjrcBase;
             uplTyBase = Settings.Default.uplTyBase;
             projectBase = Settings.Default.projectBase;
-            projectBaseDefault = Settings.Default.projectBaseDefault;
+            projectName = Settings.Default.projectName;
             boardTxtPath = Settings.Default.boardsTxtPath;
             coreBase = Settings.Default.coreBase;
             compilerBase = Settings.Default.compilerBase;
@@ -166,13 +184,13 @@ namespace Board2Make.Model
             Settings.Default.uplPjrcBase = uplPjrcBase;
             Settings.Default.uplTyBase = uplTyBase;
             Settings.Default.projectBase = projectBase;
-            Settings.Default.projectBaseDefault = projectBaseDefault;
+            Settings.Default.projectName = projectName;
             Settings.Default.boardsTxtPath = boardTxtPath;
             Settings.Default.coreBase = coreBase;
             Settings.Default.compilerBase = compilerBase;
             Settings.Default.Save();
 
             fromArduino = oldState;
-        }     
+        }
     }
 }

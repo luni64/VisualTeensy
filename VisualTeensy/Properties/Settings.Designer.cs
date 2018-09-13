@@ -130,5 +130,29 @@ namespace Board2Make.Properties {
                 this["projectBaseDefault"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool updateNeeded {
+            get {
+                return ((bool)(this["updateNeeded"]));
+            }
+            set {
+                this["updateNeeded"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("myProject")]
+        public string projectName {
+            get {
+                return ((string)(this["projectName"]));
+            }
+            set {
+                this["projectName"] = value;
+            }
+        }
     }
 }

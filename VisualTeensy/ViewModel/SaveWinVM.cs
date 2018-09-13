@@ -1,6 +1,6 @@
 ﻿using Board2Make.Model;
 using System.IO;
-using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace ViewModel
 {
@@ -20,10 +20,47 @@ namespace ViewModel
         }
         bool _status;
     }
-
-
+    
     public class SaveWinVM : BaseViewModel
     {
+        public AsyncCommand cmdSave { get; private set; }
+        async Task doSave()
+        {
+            projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status = 
+                coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
+
+            Directory.CreateDirectory(Path.Combine(data.projectBase, ".vscode"));
+            Directory.CreateDirectory(Path.Combine(data.projectBase, "src"));
+            await Delay(50);
+            projectFolder.status = true;
+
+            await writeProjectFiles();
+
+            if (!data.fromArduino && data.copyCore)
+            {
+                await copyCoreFiles();
+            }
+            else await Delay(50);                        
+            coreBase.status = true;
+
+            writeMainCpp();
+            await Delay(50);
+            mainCppPath.status = true;
+
+            if (!data.fromArduino && data.copyBoardTxt)
+            {
+                copyBoardFile();
+            }
+            await Delay(50);
+            boardDefintionPath.status = true;
+            
+            await Delay(50);
+            compilerBase.status = true;
+
+            await Delay(50);
+            makeExePath.status = true;
+        }
+
         public DisplayText projectFolder { get; }
         public DisplayText makefilePath { get; }
         public DisplayText buildTaskPath { get; }
@@ -38,35 +75,7 @@ namespace ViewModel
 
         public bool copyBoardTxt => data.copyBoardTxt && !data.fromArduino;
         public bool copyCore => data.copyCore && !data.fromArduino;
-
-        async System.Threading.Tasks.Task copyCoreFiles()
-        {
-            showProg = true;
-            string SourcePath = data.coreBase;
-            string DestinationPath = Path.Combine(data.projectBase, "core");
-
-            //Now Create all of the directories
-            foreach (string dirPath in Directory.GetDirectories(SourcePath, "*.*", SearchOption.AllDirectories))
-            {
-                Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
-            }
-
-            await Delay(1);
-
-            //Copy all the files
-
-            var files = Directory.GetFiles(SourcePath, "*.*", SearchOption.AllDirectories).ToList();
-            double cnt = (double) files.Count/100;
-
-            for (int i = 0; i < files.Count; i++)
-            {
-                File.Copy(files[i], files[i].Replace(SourcePath, DestinationPath), overwrite: true);
-                perc = (i+1) / (double)cnt;
-                await Delay(1);
-            }
-            showProg = false;
-        }
-
+        
         public double perc
         {
             get => _perc;
@@ -80,16 +89,36 @@ namespace ViewModel
             set => SetProperty(ref _showProg, value);
         }
         bool _showProg = false;
-
         
-        void copyBoardFile()
+        private void copyBoardFile()
         {
             string SourcePath = data.boardTxtPath;
             string DestinationPath = Path.Combine(data.projectBase, Path.GetFileName(SourcePath));
             File.Copy(SourcePath, DestinationPath, overwrite: true);
         }
+        private async Task copyCoreFiles()
+        {
+            showProg = true;
+            string SourcePath = data.coreBase;
+            string DestinationPath = Path.Combine(data.projectBase, "core");
+                       
+            foreach (string dirPath in Directory.GetDirectories(SourcePath, "*.*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
+            }
 
-        async System.Threading.Tasks.Task writeProjectFiles()
+            var files = Directory.GetFiles(SourcePath, "*.*", SearchOption.AllDirectories).ToList();
+            double cnt = (double) files.Count/100;
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                File.Copy(files[i], files[i].Replace(SourcePath, DestinationPath), overwrite: true);
+                perc = (i+1) / (double)cnt;
+                await Delay(1);
+            }
+            showProg = false;
+        }
+        private async Task writeProjectFiles()
         {
             string DestinationPath = Path.Combine(makefilePath.text);
             using (TextWriter writer = new StreamWriter(DestinationPath))
@@ -129,59 +158,16 @@ namespace ViewModel
                 }
             }
         }
-
-        public AsyncCommand cmdSave { get; private set; }
-        
-
-
-        async System.Threading.Tasks.Task doSSave()
-        {
-            projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status = 
-                coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
-
-            Directory.CreateDirectory(Path.Combine(data.projectBase, ".vscode"));
-            Directory.CreateDirectory(Path.Combine(data.projectBase, "src"));
-            await Delay(50);
-            projectFolder.status = true;
-
-            await writeProjectFiles();
-
-            if (!data.fromArduino && data.copyCore)
-            {
-                await copyCoreFiles();
-            }
-            else await Delay(50);                        
-            coreBase.status = true;
-
-            writeMainCpp();
-            await Delay(50);
-            mainCppPath.status = true;
-
-            if (!data.fromArduino && data.copyBoardTxt)
-            {
-                copyBoardFile();
-            }
-            await Delay(50);
-            boardDefintionPath.status = true;
-            
-            await Delay(50);
-            compilerBase.status = true;
-
-            await Delay(50);
-            makeExePath.status = true;
-        }
-
+                
         public SaveWinVM(SetupData data)
-        {
-            // cmdSave = new RelayCommand(doSave);
-
-            cmdSave = new AsyncCommand(doSSave);
+        {            
+            cmdSave = new AsyncCommand(doSave);
             this.data = data;
 
             projectFolder = new DisplayText()
             {
                 text = data.projectBaseError == null ? data.projectBase : "MISSING",
-                action = Directory.Exists(data.projectBase) ? "overwrite" : "generate",
+                action = Directory.Exists(data.projectBase) ? "use existing" : "generate",
                 status = false
             };
 
@@ -217,11 +203,6 @@ namespace ViewModel
             makeExePath = new DisplayText() { text = data.makeExePath };
         }
 
-
-        SetupData data;
-
-        
-
-
+        private SetupData data;             
     }
 }
