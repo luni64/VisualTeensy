@@ -53,7 +53,7 @@ namespace Board2Make.Model
             }
             else
             {
-                ok = ok && data.corePathError == null && data.compilerPathError == null && data.uplPjrcBaseError == null && data.uplTyBaseError == null;
+                ok = ok && data.corePathError == null && data.compilerPathError == null;
             }
 
             //if (board != null && data.corePathError == null && data.compilerPathError == null && (data.fromArduino ? data.uplPjrcBaseError == null))

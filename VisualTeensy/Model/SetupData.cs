@@ -129,7 +129,7 @@ namespace Board2Make.Model
             get
             {
                 string path = fromArduino ? FileHelpers.getToolsFromArduino(arduinoBase) : uplPjrcBase;
-                return path.Contains(" ") ? FileHelpers.getShortPath(path) : path;
+                return (path??"").Contains(" ") ? FileHelpers.getShortPath(path) : path;
             }
         }
 

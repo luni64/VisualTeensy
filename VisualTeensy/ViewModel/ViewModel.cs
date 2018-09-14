@@ -11,9 +11,7 @@ using System.Linq;
 namespace ViewModel
 {
     public class ViewModel : BaseViewModel, IDataErrorInfo
-    {
-
-
+    {        
         public SetupTabVM setupTabVM { get; }
 
 
