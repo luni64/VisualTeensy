@@ -126,6 +126,7 @@
                         <TextBlock Text="{Binding makeExePath.OK}" Canvas.Left="1" Canvas.Top="-6"  FontSize="18" Foreground="Green"/>
                     </Canvas>
                 </StackPanel>
+                <TextBlock  Margin="0,10,0,0" Foreground="Red" Text="{Binding error}" Width="400" HorizontalAlignment="Left" TextWrapping="Wrap"/>
 
 
 

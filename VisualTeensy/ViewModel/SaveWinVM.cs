@@ -4,6 +4,8 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ViewModel
 {
+    using System;
+    using System.Diagnostics;
     using System.Linq;
     using static System.Threading.Tasks.Task;
 
@@ -20,17 +22,49 @@ namespace ViewModel
         }
         bool _status;
     }
-    
+
+
+
     public class SaveWinVM : BaseViewModel
     {
+
+        public string error
+        {
+            get => _error;
+            set => SetProperty(ref _error, value);
+        }
+        string _error;
+
+
         public AsyncCommand cmdSave { get; private set; }
         async Task doSave()
         {
-            projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status = 
+            projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
                 coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
 
-            Directory.CreateDirectory(Path.Combine(data.projectBase, ".vscode"));
-            Directory.CreateDirectory(Path.Combine(data.projectBase, "src"));
+            try
+            {
+                string vsCodeFolder = Path.Combine(data.projectBase, ".vscode");
+                string srcFolder = Path.Combine(data.projectBase, "src");
+                string binCoreFolder = Path.Combine(data.projectBase, "bin","core");
+                string binUserFolder = Path.Combine(data.projectBase, "bin","src");
+
+                Directory.CreateDirectory(vsCodeFolder);
+                Directory.CreateDirectory(srcFolder);
+                if (Directory.Exists(binCoreFolder)) Directory.Delete(binCoreFolder, true);
+                if (Directory.Exists(binUserFolder)) Directory.Delete(binUserFolder, true);
+            }
+            catch(UnauthorizedAccessException)
+            {
+                error = "Access violation! Please make sure that you have enough space and sufficient access rights.";
+            }           
+            catch (Exception e)
+            {
+                error = $"Error while setting up the project folder ({data.projectBase}). {e.GetBaseException().Message}";
+                return;
+            }
+                        
+
             await Delay(50);
             projectFolder.status = true;
 
@@ -40,7 +74,7 @@ namespace ViewModel
             {
                 await copyCoreFiles();
             }
-            else await Delay(50);                        
+            else await Delay(50);
             coreBase.status = true;
 
             writeMainCpp();
@@ -53,13 +87,45 @@ namespace ViewModel
             }
             await Delay(50);
             boardDefintionPath.status = true;
-            
+
             await Delay(50);
             compilerBase.status = true;
 
             await Delay(50);
             makeExePath.status = true;
+
+            startVSCode(projectFolder.text);
+
+            await Task.Delay(2000);
+            System.Windows.Application.Current.Shutdown();
+
         }
+
+        public void startVSCode(string folder)
+        {
+
+
+            //var vsCode = new Process();
+            //vsCode.StartInfo.FileName = "code";
+            //vsCode.StartInfo.Arguments = folder + " " + "src/main.cpp";
+            //vsCode.StartInfo.WorkingDirectory = folder;
+            //vsCode.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            //vsCode.Start();
+            //return;
+
+
+
+            var vsCode = new Process();
+            vsCode.StartInfo.FileName = "cmd";
+            vsCode.StartInfo.Arguments = $"/c code {folder} src/main.cpp";
+            vsCode.StartInfo.WorkingDirectory = folder;
+            vsCode.StartInfo.UseShellExecute = false;
+            vsCode.StartInfo.CreateNoWindow = true;
+            //vsCode.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            vsCode.Start();
+            return;
+        }
+
 
         public DisplayText projectFolder { get; }
         public DisplayText makefilePath { get; }
@@ -75,7 +141,7 @@ namespace ViewModel
 
         public bool copyBoardTxt => data.copyBoardTxt && !data.fromArduino;
         public bool copyCore => data.copyCore && !data.fromArduino;
-        
+
         public double perc
         {
             get => _perc;
@@ -89,7 +155,7 @@ namespace ViewModel
             set => SetProperty(ref _showProg, value);
         }
         bool _showProg = false;
-        
+
         private void copyBoardFile()
         {
             string SourcePath = data.boardTxtPath;
@@ -101,19 +167,19 @@ namespace ViewModel
             showProg = true;
             string SourcePath = data.coreBase;
             string DestinationPath = Path.Combine(data.projectBase, "core");
-                       
+
             foreach (string dirPath in Directory.GetDirectories(SourcePath, "*.*", SearchOption.AllDirectories))
             {
                 Directory.CreateDirectory(dirPath.Replace(SourcePath, DestinationPath));
             }
 
             var files = Directory.GetFiles(SourcePath, "*.*", SearchOption.AllDirectories).ToList();
-            double cnt = (double) files.Count/100;
+            double cnt = (double)files.Count / 100;
 
             for (int i = 0; i < files.Count; i++)
             {
                 File.Copy(files[i], files[i].Replace(SourcePath, DestinationPath), overwrite: true);
-                perc = (i+1) / (double)cnt;
+                perc = (i + 1) / (double)cnt;
                 await Delay(1);
             }
             showProg = false;
@@ -158,9 +224,9 @@ namespace ViewModel
                 }
             }
         }
-                
+
         public SaveWinVM(SetupData data)
-        {            
+        {
             cmdSave = new AsyncCommand(doSave);
             this.data = data;
 
@@ -203,6 +269,6 @@ namespace ViewModel
             makeExePath = new DisplayText() { text = data.makeExePath };
         }
 
-        private SetupData data;             
+        private SetupData data;
     }
 }

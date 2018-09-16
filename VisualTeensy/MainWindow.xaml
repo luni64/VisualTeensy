@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"        
         xmlns:local="clr-namespace:Board2Make"    
-        xmlns:vm ="clr-namespace:ViewModel"        
-        Height="850" Width="1500" Title="{Binding Title}" Closing="Window_Closing">
+        xmlns:vm ="clr-namespace:ViewModel"      
+        WindowStartupLocation="CenterScreen"
+        Height="670" Width="1100" Title="{Binding Title}" Closing="Window_Closing">
     <Window.DataContext>
         <vm:ViewModel/>
     </Window.DataContext>

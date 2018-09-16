@@ -13,7 +13,7 @@
             "void loop()\n" +
             "{\n" +
             "  digitalWriteFast(LED_BUILTIN,!digitalReadFast(LED_BUILTIN));\n" +
-            "  delay(100);\n" +
+            "  delay(500);\n" +
             "}\n";
 
 

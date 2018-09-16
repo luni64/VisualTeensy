@@ -25,7 +25,7 @@ namespace Board2Make.Model
                 Properties.Settings.Default.Reload();
             }
 
-            data.loadSettings();
+           // data.loadSettings();
         }
         public void saveSettings()
         {
@@ -34,7 +34,29 @@ namespace Board2Make.Model
 
         public Model()
         {
-            loadSettings();
+            loadSettings();         
+
+
+            if (data.arduinoBaseError != null) data.arduinoBase = FileHelpers.findArduinoFolder();
+            if (String.IsNullOrWhiteSpace(data.projectName)) data.projectName = "new_project";
+            if (String.IsNullOrWhiteSpace(data.projectBase))
+            {
+                var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                data.projectBase = Path.Combine(user, "source", data.projectName);
+
+                Directory.CreateDirectory(data.projectBase);                
+                
+            }
+
+            if(String.IsNullOrWhiteSpace(data.makeExePath))
+            {
+                var curDir = Directory.GetCurrentDirectory();
+                var makeExePath = Path.Combine(curDir, "make.exe");
+                if(File.Exists(makeExePath))
+                {
+                    data.makeExePath = makeExePath;
+                }
+            }
         }
 
         public void parseBoardsTxt()
@@ -49,7 +71,7 @@ namespace Board2Make.Model
             bool ok = board != null && data.uplTyBaseError == null && data.projectBaseError == null && data.projectNameError == null;
             if (data.fromArduino)
             {
-                ok = ok && data.arduinoBaseError == null ;
+                ok = ok && data.arduinoBaseError == null;
             }
             else
             {
@@ -57,7 +79,7 @@ namespace Board2Make.Model
             }
 
             //if (board != null && data.corePathError == null && data.compilerPathError == null && (data.fromArduino ? data.uplPjrcBaseError == null))
-            if(ok)
+            if (ok)
             {
                 var options = board.getAllOptions();
 
@@ -218,7 +240,7 @@ namespace Board2Make.Model
 
             return mf.ToString();
         }
-        
+
         private string makeEntry(String txt, String key, Dictionary<String, String> options)
         {
             if (options.ContainsKey(key))
