@@ -12,6 +12,13 @@ Precompiled binaries can be downloaded [here](https://github.com/luni64/VisualTe
 
 ## Usage
 ### Quickstart Guide
+
+Here a short video showing the setup of VisualTeensy and the generation of a new project using default settings. 
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=leQS2GS_BmE
+" target="_blank"><img src="http://img.youtube.com/vi/leQS2GS_BmE/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="480" height="360" border="10" /></a>
+
 - Download VisualTeensy.exe and make.exe from the release section [https://github.com/luni64/VisualTeensy/releases] and store it in some convenient folder. You don't need to install anything, just double click on VisualTeensy to start it. 
 
 - If VisualTeensy finds an Arduino installation, it will use it for generating the project without further configuration. The project folder defaults to "%HOMEPATH%\source\new_project and the path to make.exe will default to the VisualTeensy directory. Of course, all default settings can be changed later to fit your needs.
