@@ -25,7 +25,7 @@ namespace Board2Make.Model
                 Properties.Settings.Default.Reload();
             }
 
-           // data.loadSettings();
+            // data.loadSettings();
         }
         public void saveSettings()
         {
@@ -34,25 +34,33 @@ namespace Board2Make.Model
 
         public Model()
         {
-            loadSettings();         
+            loadSettings();
 
 
-            if (data.arduinoBaseError != null) data.arduinoBase = FileHelpers.findArduinoFolder();
-            if (String.IsNullOrWhiteSpace(data.projectName)) data.projectName = "new_project";
+            if (data.arduinoBaseError != null)
+            {
+                data.arduinoBase = FileHelpers.findArduinoFolder();
+            }
+
+            if (String.IsNullOrWhiteSpace(data.projectName))
+            {
+                data.projectName = "new_project";
+            }
+
             if (String.IsNullOrWhiteSpace(data.projectBase))
             {
                 var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 data.projectBase = Path.Combine(user, "source", data.projectName);
 
-                Directory.CreateDirectory(data.projectBase);                
-                
+                Directory.CreateDirectory(data.projectBase);
+
             }
 
-            if(String.IsNullOrWhiteSpace(data.makeExePath))
+            if (String.IsNullOrWhiteSpace(data.makeExePath))
             {
                 var curDir = Directory.GetCurrentDirectory();
                 var makeExePath = Path.Combine(curDir, "make.exe");
-                if(File.Exists(makeExePath))
+                if (File.Exists(makeExePath))
                 {
                     data.makeExePath = makeExePath;
                 }
@@ -66,7 +74,7 @@ namespace Board2Make.Model
         }
         public void generateFiles(Board board)
         {
-            data.makefile = data.tasks_json = data.propsFile = null;
+            data.makefile = data.tasks_json = data.props_json = null;
 
             bool ok = board != null && data.uplTyBaseError == null && data.projectBaseError == null && data.projectNameError == null;
             if (data.fromArduino)
@@ -86,12 +94,42 @@ namespace Board2Make.Model
                 Console.WriteLine("generate files");
 
                 data.makefile = generateMakefile(board.name, board.optionSets, options, data);
-                data.propsFile = generatePropertiesFile(options, data);
+                data.props_json = generatePropertiesFile(options, data);
+                data.vsSetup_json = generateVisualTeensySetup(board);
             }
             if (data.makeExePathError == null)
             {
                 data.tasks_json = generateTasksFile(data.makeExePath);
             }
+
+        }
+
+
+        private string generateVisualTeensySetup(Board board)
+        {
+            bool quickSetup = data.fromArduino;
+            data.fromArduino = false;
+
+            var content = new
+            {
+                quickSetup,
+                data.arduinoBase,
+                data.boardTxtPath,
+                data.compilerBase,
+                data.makeExePath,
+                data.projectName,
+
+                board = new
+                {
+                    type = board?.name,
+                    options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption.name)
+                },
+            };
+
+            data.fromArduino = quickSetup;
+
+            var json = new JavaScriptSerializer();
+            return FileHelpers.FormatOutput(json.Serialize(content));
         }
 
         private string generateTasksFile(string makePath)

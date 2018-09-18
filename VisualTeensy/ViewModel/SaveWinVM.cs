@@ -7,6 +7,7 @@ namespace ViewModel
     using System;
     using System.Diagnostics;
     using System.Linq;
+    using System.Web.Script.Serialization;
     using static System.Threading.Tasks.Task;
 
     public class DisplayText : BaseViewModel
@@ -27,7 +28,6 @@ namespace ViewModel
 
     public class SaveWinVM : BaseViewModel
     {
-
         public string error
         {
             get => _error;
@@ -35,35 +35,43 @@ namespace ViewModel
         }
         string _error;
 
-
         public AsyncCommand cmdSave { get; private set; }
         async Task doSave()
         {
             projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
                 coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
 
+           
+
             try
             {
                 string vsCodeFolder = Path.Combine(data.projectBase, ".vscode");
                 string srcFolder = Path.Combine(data.projectBase, "src");
-                string binCoreFolder = Path.Combine(data.projectBase, "bin","core");
-                string binUserFolder = Path.Combine(data.projectBase, "bin","src");
+                string binCoreFolder = Path.Combine(data.projectBase, "bin", "core");
+                string binUserFolder = Path.Combine(data.projectBase, "bin", "src");
 
                 Directory.CreateDirectory(vsCodeFolder);
                 Directory.CreateDirectory(srcFolder);
-                if (Directory.Exists(binCoreFolder)) Directory.Delete(binCoreFolder, true);
-                if (Directory.Exists(binUserFolder)) Directory.Delete(binUserFolder, true);
+                if (Directory.Exists(binCoreFolder))
+                {
+                    Directory.Delete(binCoreFolder, true);
+                }
+
+                if (Directory.Exists(binUserFolder))
+                {
+                    Directory.Delete(binUserFolder, true);
+                }
             }
-            catch(UnauthorizedAccessException)
+            catch (UnauthorizedAccessException)
             {
                 error = "Access violation! Please make sure that you have enough space and sufficient access rights.";
-            }           
+            }
             catch (Exception e)
             {
                 error = $"Error while setting up the project folder ({data.projectBase}). {e.GetBaseException().Message}";
                 return;
             }
-                        
+
 
             await Delay(50);
             projectFolder.status = true;
@@ -74,7 +82,11 @@ namespace ViewModel
             {
                 await copyCoreFiles();
             }
-            else await Delay(50);
+            else
+            {
+                await Delay(50);
+            }
+
             coreBase.status = true;
 
             writeMainCpp();
@@ -131,6 +143,7 @@ namespace ViewModel
         public DisplayText makefilePath { get; }
         public DisplayText buildTaskPath { get; }
         public DisplayText intellisensePath { get; }
+        public DisplayText setupFilePath { get; }
         public DisplayText coreBase { get; }
         public DisplayText coreTarget { get; }
         public DisplayText mainCppPath { get; }
@@ -186,30 +199,47 @@ namespace ViewModel
         }
         private async Task writeProjectFiles()
         {
-            string DestinationPath = Path.Combine(makefilePath.text);
-            using (TextWriter writer = new StreamWriter(DestinationPath))
-            {
-                await writer.WriteAsync(data.makefile);
-            }
-            await Delay(50);
-            makefilePath.status = true;
+            //string DestinationPath = Path.Combine(makefilePath.text);
+            //using (TextWriter writer = new StreamWriter(DestinationPath))
+            //{
+            //    await writer.WriteAsync(data.makefile);
+            //}
+            //await Delay(50);
+            //makefilePath.status = true;
 
-            DestinationPath = Path.Combine(buildTaskPath.text);
-            using (TextWriter writer = new StreamWriter(DestinationPath))
-            {
-                await writer.WriteAsync(data.tasks_json);
-            }
-            await Delay(50);
-            buildTaskPath.status = true;
+            //DestinationPath = Path.Combine(buildTaskPath.text);
+            //using (TextWriter writer = new StreamWriter(DestinationPath))
+            //{
+            //    await writer.WriteAsync(data.tasks_json);
+            //}
+            //await Delay(50);
+            //buildTaskPath.status = true;
 
-            DestinationPath = Path.Combine(intellisensePath.text);
-            using (TextWriter writer = new StreamWriter(DestinationPath))
-            {
-                await writer.WriteAsync(data.propsFile);
-            }
-            await Delay(50);
-            intellisensePath.status = true;
+            //DestinationPath = Path.Combine(intellisensePath.text);
+            //using (TextWriter writer = new StreamWriter(DestinationPath))
+            //{
+            //    await writer.WriteAsync(data.propsFile);
+            //}
+            //await Delay(50);
+            //intellisensePath.status = true;
+            await writeFile(makefilePath, data.makefile);
+            await writeFile(buildTaskPath, data.tasks_json);
+            await writeFile(intellisensePath, data.props_json);
+            await writeFile(setupFilePath, data.vsSetup_json);
+
         }
+
+        async Task writeFile(DisplayText filename, string file)
+        {
+            using (TextWriter writer = new StreamWriter(filename.text))
+            {
+                await writer.WriteAsync(file);
+            }
+            await Delay(50);
+            filename.status = true;
+        }
+
+
 
         void writeMainCpp()
         {
@@ -250,9 +280,13 @@ namespace ViewModel
                 action = File.Exists(Path.Combine(projectFolder.text, ".vscode", "tasks.json")) ? "overwrite" : "generate",
                 status = false
             };
-
+            
             intellisensePath = new DisplayText() { text = Path.Combine(projectFolder.text, ".vscode", "c_cpp_properties.json") };
             intellisensePath.action = File.Exists(intellisensePath.text) ? "overwrite" : "generate";
+
+            setupFilePath = new DisplayText() { text = Path.Combine(projectFolder.text, ".vscode", "visual_teensy.json") };
+            setupFilePath.action = File.Exists(setupFilePath.text) ? "overwrite" : "generate";
+
 
             coreBase = new DisplayText() { text = data.coreBase };
             coreBase.action = data.copyCore ? "copy from" : "link to";
