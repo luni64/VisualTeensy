@@ -11,13 +11,13 @@ using System.Linq;
 namespace ViewModel
 {
     public class ViewModel : BaseViewModel, IDataErrorInfo
-    {        
+    {
         public SetupTabVM setupTabVM { get; }
 
 
         public RelayCommand cmdGenerate { get; private set; }
-        void doGenerate(object o)
-        {
+        void doGenerate(object obj)
+        {   
             Message("Generate");
         }
 
@@ -88,7 +88,7 @@ namespace ViewModel
 
         #region Properties ------------------------------------------------------
         public String makefile => model.data.makefile;
-        public String propFile => model.data.propsFile;
+        public String propFile => model.data.props_json;
         public String taskFile => model.data.tasks_json;
 
         public String makeFileName => Path.Combine(projectPath ?? "", "makefile");
@@ -104,6 +104,28 @@ namespace ViewModel
                 if (value != model.data.projectBase)
                 {
                     model.data.projectBase = value.Trim();
+
+                    var t = model.readProjectConfig();
+
+                    if(t != null)
+                    {
+                        var board = boardVMs.FirstOrDefault(b => b.boardName == t.board.name);
+                        if (board != null)
+                        {
+                            foreach (var option in t.board.options)
+                            {
+                                var o = board.optionSetVMs.FirstOrDefault(os => os.name == option.Key);
+                                if (o != null)
+                                {
+                                    o.selectedOption = o.options.FirstOrDefault(x => x.name == option.Value);
+                                }
+                            }
+                            selectedBoard = board;
+                        }
+                    }
+
+
+
                     OnPropertyChanged();
                     OnPropertyChanged("makeFileName");
                     OnPropertyChanged("propFileName");
@@ -320,7 +342,7 @@ namespace ViewModel
                 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             }
 
-            cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.propsFile));
+            cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
             cmdClose = new RelayCommand(doClose);
 
 

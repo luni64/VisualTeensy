@@ -89,6 +89,7 @@
     <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\ValidatedPath.cs" />
+    <Compile Include="Model\vsData.cs" />
     <Compile Include="Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>

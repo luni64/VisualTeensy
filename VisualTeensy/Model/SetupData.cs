@@ -1,5 +1,6 @@
 ﻿using Board2Make.Properties;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Board2Make.Model
@@ -158,9 +159,11 @@ namespace Board2Make.Model
 
         public string makefile { get; set; }
         public string tasks_json { get; set; }
-        public string propsFile { get; set; }
+        public string props_json { get; set; }
+        public string vsSetup_json { get; set; }
 
-
+        
+        
         public void loadSettings()
         {
             arduinoBase = Settings.Default.arduinoBase;

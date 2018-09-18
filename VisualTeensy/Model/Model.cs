@@ -25,7 +25,7 @@ namespace Board2Make.Model
                 Properties.Settings.Default.Reload();
             }
 
-           // data.loadSettings();
+            // data.loadSettings();
         }
         public void saveSettings()
         {
@@ -34,30 +34,90 @@ namespace Board2Make.Model
 
         public Model()
         {
-            loadSettings();         
+            loadSettings();
 
 
-            if (data.arduinoBaseError != null) data.arduinoBase = FileHelpers.findArduinoFolder();
-            if (String.IsNullOrWhiteSpace(data.projectName)) data.projectName = "new_project";
+            if (data.arduinoBaseError != null)
+            {
+                data.arduinoBase = FileHelpers.findArduinoFolder();
+            }
+
+            if (String.IsNullOrWhiteSpace(data.projectName))
+            {
+                data.projectName = "new_project";
+            }
+
             if (String.IsNullOrWhiteSpace(data.projectBase))
             {
                 var user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 data.projectBase = Path.Combine(user, "source", data.projectName);
 
-                Directory.CreateDirectory(data.projectBase);                
-                
+                Directory.CreateDirectory(data.projectBase);
+
             }
 
-            if(String.IsNullOrWhiteSpace(data.makeExePath))
+            if (String.IsNullOrWhiteSpace(data.makeExePath))
             {
                 var curDir = Directory.GetCurrentDirectory();
                 var makeExePath = Path.Combine(curDir, "make.exe");
-                if(File.Exists(makeExePath))
+                if (File.Exists(makeExePath))
                 {
                     data.makeExePath = makeExePath;
                 }
             }
         }
+
+
+
+        public vtTransferData readProjectConfig()
+        {
+            string jsonString = "";
+
+            var configFile = Path.Combine(data.projectBase, ".vscode", "visual_teensy.json");
+
+            if (File.Exists(configFile))
+            {
+                try
+                {
+                    var reader = new StreamReader(configFile);
+                    jsonString = reader.ReadToEnd();
+
+                }
+                catch (Exception e) { }
+
+            }
+
+
+            var json = new JavaScriptSerializer();
+
+
+
+
+            return  json.Deserialize<vtTransferData>(jsonString);
+
+            //if (t != null)
+            //{
+            //    data.fromArduino = t.quickSetup;
+
+            //    data.arduinoBase = t.arduinoBase;
+            //    data.boardTxtPath = t.boardTxtPath;
+            //    data.compilerBase = t.compilerBase;
+            //    data.makeExePath = t.makeExePath;
+            //    data.projectName = t.projectName;
+
+                
+            //}
+
+
+
+
+
+
+        }
+
+
+
+
 
         public void parseBoardsTxt()
         {
@@ -66,7 +126,7 @@ namespace Board2Make.Model
         }
         public void generateFiles(Board board)
         {
-            data.makefile = data.tasks_json = data.propsFile = null;
+            data.makefile = data.tasks_json = data.props_json = null;
 
             bool ok = board != null && data.uplTyBaseError == null && data.projectBaseError == null && data.projectNameError == null;
             if (data.fromArduino)
@@ -78,22 +138,28 @@ namespace Board2Make.Model
                 ok = ok && data.corePathError == null && data.compilerPathError == null;
             }
 
-            //if (board != null && data.corePathError == null && data.compilerPathError == null && (data.fromArduino ? data.uplPjrcBaseError == null))
             if (ok)
             {
                 var options = board.getAllOptions();
 
                 Console.WriteLine("generate files");
 
-                data.makefile = generateMakefile(board.name, board.optionSets, options, data);
-                data.propsFile = generatePropertiesFile(options, data);
+                data.makefile = generateMakefile(board, options, data);
+                data.props_json = generatePropertiesFile(options, data);
+                data.vsSetup_json = generateVisualTeensySetup(board);
             }
             if (data.makeExePathError == null)
             {
                 data.tasks_json = generateTasksFile(data.makeExePath);
             }
+
         }
 
+        private string generateVisualTeensySetup(Board board)
+        {
+            var json = new JavaScriptSerializer();
+            return FileHelpers.FormatOutput(json.Serialize(new vtTransferData(data, board)));
+        }
         private string generateTasksFile(string makePath)
         {
             var tasks = new tasksJson()
@@ -179,15 +245,17 @@ namespace Board2Make.Model
 
             return FileHelpers.FormatOutput(new JavaScriptSerializer().Serialize(props));
         }
-        private string generateMakefile(string boardName, List<OptionSet> optionSets, Dictionary<string, string> options, SetupData data)
+        private string generateMakefile(Board board,/*string boardName, List<OptionSet> optionSets,*/ Dictionary<string, string> options, SetupData data)
         {
+
+
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");
             mf.Append("# Generated by VisualTeensy (https://github.com/luni64/VisualTeensy)\n");
             mf.Append("#\n");
-            mf.Append($"# {"Board",-18} {boardName}\n");
-            optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption.name}\n"));
+            mf.Append($"# {"Board",-18} {board.name}\n");
+            board.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption.name}\n"));
             mf.Append("#\n");
             if (data.fromArduino || !data.copyBoardTxt)
             {
