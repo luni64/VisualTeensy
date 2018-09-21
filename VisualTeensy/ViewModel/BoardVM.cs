@@ -11,12 +11,12 @@ namespace ViewModel
         public String boardName => board.name;
         public List<OptionSetVM> optionSetVMs { get; }
 
-        public String makefile
-        {
-            get => _makefile;
-            set => SetProperty(ref _makefile, value);
-        }
-        String _makefile;
+        //public String makefile
+        //{
+        //    get => _makefile;
+        //    set => SetProperty(ref _makefile, value);
+        //}
+        //String _makefile;
 
         public BoardVM(Board board)
         {

@@ -15,14 +15,14 @@ namespace Board2Make.Model
 
         public string core { get; private set; }
 
-        public bool ParseError { get; private set; }
+        public bool parseError { get; private set; }
 
         override public string ToString() => name;
 
 
         public Board(IEnumerable<Menu> menus, IEnumerable<Entry> entries)
         {
-            ParseError = false;
+            parseError = false;
             try
             {
                 foreach (var menu in menus)
@@ -31,7 +31,7 @@ namespace Board2Make.Model
                 }
                 parse(entries);
             }
-            catch { ParseError = true; }
+            catch { parseError = true; }
         }
 
         void parse(IEnumerable<Entry> entries)

@@ -9,7 +9,7 @@ namespace Board2Make.Model
     {
         public bool fromArduino { get; set; }
 
-        public string projectName { get; set; }
+        public string projectName => Path.GetFileName(projectBase??"ERROR");
         public string projectNameError => String.IsNullOrWhiteSpace(projectName) ? "Error" : null;
 
         public string arduinoBase { get; set; }
@@ -171,7 +171,7 @@ namespace Board2Make.Model
             uplPjrcBase = Settings.Default.uplPjrcBase;
             uplTyBase = Settings.Default.uplTyBase;
             projectBase = Settings.Default.projectBase;
-            projectName = Settings.Default.projectName;
+         //   projectName = Settings.Default.projectName;
             boardTxtPath = Settings.Default.boardsTxtPath;
             coreBase = Settings.Default.coreBase;
             compilerBase = Settings.Default.compilerBase;
@@ -187,7 +187,7 @@ namespace Board2Make.Model
             Settings.Default.uplPjrcBase = uplPjrcBase;
             Settings.Default.uplTyBase = uplTyBase;
             Settings.Default.projectBase = projectBase;
-            Settings.Default.projectName = projectName;
+           // Settings.Default.projectName = projectName;
             Settings.Default.boardsTxtPath = boardTxtPath;
             Settings.Default.coreBase = coreBase;
             Settings.Default.compilerBase = compilerBase;

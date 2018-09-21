@@ -5,33 +5,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace ViewModel
 {
     public class ViewModel : BaseViewModel, IDataErrorInfo
     {
-        public SetupTabVM setupTabVM { get; }
-
-
-        public RelayCommand cmdGenerate { get; private set; }
-        void doGenerate(object obj)
-        {   
-            Message("Generate");
-        }
-
-        public RelayCommand cmdClose { get; private set; }
-        void doClose(object o)
-        {
-            model.saveSettings();
-        }
-
-
         #region IDataErrorInfo ------------------------------------------------
-
-
-
+               
         public string Error => throw new NotImplementedException();
 
         public string this[string columnName]
@@ -85,71 +66,42 @@ namespace ViewModel
         }
         #endregion
 
+      
+        
+        public RelayCommand cmdGenerate { get; private set; }
+        void doGenerate(object obj)
+        {
+            Message("Generate");
+        }
+
+        public RelayCommand cmdClose { get; private set; }
+        void doClose(object o)
+        {
+            model.saveSettings();
+        }
+                
 
         #region Properties ------------------------------------------------------
         public String makefile => model.data.makefile;
         public String propFile => model.data.props_json;
         public String taskFile => model.data.tasks_json;
-
-        public String makeFileName => Path.Combine(projectPath ?? "", "makefile");
-        public String propFileName => Path.Combine(projectPath ?? "", ".vscode", "c_cpp_properties.json");
-        public String taskFileName => Path.Combine(projectPath ?? "", ".vscode", "tasks.json");
-
-
+        
         public String projectPath
         {
             get => model.data.projectBase;
             set
-            {
+            {               
                 if (value != model.data.projectBase)
                 {
                     model.data.projectBase = value.Trim();
-
-                    var t = model.readProjectConfig();
-
-                    if(t != null)
-                    {
-                        var board = boardVMs.FirstOrDefault(b => b.boardName == t.board.name);
-                        if (board != null)
-                        {
-                            foreach (var option in t.board.options)
-                            {
-                                var o = board.optionSetVMs.FirstOrDefault(os => os.name == option.Key);
-                                if (o != null)
-                                {
-                                    o.selectedOption = o.options.FirstOrDefault(x => x.name == option.Value);
-                                }
-                            }
-                            selectedBoard = board;
-                        }
-                    }
-
-
-
                     OnPropertyChanged();
-                    OnPropertyChanged("makeFileName");
-                    OnPropertyChanged("propFileName");
-                    OnPropertyChanged("taskFileName");
-                    updateFiles();
-                }
-            }
-        }
 
-        public string projectName
-        {
-            get => model.data.projectName;
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value))
-                {
-                    value = "newProject";
-                }
-                if (value != model.data.projectName)
-                {
-                    model.data.projectName = value.Trim().Replace(" ", "_");
+                    selectedBoard = null;  //important, otherwhise update boards will delete it later
 
-                    OnPropertyChanged();
-                    updateFiles();
+                    model.openProjectPath();
+                    updateBoards();
+
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -163,7 +115,15 @@ namespace ViewModel
                 {
                     model.data.arduinoBase = value.Trim();
                     OnPropertyChanged();
+
+                    ///Hack
+                    var board = selectedBoard?.board;
+                    selectedBoard = null;
+                    model.selectedBoard = board;
+                    ///---
                     updateBoards();
+                    updateFiles();
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -266,49 +226,37 @@ namespace ViewModel
         }
         String _outputFilename;
 
-        public String Title
-        {
-            get
-            {
-                var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return $"lunOptics - VisualTeensy v{v.Major}.{v.Minor}";
-            }
-        }
+        
 
 
         public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
 
         public BoardVM selectedBoard
         {
-            get => _selectedBoard;
+            get => boardVMs.FirstOrDefault(b => b.board == model.selectedBoard);
             set
             {
-                if (value != _selectedBoard)
+                if (value?.board != model.selectedBoard)
                 {
-                    _selectedBoard = value;
+                    model.selectedBoard = value?.board;
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
-        BoardVM _selectedBoard;
-
 
         #endregion
 
         public void updateFiles()
         {
-            model.generateFiles(selectedBoard?.board);
+            model.generateFiles();
             OnPropertyChanged("makefile");
             OnPropertyChanged("propFile");
             OnPropertyChanged("taskFile");
         }
-
-
+        
         public void updateBoards()
         {
-            model.parseBoardsTxt();
-
             foreach (var boardVM in boardVMs)  // remove old event handlers
             {
                 foreach (var optionSetVM in boardVM.optionSetVMs)
@@ -316,6 +264,7 @@ namespace ViewModel
                     optionSetVM.PropertyChanged -= (s, e) => updateFiles();
                 }
             }
+
             boardVMs.Clear();
 
             foreach (var board in model.boards)
@@ -326,40 +275,33 @@ namespace ViewModel
                 {
                     optionSetVM.PropertyChanged += (s, e) => updateFiles();
                 }
+
+                if (board == model.selectedBoard) selectedBoard = boardVM;
             }
-            selectedBoard = boardVMs.FirstOrDefault();
         }
-
-
-        public ViewModel()
+        
+        public ViewModel( Model model)
         {
-            setupTabVM = new SetupTabVM(model.data);
+            this.model = model;
 
-            setupTabVM.PropertyChanged += (s, e) => updateFiles();
-
-            if (Debugger.IsAttached)
-            {
-                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
-            }
+          
 
             cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
             cmdClose = new RelayCommand(doClose);
 
-
-            quickSetup = true;
             updateBoards();
+
+            // OnPropertyChanged("");
         }
 
-
-
+        
         public event EventHandler<string> MessageHandler;
         protected void Message(string message)
         {
             MessageHandler?.Invoke(this, message);
         }
 
-
-        public Model model = new Model();
+        public Model model;
     }
 }
 

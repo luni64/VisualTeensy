@@ -1,0 +1,42 @@
+﻿using Board2Make.Model;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace ViewModel
+{
+    class MainVM : BaseViewModel
+    {
+        public SetupTabVM setupTabVM { get; }
+        public ViewModel projecTabVM { get; }
+
+        public String Title
+        {
+            get
+            {
+                var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return $"lunOptics - VisualTeensy v{v.Major}.{v.Minor}";
+            }
+        }
+
+        public MainVM()
+        {
+            if (Debugger.IsAttached)
+            {
+                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            }
+
+            var model = new Model();
+
+            projecTabVM = new ViewModel(model);
+            setupTabVM = new SetupTabVM(model);
+                       
+            setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
+        }
+    }
+}

@@ -35,7 +35,7 @@ namespace Board2Make.Model
             board = new vsBoard()
             {
                 name = _board.name,
-                options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption.name)
+                options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name)
             };
 
             data.fromArduino = oldSetup;

@@ -28,39 +28,15 @@ namespace Board2Make
         {
             InitializeComponent();
 
-            var vm = DataContext as ViewModel.ViewModel;
-            vm.MessageHandler += HandleMessages;
-        }
-
-        private void HandleMessages(object sender, string message)
-        {
-           switch (message)
-            {
-                case "Generate":
-                    OpenOutput();
-                    break;
-            }
-        }
-
-
-        private void OpenOutput()
-        {
            
-            var mvm = DataContext as ViewModel.ViewModel;
-
-            SetupData data = mvm.model.data;
-          
-            var vm = new SaveWinVM(data);
-
-            var dlg = new SaveProjectWin(vm);
-            dlg.ShowDialog();
-
         }
+
+        
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var mvm = DataContext as ViewModel.ViewModel;
-            mvm.cmdClose.Execute(null);
+            var mvm = DataContext as ViewModel.MainVM;
+            mvm.projecTabVM.cmdClose.Execute(null);
         }
     }
 }

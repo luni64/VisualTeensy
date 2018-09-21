@@ -152,9 +152,9 @@ namespace ViewModel
             }
         }
 
-        public SetupTabVM(SetupData data)
+        public SetupTabVM(Model model)
         {
-            this.data = data;
+            this.data = model.data;
 
             cmdDownloadMake = new AsyncCommand(doDownload);
         }

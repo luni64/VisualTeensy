@@ -7,17 +7,16 @@
         WindowStartupLocation="CenterScreen"
         Height="670" Width="1100" Title="{Binding Title}" Closing="Window_Closing">
     <Window.DataContext>
-        <vm:ViewModel/>
+        <vm:MainVM/>
     </Window.DataContext>
-
    
 
-    <TabControl>
+    <TabControl Margin="20">
         <TabItem Header="Project">
-            <local:ProjectTab/>
+            <local:ProjectTab DataContext="{Binding projecTabVM, Mode=OneWay}"/>
         </TabItem>
         <TabItem Header="Setup">
-            <local:SetupTab DataContext="{Binding setupTabVM}"/>
+            <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
         </TabItem>
     </TabControl>
 </Window>

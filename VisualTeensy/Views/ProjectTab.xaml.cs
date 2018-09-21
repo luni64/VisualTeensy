@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Board2Make.Model;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using ViewModel;
 
 namespace Board2Make
 {
@@ -23,6 +13,46 @@ namespace Board2Make
         public ProjectTab()
         {
             InitializeComponent();
+
+           
+        }
+
+
+        private void handleMessages(object sender, string message)
+        {
+            switch (message)
+            {
+                case "Generate":
+                    openOutput();
+                    break;
+            }
+        }
+
+
+        private void openOutput()
+        {
+
+            var mvm = DataContext as ViewModel.ViewModel;
+
+            SetupData data = mvm.model.data;
+
+            var vm = new SaveWinVM(data);
+
+            var dlg = new SaveProjectWin(vm);
+            dlg.ShowDialog();
+
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as ViewModel.ViewModel;
+            vm.MessageHandler += handleMessages; 
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as ViewModel.ViewModel;
+            vm.MessageHandler -= handleMessages; 
         }
     }
 }

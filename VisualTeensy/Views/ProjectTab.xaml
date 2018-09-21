@@ -4,12 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Board2Make"
+             xmlns:vm="clr-namespace:ViewModel"
              mc:Ignorable="d" 
              Background="White"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DataContext="{d:DesignInstance vm:ViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
 
     
-    <Grid Margin="20" >
+    <Grid Margin="10" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
@@ -24,7 +26,9 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Column="0" Grid.Row="0" Width="400">
+                <StackPanel Grid.Column="0" Grid.Row="0" Width="300">
+                   
+
 
                     <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" Margin="0,10,0,5">
                         <RadioButton.ToolTip>
@@ -37,18 +41,26 @@
                         </RadioButton.ToolTip>
                     </RadioButton>
 
+                    <TextBlock Text="Project Folder:" FontWeight="Bold" FontSize="11" Margin="0,20,0,0"/>
+                    <!--<Label   Content="Project Folder" HorizontalAlignment="Left" FontSize="10" Padding="0" Margin="0,5,0,0" />-->
+                    <local:PSelector SelectedPath="{Binding projectPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+
+                    <!--<Button Content="New" Width="50" HorizontalAlignment="Right" Margin="0,3,31,0" />-->
+                    
+
                     <!--Project Information ____________________________-->
                     
-                    <TextBlock Text="Project Information:" FontWeight="Bold" FontSize="11" Margin="0,20,0,5"/>
+                    <!--<TextBlock Text="Project Information:" FontWeight="Bold" FontSize="11" Margin="0,20,0,5"/>
                     <StackPanel Width="auto"  HorizontalAlignment="Stretch" x:Name="ProjectSettings" Style="{DynamicResource ValidatingControl}" >
-                        <!--<TextBlock Text="Project" FontWeight="Bold" />-->
+                        --><!--<TextBlock Text="Project" FontWeight="Bold" />--><!--
 
                         <Label   Content="Project Name (defines names of output files *.hex, *.elf ...)" HorizontalAlignment="Left" FontSize="10" Padding="0" Margin="0,5,0,0" />
                         <TextBox Text="{Binding projectName, ValidatesOnDataErrors=True}" Margin="0,0,33,0"  />
 
                         <Label   Content="Project Path" FontSize="10" Padding="0" Margin="0,5,0,0"  />
                         <local:PSelector SelectedPath="{Binding  projectPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-                    </StackPanel>
+                    </StackPanel>-->
 
                     <!--Expert Setup ____________________________________ -->
 
@@ -68,23 +80,23 @@
 
                     <!--Quick Setup ____________________________________ -->
                     
-                    <StackPanel Width="auto" Margin="0,20,0,0" HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton}" x:Name="Quick_Settings">
-                        <TextBlock Text="Arduino:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
-                        <Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" />
-                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+                    <StackPanel Width="auto" Margin="0,15,0,0" HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton}" x:Name="Quick_Settings">
+                        <TextBlock Text="Arduino Folder:" FontWeight="Bold" FontSize="11" Margin="0,0,0,0"/>
+                        <!--<Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" />-->
+                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
                     </StackPanel>
 
-                    <TextBlock Text="Board Properties:" FontWeight="Bold" FontSize="11" Margin="0,20,0,5"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,20,33,10" Width="auto" HorizontalAlignment="Stretch"  >
+                    <TextBlock Text="Board Properties:" FontWeight="Bold" FontSize="11" Margin="0,15,0,5"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10"  HorizontalAlignment="Left"  >
                         <Label Content="Board:" Width="100" Padding="0" />
-                        <ComboBox ItemsSource="{Binding boardVMs, ValidatesOnDataErrors=True}" DisplayMemberPath="boardName" Width="210" SelectedItem="{Binding selectedBoard}" />
+                        <ComboBox ItemsSource="{Binding boardVMs, ValidatesOnDataErrors=True}" DisplayMemberPath="boardName" Width="200" SelectedItem="{Binding selectedBoard}" />
                     </StackPanel>
                     <ItemsControl ItemsSource="{Binding selectedBoard.optionSetVMs, ValidatesOnDataErrors=True}" Margin="0,0,0,15">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10" >
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10"  >
                                     <Label Content="{Binding name}" Width="100" Padding="0" />
-                                    <ComboBox ItemsSource="{Binding options}" DisplayMemberPath="name"  Width="210" SelectedItem="{Binding selectedOption}"/>
+                                    <ComboBox ItemsSource="{Binding options}" DisplayMemberPath="name" Width="200" SelectedItem="{Binding selectedOption}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -115,7 +127,7 @@
                 </Grid.ColumnDefinitions>
 
 
-                <TextBlock Text="{Binding makeFileName}"   />
+               
                 <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2" >
                     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">
                         <TextBox Background="Transparent" FontFamily="Courier New" FontSize="13" BorderThickness="0" 

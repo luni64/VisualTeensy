@@ -88,7 +88,7 @@ namespace Board2Make.Model
         }
 
 
-        public static string FormatOutput(string jsonString)
+        public static string formatOutput(string jsonString)
         {
             var stringBuilder = new StringBuilder();
 

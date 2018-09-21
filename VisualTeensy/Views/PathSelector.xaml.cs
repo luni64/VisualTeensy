@@ -1,8 +1,7 @@
-﻿using System.IO;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
 
 namespace Board2Make
 {
@@ -18,40 +17,23 @@ namespace Board2Make
 
         private void OpenInput(object sender, RoutedEventArgs e)
         {
-            if (isFolderDialog)
+            using (var dialog = new CommonOpenFileDialog())
             {
-                var dlg = new System.Windows.Forms.FolderBrowserDialog();
-
-                dlg.SelectedPath = SelectedPath;
-
-                //fileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                dialog.IsFolderPicker = isFolderDialog;
+                dialog.AllowNonFileSystemItems = false;
+                dialog.AddToMostRecentlyUsedList = true;
+                try
                 {
-                    SelectedPath = dlg.SelectedPath;
+                    dialog.InitialDirectory = Path.GetDirectoryName(SelectedPath);
+                    dialog.DefaultFileName = Path.GetFileName(SelectedPath);
+                }
+                catch { }
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    SelectedPath = dialog.FileName;
                 }
             }
-            else
-            {
-                var dlg = new System.Windows.Forms.OpenFileDialog();
-                //fileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-
-                if (Directory.Exists(SelectedPath))
-                {
-
-                    dlg.InitialDirectory = Path.GetDirectoryName(SelectedPath);
-
-                    dlg.FileName = Path.GetFileName(SelectedPath);
-
-                }
-
-
-
-                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    SelectedPath = dlg.FileName;
-                }
-            }
-
         }
 
         #region Dependency Properties
@@ -63,7 +45,6 @@ namespace Board2Make
             set => SetValue(SelectedPathProperty, value);
         }
 
-
         public static readonly DependencyProperty isFolderDialogProperty = DependencyProperty.Register("isFolderDialog", typeof(bool), typeof(PSelector), new FrameworkPropertyMetadata());
         public bool isFolderDialog
         {
@@ -72,8 +53,6 @@ namespace Board2Make
         }
 
         #endregion
-
-
     }
 }
 
