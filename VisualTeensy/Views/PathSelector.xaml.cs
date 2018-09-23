@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Board2Make
+namespace VisualTeensy
 {
     /// <summary>
     /// Interaction logic for PathSelector.xaml
@@ -11,7 +11,7 @@ namespace Board2Make
     public partial class PSelector : UserControl
     {
         public PSelector()
-        {
+        { 
             InitializeComponent();
         }
 

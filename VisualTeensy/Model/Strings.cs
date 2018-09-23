@@ -1,4 +1,4 @@
-﻿namespace Board2Make.Model
+﻿namespace VisualTeensy.Model
 {
     static class Strings
     {

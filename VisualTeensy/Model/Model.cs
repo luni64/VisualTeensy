@@ -1,32 +1,32 @@
-﻿using Board2Make.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
+using VisualTeensy.Properties;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     public class Model
     {
-        public SetupData data { get; } 
+        public SetupData data { get; }
 
-        public List<Board> boards { get; private set; } 
+        public List<Board> boards { get; private set; }
         public Board selectedBoard { get; set; }
-        
+
         void loadSettings()
         {
-            if (Settings.Default.updateNeeded) 
+            if (Settings.Default.updateNeeded)
             {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.updateNeeded = false;
-                Properties.Settings.Default.Save();
-                Properties.Settings.Default.Reload();
+                Settings.Default.Upgrade();
+                Settings.Default.updateNeeded = false;
+                Settings.Default.Save();
+                Settings.Default.Reload();
             }
 
             data.loadSettings();
-            data.fromArduino = true;
+            data.fromArduino = false;
 
             if (String.IsNullOrWhiteSpace(data.arduinoBase))
             {
@@ -42,9 +42,7 @@ namespace Board2Make.Model
                 while (Directory.Exists(data.projectBase))
                 {
                     data.projectBase = $"{basePath}({i++})";
-                }
-
-                //Directory.CreateDirectory(data.projectBase);
+                }                
             }
             if (String.IsNullOrWhiteSpace(data.makeExePath))
             {
@@ -55,19 +53,31 @@ namespace Board2Make.Model
                     data.makeExePath = makeExePath;
                 }
             }
+            if (String.IsNullOrWhiteSpace(data.uplTyBase))
+            {
+                data.uplTyBase = FileHelpers.findTyToolsFolder();
+            }
+            if (data.arduinoBaseError == null)
+            {
+                if (String.IsNullOrWhiteSpace(data.uplPjrcBase)) data.uplPjrcBase = FileHelpers.getToolsFromArduino(data.arduinoBase);
+                if (String.IsNullOrWhiteSpace(data.boardTxtPath)) data.boardTxtPath = FileHelpers.getBoardFromArduino(data.arduinoBase);
+                if (String.IsNullOrWhiteSpace(data.coreBase)) data.coreBase = FileHelpers.getCoreFromArduino(data.arduinoBase);
+                if (String.IsNullOrWhiteSpace(data.compilerBase)) data.compilerBase = Path.Combine(FileHelpers.getToolsFromArduino(data.arduinoBase), "arm");
+            }
+
+            data.fromArduino = true;
+
         }
         public void saveSettings()
         {
             data.saveSettings();
         }
-                
-        public void openProjectPath()
+
+        public bool openProjectPath()
         {
             vtTransferData transferData;
 
             var configFile = Path.Combine(data.projectBase, ".vscode", "visual_teensy.json");
-
-
             try
             {
                 var reader = new StreamReader(configFile);
@@ -77,10 +87,13 @@ namespace Board2Make.Model
 
                 if (transferData != null)
                 {
+                    data.fromArduino = transferData.quickSetup;
                     data.arduinoBase = transferData.arduinoBase;
                     data.compilerBase = transferData.compilerBase;
                     data.makeExePath = transferData.makeExePath;
-                    //  data.projectName = Path.GetFileName(data.projectBase);
+
+                    data.boardTxtPath = transferData.boardTxtPath.StartsWith("\\") ? Path.Combine(data.projectBase, transferData.boardTxtPath.Substring(1)) : transferData.boardTxtPath;
+                    data.coreBase = transferData.coreBase.StartsWith("\\") ? Path.Combine(data.projectBase, transferData.coreBase.Substring(1)) : transferData.coreBase;
 
                     parseBoardsTxt();
 
@@ -99,19 +112,23 @@ namespace Board2Make.Model
                 }
 
                 generateFiles();
+                return true;
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                return false;
+            }
 
 
 
 
 
-        }               
+        }
         public void generateFiles()
         {
             data.makefile = data.tasks_json = data.props_json = null;
 
-            bool ok = selectedBoard != null && data.uplTyBaseError == null && data.projectBaseError == null && data.projectNameError == null;
+            bool ok = selectedBoard != null && data.uplTyBaseError == null && data.projectBaseError == null;
             if (data.fromArduino)
             {
                 ok = ok && data.arduinoBaseError == null;
@@ -131,32 +148,38 @@ namespace Board2Make.Model
                 data.props_json = generatePropertiesFile(options);
                 data.vsSetup_json = generateVisualTeensySetup();
             }
-            if (data.makeExePathError == null)
-            {
-                data.tasks_json = generateTasksFile(data.makeExePath);
-            }
+            data.tasks_json = generateTasksFile();
         }
-        
+
         public Model()
         {
             boards = new List<Board>();
             data = new SetupData();
             loadSettings();
-            openProjectPath();
+            if (!openProjectPath())
+            {
+                parseBoardsTxt();
+                selectedBoard = boards?.FirstOrDefault();
+                generateFiles();
+            }
         }
 
-        private void parseBoardsTxt()
+        public void parseBoardsTxt()
         {
             Console.WriteLine("parseBoardsTxt");
-            boards = FileContent.parse(data.boardTxtPath).ToList();
+            boards = FileContent.parse(data.boardTxtPath).Where(b => b.core == "teensy3").ToList();
         }
         private string generateVisualTeensySetup()
         {
             var json = new JavaScriptSerializer();
             return FileHelpers.formatOutput(json.Serialize(new vtTransferData(data, selectedBoard)));
         }
-        private string generateTasksFile(string makePath)
+        private string generateTasksFile()
         {
+            if (data.makeExePathError != null) return null;
+
+            string makePath = data.makeExePath;
+
             var tasks = new tasksJson()
             {
                 presentation = new Presentation(),
@@ -229,14 +252,21 @@ namespace Board2Make.Model
                 }
             };
 
-            foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                props.configurations[0].defines.Add(define.Trim());
-            }
 
-            props.configurations[0].defines.Add("F_CPU=" + options["build.fcpu"]);
-            props.configurations[0].defines.Add(options["build.usbtype"]);
-            props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
+
+            if (options.ContainsKey("build.flag.defs"))
+            {
+                foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    props.configurations[0].defines.Add(define.Trim());
+                }
+            }
+            addConfigOption(options, props, "F_CPU=", "build.fcpu");
+            addConfigOption(options, props, "", "build.usbtype");
+            addConfigOption(options, props, "LAYOUT_", "build.keylayout");
+            //props.configurations[0].defines.Add("F_CPU=" + options["build.fcpu"]);
+            //props.configurations[0].defines.Add(options["build.usbtype"]);
+            //props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
 
             return FileHelpers.formatOutput(new JavaScriptSerializer().Serialize(props));
         }
@@ -250,23 +280,13 @@ namespace Board2Make.Model
             mf.Append($"# {"Board",-18} {selectedBoard.name}\n");
             selectedBoard.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n"));
             mf.Append("#\n");
-            if (data.fromArduino || !data.copyBoardTxt)
-            {
-                mf.Append($"# {"Boards.txt",-18}  {data.boardTxtPath} \n");
-            }
-            else
-            {
-                mf.Append($"# {"Boards.txt",-18} " + $"{Path.Combine(data.projectBase, Path.GetFileName(data.boardTxtPath)) }\n");
-            }
-
-            mf.Append("#\n");
             mf.Append($"# {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}\n");
             mf.Append("#******************************************************************************\n\n");
 
-            mf.Append($"TARGET_NAME := {data.projectName}\n\n");
+            mf.Append($"TARGET_NAME := {data.projectName.Replace(" ", "_")}\n\n");
 
             mf.Append(makeEntry("BOARD_ID    := ", "build.board", options) + "\n");
-            mf.Append($"CORE_BASE   := {(data.copyCore ? "core" : data.coreBaseShort)}\n");
+            mf.Append($"CORE_BASE   := {((data.copyCore || (Path.GetDirectoryName(data.coreBase) == data.projectBase)) ? "core" : data.coreBaseShort)}\n");
             mf.Append($"GCC_BASE    := {data.compilerBaseShort}\n");
             mf.Append($"UPL_PJRC_B  := {data.uplPjrcBaseShort}\n");
             mf.Append($"UPL_TYCMD_B := {data.uplTyBaseShort}\n\n");
@@ -311,6 +331,16 @@ namespace Board2Make.Model
             else
             {
                 return "";
+            }
+        }
+
+        void addConfigOption(Dictionary<string, string> options, PropertiesJson props, string prefix, string key)
+        {
+            var option = options.FirstOrDefault(o => o.Key == key).Value;
+
+            if (option != null)
+            {
+                props.configurations[0].defines.Add(prefix + option);
             }
         }
     }

@@ -1,9 +1,10 @@
-﻿using Board2Make.Model;
+﻿using VisualTeensy;
+using VisualTeensy.Model;
 using System.Windows;
 using System.Windows.Controls;
 using ViewModel;
 
-namespace Board2Make
+namespace VisualTeensy
 {
     /// <summary>
     /// Interaction logic for ProjectTab.xaml
@@ -14,7 +15,7 @@ namespace Board2Make
         {
             InitializeComponent();
 
-           
+
         }
 
 
@@ -32,7 +33,7 @@ namespace Board2Make
         private void openOutput()
         {
 
-            var mvm = DataContext as ViewModel.ViewModel;
+            var mvm = DataContext as ViewModel.ProjectTabVM;
 
             SetupData data = mvm.model.data;
 
@@ -45,14 +46,14 @@ namespace Board2Make
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            var vm = DataContext as ViewModel.ViewModel;
-            vm.MessageHandler += handleMessages; 
+            var vm = DataContext as ViewModel.ProjectTabVM;
+            if (vm != null) vm.MessageHandler += handleMessages;
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            var vm = DataContext as ViewModel.ViewModel;
-            vm.MessageHandler -= handleMessages; 
+            var vm = DataContext as ViewModel.ProjectTabVM;
+            if (vm != null) vm.MessageHandler -= handleMessages;
         }
     }
 }

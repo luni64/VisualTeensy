@@ -1,0 +1,20 @@
+﻿<Window x:Class="VisualTeensy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisualTeensy"
+        xmlns:vm="clr-namespace:ViewModel"
+         WindowStartupLocation="CenterScreen" Title="{Binding Title, Mode=OneWay}"
+        mc:Ignorable="d"
+        Height="auto" Width="1000" Closing="Window_Closing">
+
+    <TabControl Margin="20">
+        <TabItem Header="Project">
+            <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
+        </TabItem>
+        <TabItem Header="Setup">           
+            <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
+        </TabItem>
+    </TabControl>
+</Window>

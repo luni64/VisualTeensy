@@ -4,90 +4,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Linq;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     static class FileHelpers
     {
-        public static string getBoardFromArduino(string arduinoPath)
-        {
-            if (arduinoPath == null)
-            {
-                return null;
-            }
-
-            string boardPath = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "boards.txt");
-            return File.Exists(boardPath) ? boardPath : null;
-        }
-        public static string getToolsFromArduino(string arduinoPath)
-        {
-            if (String.IsNullOrWhiteSpace(arduinoPath))
-            {
-                return null;
-            }
-
-            string path = Path.Combine(arduinoPath, "hardware", "tools");
-            return Directory.Exists(path) ? path : null;
-        }
-        public static string getCoreFromArduino(string arduinoPath)
-        {
-            if (arduinoPath == null)
-            {
-                return null;
-            }
-
-            string path = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "cores", "teensy3");
-            return Directory.Exists(path) ? path : null;
-        }
-
-        public static bool isArduinoFolder(string folder)
-        {
-            if (folder == null || !Directory.Exists(folder)) return false;
-
-            var arduinoExe = Path.Combine(folder, "arduino.exe");
-            if (!File.Exists(arduinoExe)) return false;
-
-            var boardsTxt = Path.Combine(folder, "hardware" , "teensy", "avr", "boards.txt");
-            if (!File.Exists(boardsTxt)) return false;
-
-            return true;
-        }
-
-        public static string findArduinoFolder()
-        {
-            string programFiles = @"C:\Program Files";
-
-            if (Directory.Exists(programFiles))
-            {
-                foreach (string dir in Directory.GetDirectories(programFiles).Where(d => d.Contains("Arduino")))
-                {
-                    if (isArduinoFolder(dir)) return dir;
-                }
-            }
-
-            programFiles = @"C:\Program Files (x86)";
-            if (Directory.Exists(programFiles))
-            {
-                foreach (string dir in Directory.GetDirectories(programFiles).Where(d => d.Contains("Arduino")))
-                {
-                    if (isArduinoFolder(dir)) return dir;
-                }
-            }
-
-            foreach (string dir in Directory.GetDirectories(@"C:\").Where(d => d.Contains("Arduino")))
-            {
-                if (isArduinoFolder(dir)) return dir;
-                foreach (string subDir in Directory.GetDirectories(dir).Where(d => d.Contains("Arduino")))
-                {
-                    if (isArduinoFolder(subDir)) return subDir;
-                }
-            }
-
-            return null;
-
-
-        }
-
-
         public static string formatOutput(string jsonString)
         {
             var stringBuilder = new StringBuilder();
@@ -159,9 +79,106 @@ namespace Board2Make.Model
             return stringBuilder.ToString();
         }
 
+        public static string getBoardFromArduino(string arduinoPath)
+        {
+            if (arduinoPath == null)
+            {
+                return null;
+            }
+
+            string boardPath = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "boards.txt");
+            return File.Exists(boardPath) ? boardPath : null;
+        }
+        public static string getToolsFromArduino(string arduinoPath)
+        {
+            if (String.IsNullOrWhiteSpace(arduinoPath))
+            {
+                return null;
+            }
+
+            string path = Path.Combine(arduinoPath, "hardware", "tools");
+            return Directory.Exists(path) ? path : null;
+        }
+        public static string getCoreFromArduino(string arduinoPath)
+        {
+            if (arduinoPath == null)
+            {
+                return null;
+            }
+
+            string path = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "cores", "teensy3");
+            return Directory.Exists(path) ? path : null;
+        }
+
+        public static string findArduinoFolder()
+        {
+            string folder;            
+
+            folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
+            if (folder != null) return folder;
+
+            folder = checkFolder(@"C:\Program Files (x86)", f => isArduinoFolder(f));
+            if (folder != null) return folder;
+
+
+            return null;
+        }
+        public static string findTyToolsFolder()
+        {
+            string folder;
+            
+            folder = checkFolder(@"C:\Program Files", f => isTyToolsFolder(f));
+            if (folder != null) return folder;
+
+            folder = checkFolder(@"C:\Program Files (x86)", f => isTyToolsFolder(f));
+            if (folder != null) return folder;
+
+            return null;
+        }
+        
+        private static bool isArduinoFolder(string folder)
+        {
+            if (folder == null || !Directory.Exists(folder)) return false;
+
+            var arduinoExe = Path.Combine(folder, "arduino.exe");
+            if (!File.Exists(arduinoExe)) return false;
+
+            var boardsTxt = Path.Combine(folder, "hardware", "teensy", "avr", "boards.txt");
+            if (!File.Exists(boardsTxt)) return false;
+
+            return true;
+        }
+        private static bool isTyToolsFolder(string folder)
+        {
+            if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "TyTools" || !Directory.Exists(folder)) return false;
+            
+            var tyCommanderC = Path.Combine(folder, "TyCommanderC.exe");
+            return (File.Exists(tyCommanderC));
+        }
+        private static string checkFolder(string baseFolder, Predicate<string> isValid)
+        {
+            if (Directory.Exists(baseFolder))
+            {
+                foreach (string dir in Directory.GetDirectories(baseFolder).Where(d => !d.Contains("Recycle.Bin")))
+                {
+                    if (isValid(dir)) return dir;
+                    {
+                        try
+                        {
+                            foreach (string subDir in Directory.GetDirectories(dir))
+                            {
+                                if (isValid(subDir)) return subDir;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            return null;
+        }
+
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
-
         public static string getShortPath(string longPath)
         {
             const int maxPath = 255;
@@ -171,7 +188,7 @@ namespace Board2Make.Model
             return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
 
         }
-
+        
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
     }

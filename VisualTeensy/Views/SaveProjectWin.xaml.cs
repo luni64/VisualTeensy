@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ViewModel;
 
-namespace Board2Make
+namespace VisualTeensy
 {
     /// <summary>
     /// Interaction logic for SaveProjectWin.xaml

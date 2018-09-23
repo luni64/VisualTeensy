@@ -1,4 +1,4 @@
-﻿using Board2Make.Model;
+﻿using VisualTeensy.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ViewModel;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     public class Menu : BaseViewModel
     {

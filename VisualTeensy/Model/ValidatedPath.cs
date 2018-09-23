@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     public class ValidatedPath
     {

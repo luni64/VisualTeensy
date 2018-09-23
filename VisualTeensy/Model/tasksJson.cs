@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
 
     class Group

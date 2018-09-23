@@ -7,7 +7,7 @@
     <ProjectGuid>{ED408FC4-7F0D-4C4A-8272-D4C45B8ABA51}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Board2Make</RootNamespace>
+    <RootNamespace>VisualTeensy</RootNamespace>
     <AssemblyName>VisualTeensy</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -19,6 +19,21 @@
     <SccProvider>SAK</SccProvider>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,11 +68,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAPICodePack">
-      <HintPath>.\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <HintPath>Embedded\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
+      <HintPath>Embedded\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -96,10 +110,7 @@
     <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\ValidatedPath.cs" />
-    <Compile Include="Model\vsData.cs" />
-    <Compile Include="Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Model\vtTransferData.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
     <Compile Include="ViewModel\SetupTabVM.cs" />
     <Compile Include="Views\SetupTab.xaml.cs">
@@ -108,7 +119,7 @@
     <Compile Include="ViewModel\BoardVM.cs" />
     <Compile Include="ViewModel\OptionSetVM.cs" />
     <Compile Include="ViewModel\SaveWinVM.cs" />
-    <Compile Include="ViewModel\ViewModel.cs" />
+    <Compile Include="ViewModel\ProjectTabVM.cs" />
     <Compile Include="Views\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
     </Compile>
@@ -118,23 +129,14 @@
     <Compile Include="Views\SaveProjectWin.xaml.cs">
       <DependentUpon>SaveProjectWin.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+    <Compile Include="Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Settings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\MiscRessources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -152,6 +154,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SaveProjectWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -198,8 +204,40 @@
     <Resource Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Microsoft.WindowsAPICodePack.dll" />
-    <EmbeddedResource Include="Microsoft.WindowsAPICodePack.Shell.dll" />
+    <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.dll" />
+    <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.Shell.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Microsoft.WindowsAPICodePack">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="Microsoft.WindowsAPICodePack.Shell">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded\makefile" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

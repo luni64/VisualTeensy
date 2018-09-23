@@ -1,4 +1,4 @@
-﻿using Board2Make.Model;
+﻿using VisualTeensy.Model;
 using System.IO;
 using Task = System.Threading.Tasks.Task;
 
@@ -41,7 +41,7 @@ namespace ViewModel
             projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
                 coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
 
-           
+
 
             try
             {
@@ -115,29 +115,15 @@ namespace ViewModel
 
         public void startVSCode(string folder)
         {
-
-
-            //var vsCode = new Process();
-            //vsCode.StartInfo.FileName = "code";
-            //vsCode.StartInfo.Arguments = folder + " " + "src/main.cpp";
-            //vsCode.StartInfo.WorkingDirectory = folder;
-            //vsCode.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            //vsCode.Start();
-            //return;
-
-
-
             var vsCode = new Process();
             vsCode.StartInfo.FileName = "cmd";
-            vsCode.StartInfo.Arguments = $"/c code {folder} src/main.cpp";
+            vsCode.StartInfo.Arguments = $"/c code \"{folder}\" src/main.cpp";
             vsCode.StartInfo.WorkingDirectory = folder;
             vsCode.StartInfo.UseShellExecute = false;
             vsCode.StartInfo.CreateNoWindow = true;
-            //vsCode.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             vsCode.Start();
             return;
         }
-
 
         public DisplayText projectFolder { get; }
         public DisplayText makefilePath { get; }
@@ -280,7 +266,7 @@ namespace ViewModel
                 action = File.Exists(Path.Combine(projectFolder.text, ".vscode", "tasks.json")) ? "overwrite" : "generate",
                 status = false
             };
-            
+
             intellisensePath = new DisplayText() { text = Path.Combine(projectFolder.text, ".vscode", "c_cpp_properties.json") };
             intellisensePath.action = File.Exists(intellisensePath.text) ? "overwrite" : "generate";
 

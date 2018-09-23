@@ -1,8 +1,9 @@
-﻿using Board2Make;
-using System;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Windows;
-
+using ViewModel;
+using VisualTeensy;
 
 namespace WpfApplication1
 {
@@ -20,13 +21,21 @@ namespace WpfApplication1
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
 
-            var win = new MainWindow(); 
-            win.Show();
+            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
+            {
+                string s = reader.ReadToEnd();
+            }
+
+            new MainWindow
+            {
+                DataContext = new MainVM()
+            }
+            .Show();
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            String resourceName = "Board2Make." + new AssemblyName(args.Name).Name + ".dll";
+            String resourceName = "VisualTeensy.EmbeddedDlls." + new AssemblyName(args.Name).Name + ".dll";
 
             var x = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 
@@ -39,5 +48,5 @@ namespace WpfApplication1
 
         }
     }
-} 
+}
 

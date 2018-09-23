@@ -1,18 +1,15 @@
-﻿using Board2Make.Model;
-using Microsoft.Win32;
+﻿using VisualTeensy.Model;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 
 namespace ViewModel
 {
-    public class ViewModel : BaseViewModel, IDataErrorInfo
+    public class ProjectTabVM : BaseViewModel, IDataErrorInfo
     {
         #region IDataErrorInfo ------------------------------------------------
-               
+
         public string Error => throw new NotImplementedException();
 
         public string this[string columnName]
@@ -25,10 +22,6 @@ namespace ViewModel
                 {
                     case "projectPath":
                         error = model.data.projectBaseError;
-                        break;
-
-                    case "projectName":
-                        error = model.data.projectNameError;
                         break;
 
                     case "arduinoBase":
@@ -66,8 +59,6 @@ namespace ViewModel
         }
         #endregion
 
-      
-        
         public RelayCommand cmdGenerate { get; private set; }
         void doGenerate(object obj)
         {
@@ -79,29 +70,23 @@ namespace ViewModel
         {
             model.saveSettings();
         }
-                
 
         #region Properties ------------------------------------------------------
         public String makefile => model.data.makefile;
         public String propFile => model.data.props_json;
         public String taskFile => model.data.tasks_json;
-        
+
         public String projectPath
         {
             get => model.data.projectBase;
             set
-            {               
+            {
                 if (value != model.data.projectBase)
                 {
                     model.data.projectBase = value.Trim();
-                    OnPropertyChanged();
-
-                    selectedBoard = null;  //important, otherwhise update boards will delete it later
-
-                    model.openProjectPath();
-                    updateBoards();
-
-                    OnPropertyChanged("");
+                    selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
+                    updateAll();
+                    OnPropertyChanged(""); // update all
                 }
             }
         }
@@ -114,15 +99,13 @@ namespace ViewModel
                 if (value != model.data.arduinoBase)
                 {
                     model.data.arduinoBase = value.Trim();
-                    OnPropertyChanged();
 
                     ///Hack
                     var board = selectedBoard?.board;
                     selectedBoard = null;
                     model.selectedBoard = board;
-                    ///---
-                    updateBoards();
-                    updateFiles();
+
+                    updateAll();
                     OnPropertyChanged("");
                 }
             }
@@ -136,7 +119,7 @@ namespace ViewModel
                 {
                     model.data.boardTxtPath = value.Trim();
                     OnPropertyChanged();
-                    updateBoards();
+                    updateAll();
                 }
             }
         }
@@ -204,30 +187,11 @@ namespace ViewModel
                 if (model.data.fromArduino != value)
                 {
                     model.data.fromArduino = value;
-                    updateBoards();
+                    updateAll();
                     OnPropertyChanged("");
                 }
             }
         }
-
-
-        public String outputFilename
-        {
-            get => _outputFilename;
-            set
-            {
-                if (_outputFilename != value)
-                {
-                    _outputFilename = value;
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\lunOptics\\Board2Make");
-                    key.SetValue("output", _outputFilename);
-                }
-            }
-        }
-        String _outputFilename;
-
-        
-
 
         public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
 
@@ -254,8 +218,14 @@ namespace ViewModel
             OnPropertyChanged("propFile");
             OnPropertyChanged("taskFile");
         }
-        
-        public void updateBoards()
+
+        void updateAll()
+        {
+            model.parseBoardsTxt();
+            updateBoards();
+        }
+
+        void updateBoards()
         {
             foreach (var boardVM in boardVMs)  // remove old event handlers
             {
@@ -275,32 +245,27 @@ namespace ViewModel
                 {
                     optionSetVM.PropertyChanged += (s, e) => updateFiles();
                 }
-
-                if (board == model.selectedBoard) selectedBoard = boardVM;
             }
+
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
         }
-        
-        public ViewModel( Model model)
+
+        public ProjectTabVM(Model model)
         {
             this.model = model;
-
-          
 
             cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
             cmdClose = new RelayCommand(doClose);
 
             updateBoards();
-
-            // OnPropertyChanged("");
         }
 
-        
+
         public event EventHandler<string> MessageHandler;
         protected void Message(string message)
         {
             MessageHandler?.Invoke(this, message);
         }
-
         public Model model;
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     static class FileContent
     {

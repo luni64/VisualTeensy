@@ -1,4 +1,4 @@
-﻿using Board2Make.Model;
+﻿using VisualTeensy.Model;
 using System;
 using System.ComponentModel;
 using Task = System.Threading.Tasks.Task;

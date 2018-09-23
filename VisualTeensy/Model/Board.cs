@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     public class Board
     {

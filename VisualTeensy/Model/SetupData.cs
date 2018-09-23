@@ -1,17 +1,16 @@
-﻿using Board2Make.Properties;
+﻿using VisualTeensy.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Board2Make.Model
+namespace VisualTeensy.Model
 {
     public class SetupData
     {
         public bool fromArduino { get; set; }
 
-        public string projectName => Path.GetFileName(projectBase??"ERROR");
-        public string projectNameError => String.IsNullOrWhiteSpace(projectName) ? "Error" : null;
-
+        public string projectName => Path.GetFileName(projectBase ?? "ERROR");
+       
         public string arduinoBase { get; set; }
         public string arduinoBaseError
         {
@@ -39,7 +38,18 @@ namespace Board2Make.Model
         }
 
         public string projectBase { get; set; }
-        public string projectBaseError => (!String.IsNullOrWhiteSpace(projectBase) && (Directory.Exists(projectBase)) ? null : "Error");
+        public string projectBaseError
+        {
+            get
+            {
+                try
+                {
+                    Path.GetFullPath(projectBase);
+                    return null;
+                }
+                catch { return "Path to the project folder not valid"; }
+            }
+        }
 
         public string projectBaseDefault { get; set; }
         public string projectBaseDefaultError => (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
@@ -55,7 +65,7 @@ namespace Board2Make.Model
 
         public string compilerBase
         {
-            get => fromArduino ? Path.Combine(FileHelpers.getToolsFromArduino(arduinoBase)??"", "arm") : _compilerPath;
+            get => fromArduino ? Path.Combine(FileHelpers.getToolsFromArduino(arduinoBase) ?? "", "arm") : _compilerPath;
             set => _compilerPath = value;
         }
         string _compilerPath;
@@ -130,7 +140,7 @@ namespace Board2Make.Model
             get
             {
                 string path = fromArduino ? FileHelpers.getToolsFromArduino(arduinoBase) : uplPjrcBase;
-                return (path??"").Contains(" ") ? FileHelpers.getShortPath(path) : path;
+                return (path ?? "").Contains(" ") ? FileHelpers.getShortPath(path) : path;
             }
         }
 
@@ -155,15 +165,15 @@ namespace Board2Make.Model
             }
         }
 
-        public string uplTyBaseShort => (uplTyBase??"").Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
+        public string uplTyBaseShort => (uplTyBase ?? "").Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
 
         public string makefile { get; set; }
         public string tasks_json { get; set; }
         public string props_json { get; set; }
         public string vsSetup_json { get; set; }
 
-        
-        
+
+
         public void loadSettings()
         {
             arduinoBase = Settings.Default.arduinoBase;
@@ -171,7 +181,7 @@ namespace Board2Make.Model
             uplPjrcBase = Settings.Default.uplPjrcBase;
             uplTyBase = Settings.Default.uplTyBase;
             projectBase = Settings.Default.projectBase;
-         //   projectName = Settings.Default.projectName;
+            //   projectName = Settings.Default.projectName;
             boardTxtPath = Settings.Default.boardsTxtPath;
             coreBase = Settings.Default.coreBase;
             compilerBase = Settings.Default.compilerBase;
@@ -187,7 +197,7 @@ namespace Board2Make.Model
             Settings.Default.uplPjrcBase = uplPjrcBase;
             Settings.Default.uplTyBase = uplTyBase;
             Settings.Default.projectBase = projectBase;
-           // Settings.Default.projectName = projectName;
+            // Settings.Default.projectName = projectName;
             Settings.Default.boardsTxtPath = boardTxtPath;
             Settings.Default.coreBase = coreBase;
             Settings.Default.compilerBase = compilerBase;

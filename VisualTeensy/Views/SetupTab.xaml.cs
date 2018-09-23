@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Board2Make
+namespace VisualTeensy
 {
     /// <summary>
     /// Interaction logic for SetupTab.xaml

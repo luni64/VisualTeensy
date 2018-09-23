@@ -1,4 +1,4 @@
-﻿using Board2Make.Model;
+﻿using VisualTeensy.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,7 @@ namespace ViewModel
     class MainVM : BaseViewModel
     {
         public SetupTabVM setupTabVM { get; }
-        public ViewModel projecTabVM { get; }
+        public ProjectTabVM projecTabVM { get; }
 
         public String Title
         {
@@ -33,7 +33,7 @@ namespace ViewModel
 
             var model = new Model();
 
-            projecTabVM = new ViewModel(model);
+            projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
                        
             setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
