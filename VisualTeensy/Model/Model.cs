@@ -42,7 +42,7 @@ namespace VisualTeensy.Model
                 while (Directory.Exists(data.projectBase))
                 {
                     data.projectBase = $"{basePath}({i++})";
-                }                
+                }
             }
             if (String.IsNullOrWhiteSpace(data.makeExePath))
             {
@@ -190,14 +190,14 @@ namespace VisualTeensy.Model
                         label = "Build",
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
-                        args = new List<string>{"all"},
+                        args = new List<string>{"all","-j","-Otarget"},
                     },
                     new Task()
                     {
                         label = "Rebuild User Code",
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
-                        args = new List<string>{"rebuild"},
+                        args = new List<string>{"rebuild" ,"-j","-Otarget"},
                     },
                     new Task()
                     {
@@ -211,7 +211,7 @@ namespace VisualTeensy.Model
                         label = "Upload (Teensy Uploader)",
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
-                        args = new List<string>{"upload"},
+                        args = new List<string>{"upload" ,"-j","-Otarget"},
                     }
                     ,
                     new Task()
@@ -219,7 +219,7 @@ namespace VisualTeensy.Model
                         label = "Upload (TyCommander)",
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
-                        args = new List<string>{"uploadTy"},
+                        args = new List<string>{"uploadTy" ,"-j","-Otarget"},
                     }
                 }
             };
