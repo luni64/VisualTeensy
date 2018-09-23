@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using ViewModel;
@@ -21,10 +22,10 @@ namespace WpfApplication1
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
 
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
-            {
-                string s = reader.ReadToEnd();
-            }
+            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
+            //{
+            //    string s = reader.ReadToEnd();
+            //}
 
             new MainWindow
             {
@@ -35,9 +36,13 @@ namespace WpfApplication1
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            String resourceName = "VisualTeensy.EmbeddedDlls." + new AssemblyName(args.Name).Name + ".dll";
+            String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
 
-            var x = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            var x = Assembly.GetExecutingAssembly().GetManifestResourceNames().ToList();
+
+            x.ForEach(y => Console.WriteLine(y));
+
+            
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
             {
