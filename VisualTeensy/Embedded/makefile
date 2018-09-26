@@ -46,29 +46,37 @@ CORE_C_FILES   := $(call rwildcard,$(CORE_SRC)/,*.c)
 CORE_OBJ       := $(CORE_S_FILES:$(CORE_SRC)/%.S=$(CORE_BIN)/%.o) $(CORE_C_FILES:$(CORE_SRC)/%.c=$(CORE_BIN)/%.o) $(CORE_CPP_FILES:$(CORE_SRC)/%.cpp=$(CORE_BIN)/%.o) 
 
 
-# User library sources --------------------------------------------------------
-LIB_DIRS_SHARED  := $(foreach d, $(LIBS_SHARED),$(LIBS_SHARED_BASE)/$d)
-LIB_DIRS_LOCAL   := $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d)
+# User library sources  (see) https://github.com/arduino/arduino/wiki/arduino-ide-1.5:-library-specification
+LIB_DIRS_SHARED  := $(foreach d, $(LIBS_SHARED),$(LIBS_SHARED_BASE)/$d/ $(LIBS_SHARED_BASE)/$d/utility/)  # base and /utility 
+LIB_DIRS_SHARED  += $(dir $(call rwildcard,$(LIBS_SHARED_BASE)/test/src/,*/.))                            # src and all subdirs of base
 
-LIB_CPP_SHARED  := $(foreach d, $(LIB_DIRS_SHARED),$(call rwildcard,$d/,*.cpp))
-LIB_C_SHARED    := $(foreach d, $(LIB_DIRS_SHARED),$(call rwildcard,$d/,*.c))
-LIB_CPP_LOCAL   := $(foreach d, $(LIB_DIRS_LOCAL),$(call rwildcard,$d/,*.cpp))
-LIB_C_LOCAL     := $(foreach d, $(LIB_DIRS_LOCAL),$(call rwildcard,$d/,*.c))
+LIB_DIRS_LOCAL   := $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/ $(LIBS_LOCAL_BASE)/$d/utility )    # base and /utility  
+LIB_DIRS_LOCAL   += $(dir $(call rwildcard,$(LIBS_LOCAL_BASE)/test/src/,*/.))                             # src and all subdirs of base
+
+LIB_CPP_SHARED  := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.cpp))
+LIB_C_SHARED    := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.c))
+
+LIB_CPP_LOCAL   := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.cpp))
+LIB_C_LOCAL     := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.c))
 
 LIB_OBJ         := $(LIB_CPP_SHARED:$(LIBS_SHARED_BASE)/%.cpp=$(LIB_BIN)/%.o)  $(LIB_CPP_LOCAL:$(LIBS_LOCAL_BASE)/%.cpp=$(LIB_BIN)/%.o) 
 LIB_OBJ         += $(LIB_C_SHARED:$(LIBS_SHARED_BASE)/%.c=$(LIB_BIN)/%.o)  $(LIB_C_LOCAL:$(LIBS_LOCAL_BASE)/%.c=$(LIB_BIN)/%.o) 
 
+# Includes -------------------------------------------------------------
 INCLUDE        := -I.\$(USR_SRC) -I$(CORE_SRC) 
 INCLUDE        += $(foreach d, $(LIB_DIRS_SHARED), -I$d)
+INCLUDE        += $(foreach d, $(LIB_DIRS_SHARED), -I$d/utility)
 INCLUDE        += $(foreach d, $(LIB_DIRS_LOCAL), -I$d)
+INCLUDE        += $(foreach d, $(LIB_DIRS_LOCAL), -I$d/utility)
 
 # Generate directories --------------------------------------------------------
 DIRECTORIES := $(sort $(dir ${CORE_OBJ}) $(dir $(LIB_OBJ)) $(dir $(USR_OBJ)))
 generateDirs := $(foreach d, $(DIRECTORIES), $(shell if not exist "$d" mkdir "$d"))
 
 
-
-#$(info dirs: $(DIRECTORIES))
+#$(info dirs: $(LIB_DIRS_SHARED))
+#$(info )
+#$(info cpp: $(LIB_CPP_SHARED))
 #$(info include: ${INCLUDE})
 
 #******************************************************************************

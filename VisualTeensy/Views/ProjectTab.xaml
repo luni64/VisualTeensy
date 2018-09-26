@@ -91,7 +91,7 @@
 
 
                 </StackPanel>
-                <StackPanel Grid.Column="1" Grid.Row="0" >
+                <StackPanel Grid.Column="1" Grid.Row="0" Visibility="Collapsed" >
                     <TextBlock  FontWeight="Bold" FontSize="14" Text="Libraries"/>
                     <ListBox Height="200" Width="200" HorizontalAlignment="Left" ItemsSource="{Binding libManagerVM.libs}" DisplayMemberPath="name"/>
                 </StackPanel>
