@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using ViewModel;
 using VisualTeensy;
+using VisualTeensy.Model;
 
 namespace WpfApplication1
 {
@@ -21,17 +22,17 @@ namespace WpfApplication1
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-
-            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
-            //{
-            //    string s = reader.ReadToEnd();
-            //}
-
-            new MainWindow
+            string makefile = null;
+            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
             {
-                DataContext = new MainVM()
+                makefile = reader.ReadToEnd();
             }
-            .Show();
+
+            var data = new SetupData { makefile_fixed = makefile };
+            var model = new Model(data);
+            var mainVM = new MainVM(model);
+
+            new MainWindow { DataContext = mainVM }.Show();
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -42,7 +43,7 @@ namespace WpfApplication1
 
             x.ForEach(y => Console.WriteLine(y));
 
-            
+
 
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
             {

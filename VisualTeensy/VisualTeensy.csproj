@@ -103,6 +103,8 @@
     <Compile Include="Model\Entry.cs" />
     <Compile Include="Model\FileContent.cs" />
     <Compile Include="Model\FileHelpers.cs" />
+    <Compile Include="Model\LibManager.cs" />
+    <Compile Include="Model\Library.cs" />
     <Compile Include="Model\Menu.cs" />
     <Compile Include="Model\Model.cs" />
     <Compile Include="Model\Option.cs" />
@@ -113,8 +115,12 @@
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\ValidatedPath.cs" />
     <Compile Include="Model\vtTransferData.cs" />
+    <Compile Include="ViewModel\LibManagerVM.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
     <Compile Include="ViewModel\SetupTabVM.cs" />
+    <Compile Include="Views\FileDisplayWindow.xaml.cs">
+      <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SetupTab.xaml.cs">
       <DependentUpon>SetupTab.xaml</DependentUpon>
     </Compile>
@@ -139,6 +145,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Page Include="Views\FileDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MiscRessources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

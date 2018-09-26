@@ -10,7 +10,7 @@ namespace VisualTeensy.Model
         public bool fromArduino { get; set; }
 
         public string projectName => Path.GetFileName(projectBase ?? "ERROR");
-       
+
         public string arduinoBase { get; set; }
         public string arduinoBaseError
         {
@@ -164,15 +164,17 @@ namespace VisualTeensy.Model
                 return "Folder doesn't exist";
             }
         }
-
         public string uplTyBaseShort => (uplTyBase ?? "").Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
+
+        public string sharedLibBase { get; set; }
+        public string sharedLibBaseShort => (sharedLibBase ?? "").Contains(" ") ? FileHelpers.getShortPath(sharedLibBase) : sharedLibBase;
 
         public string makefile { get; set; }
         public string tasks_json { get; set; }
         public string props_json { get; set; }
         public string vsSetup_json { get; set; }
 
-
+        public string makefile_fixed { get; set; }
 
         public void loadSettings()
         {

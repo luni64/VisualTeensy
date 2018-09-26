@@ -10,6 +10,8 @@ namespace VisualTeensy.Model
 {
     public class Model
     {
+        public LibManager libManager { get; }
+
         public SetupData data { get; }
 
         public List<Board> boards { get; private set; }
@@ -151,10 +153,11 @@ namespace VisualTeensy.Model
             data.tasks_json = generateTasksFile();
         }
 
-        public Model()
+        public Model(SetupData data)
         {
+
             boards = new List<Board>();
-            data = new SetupData();
+            this.data = data;
             loadSettings();
             if (!openProjectPath())
             {
@@ -162,6 +165,8 @@ namespace VisualTeensy.Model
                 selectedBoard = boards?.FirstOrDefault();
                 generateFiles();
             }
+
+            libManager = new LibManager(data);
         }
 
         public void parseBoardsTxt()
@@ -244,7 +249,8 @@ namespace VisualTeensy.Model
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>()
                         {
-                            "${workspaceFolder}/src/**",
+                            "src/**",
+                            "lib/**",
                             data.coreBase?.Replace('\\','/') + "/**"
                         },
                         defines = new List<string>()
@@ -254,7 +260,7 @@ namespace VisualTeensy.Model
 
 
 
-            if (options.ContainsKey("build.flag.defs"))
+            if (options.ContainsKey("build.flags.defs"))
             {
                 foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
                 {
@@ -264,6 +270,8 @@ namespace VisualTeensy.Model
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
+            props.configurations[0].defines.Add("ARDUINO");
+            
             //props.configurations[0].defines.Add("F_CPU=" + options["build.fcpu"]);
             //props.configurations[0].defines.Add(options["build.usbtype"]);
             //props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
@@ -281,9 +289,17 @@ namespace VisualTeensy.Model
             selectedBoard.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n"));
             mf.Append("#\n");
             mf.Append($"# {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}\n");
-            mf.Append("#******************************************************************************\n\n");
+            mf.Append("#******************************************************************************\n");
 
-            mf.Append($"TARGET_NAME := {data.projectName.Replace(" ", "_")}\n\n");
+            mf.Append("SHELL := cmd.exe\nexport SHELL\n\n");
+
+            mf.Append($"TARGET_NAME      := {data.projectName.Replace(" ", "_")}\n\n");
+
+            mf.Append($"LIBS_SHARED_BASE := \n");
+            mf.Append($"LIBS_SHARED      := \n\n");
+
+            mf.Append($"LIBS_LOCAL_BASE  := lib\n");
+            mf.Append($"LIBS_LOCAL       := \n\n");
 
             mf.Append(makeEntry("BOARD_ID    := ", "build.board", options) + "\n");
             mf.Append($"CORE_BASE   := {((data.copyCore || (Path.GetDirectoryName(data.coreBase) == data.projectBase)) ? "core" : data.coreBaseShort)}\n");
@@ -307,7 +323,7 @@ namespace VisualTeensy.Model
             mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
 
             mf.Append("\n");
-            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + "\n");
+            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) +  " -DARDUINO \n");
             mf.Append("DEFINES     += ");
             mf.Append(makeEntry("-DF_CPU=", "build.fcpu", options) + " " + makeEntry("-D", "build.usbtype", options) + " " + makeEntry("-DLAYOUT_", "build.keylayout", options) + "\n");
 
@@ -317,7 +333,7 @@ namespace VisualTeensy.Model
             mf.Append("S_FLAGS     := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_S)\n");
             mf.Append("LD_FLAGS    := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_LSP) $(FLAGS_LD)\n");
             mf.Append("AR_FLAGS    := rcs\n");
-            mf.Append(Strings.makeFileEnd);
+            mf.Append(data.makefile_fixed);
 
             return mf.ToString();
         }

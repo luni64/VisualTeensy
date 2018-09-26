@@ -1,0 +1,33 @@
+﻿<Window x:Class="VisualTeensy.FileDisplayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm= "clr-namespace:ViewModel"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:ProjectTabVM, IsDesignTimeCreatable=False}"
+        Title="FileDisplayWindow" Height="450" Width="800" Closing="Window_Closing" Loaded="Window_Loaded">
+    <Grid Margin="10" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel ToggleButton.Checked="StackPanel_Checked">
+            <TextBlock Text="Select a file:" FontWeight="Bold"/>
+            <RadioButton Tag="makefile" Content="makefile" Margin="10,10,0,0" x:Name="rbMakefile" />
+            <RadioButton Tag ="taskFile" Content="tasks.json" Margin="10,3,0,0"/>
+            <RadioButton Tag="propFile" Content="c_cpp_properties.json"  Margin="10,3,0,0" />
+            <RadioButton Tag="settFile" Content="VisualTeensy.json" Margin="10,3,0,0" />
+        </StackPanel>
+
+        <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="1" Margin="0,10,0,0" >
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">
+                <TextBox x:Name="file" Background="Transparent" FontFamily="Courier New" FontSize="13" BorderThickness="0" 
+                         IsReadOnly="True"  />
+            </ScrollViewer>
+        </Border>
+        <Button Content="Close"  Grid.Row="2" HorizontalAlignment="Right" Width="80" Margin="0,10,0,0"/>
+    </Grid>
+</Window>

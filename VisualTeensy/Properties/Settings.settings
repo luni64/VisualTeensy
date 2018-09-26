@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Board2Make.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="VisualTeensy.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="makeExePath" Type="System.String" Scope="User">
@@ -28,6 +28,9 @@
     </Setting>
     <Setting Name="updateNeeded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="fileWinBounds" Type="System.Windows.Rect" Scope="User">
+      <Value Profile="(Default)">100,100,800,1000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

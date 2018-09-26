@@ -72,9 +72,13 @@ namespace ViewModel
         }
 
         #region Properties ------------------------------------------------------
+        public LibManagerVM libManagerVM {get;}
+
+
         public String makefile => model.data.makefile;
         public String propFile => model.data.props_json;
         public String taskFile => model.data.tasks_json;
+        public String settFile => model.data.vsSetup_json;
 
         public String projectPath
         {
@@ -85,7 +89,8 @@ namespace ViewModel
                 {
                     model.data.projectBase = value.Trim();
                     selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
-                    updateAll();
+                    model.openProjectPath();
+                    updateBoards();
                     OnPropertyChanged(""); // update all
                 }
             }
@@ -217,6 +222,7 @@ namespace ViewModel
             OnPropertyChanged("makefile");
             OnPropertyChanged("propFile");
             OnPropertyChanged("taskFile");
+            OnPropertyChanged("settFile");
         }
 
         void updateAll()
@@ -253,6 +259,7 @@ namespace ViewModel
         public ProjectTabVM(Model model)
         {
             this.model = model;
+            libManagerVM = new LibManagerVM(model);
 
             cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
             cmdClose = new RelayCommand(doClose);

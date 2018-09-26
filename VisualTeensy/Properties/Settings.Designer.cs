@@ -130,5 +130,17 @@ namespace VisualTeensy.Properties {
                 this["updateNeeded"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100,100,800,1000")]
+        public global::System.Windows.Rect fileWinBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["fileWinBounds"]));
+            }
+            set {
+                this["fileWinBounds"] = value;
+            }
+        }
     }
 }

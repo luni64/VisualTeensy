@@ -13,7 +13,7 @@
         <TabItem Header="Project">
             <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
         </TabItem>
-        <TabItem Header="Setup">           
+        <TabItem Header="Settings">           
             <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
         </TabItem>
     </TabControl>

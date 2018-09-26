@@ -23,9 +23,7 @@ namespace ViewModel
         }
         bool _status;
     }
-
-
-
+    
     public class SaveWinVM : BaseViewModel
     {
         public string error
@@ -40,26 +38,31 @@ namespace ViewModel
         {
             projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
                 coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
-
-
-
+            
             try
             {
                 string vsCodeFolder = Path.Combine(data.projectBase, ".vscode");
                 string srcFolder = Path.Combine(data.projectBase, "src");
+                string libFolder = Path.Combine(data.projectBase, "lib");
                 string binCoreFolder = Path.Combine(data.projectBase, "bin", "core");
                 string binUserFolder = Path.Combine(data.projectBase, "bin", "src");
+                string binLibFolder = Path.Combine(data.projectBase, "bin", "lib");
 
                 Directory.CreateDirectory(vsCodeFolder);
                 Directory.CreateDirectory(srcFolder);
+                Directory.CreateDirectory(libFolder);
+
                 if (Directory.Exists(binCoreFolder))
                 {
                     Directory.Delete(binCoreFolder, true);
                 }
-
                 if (Directory.Exists(binUserFolder))
                 {
                     Directory.Delete(binUserFolder, true);
+                }
+                if (Directory.Exists(binLibFolder))
+                {
+                    Directory.Delete(binLibFolder, true);
                 }
             }
             catch (UnauthorizedAccessException)
@@ -184,30 +187,7 @@ namespace ViewModel
             showProg = false;
         }
         private async Task writeProjectFiles()
-        {
-            //string DestinationPath = Path.Combine(makefilePath.text);
-            //using (TextWriter writer = new StreamWriter(DestinationPath))
-            //{
-            //    await writer.WriteAsync(data.makefile);
-            //}
-            //await Delay(50);
-            //makefilePath.status = true;
-
-            //DestinationPath = Path.Combine(buildTaskPath.text);
-            //using (TextWriter writer = new StreamWriter(DestinationPath))
-            //{
-            //    await writer.WriteAsync(data.tasks_json);
-            //}
-            //await Delay(50);
-            //buildTaskPath.status = true;
-
-            //DestinationPath = Path.Combine(intellisensePath.text);
-            //using (TextWriter writer = new StreamWriter(DestinationPath))
-            //{
-            //    await writer.WriteAsync(data.propsFile);
-            //}
-            //await Delay(50);
-            //intellisensePath.status = true;
+        {         
             await writeFile(makefilePath, data.makefile);
             await writeFile(buildTaskPath, data.tasks_json);
             await writeFile(intellisensePath, data.props_json);

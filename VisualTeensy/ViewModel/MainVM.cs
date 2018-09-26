@@ -24,15 +24,14 @@ namespace ViewModel
             }
         }
 
-        public MainVM()
+        public MainVM(Model model = null)
         {
             if (Debugger.IsAttached)
             {
                 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             }
 
-            var model = new Model();
-
+            
             projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
                        

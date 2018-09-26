@@ -3,6 +3,7 @@ using VisualTeensy.Model;
 using System.Windows;
 using System.Windows.Controls;
 using ViewModel;
+using System.Linq;
 
 namespace VisualTeensy
 {
@@ -14,10 +15,7 @@ namespace VisualTeensy
         public ProjectTab()
         {
             InitializeComponent();
-
-
         }
-
 
         private void handleMessages(object sender, string message)
         {
@@ -32,7 +30,6 @@ namespace VisualTeensy
 
         private void openOutput()
         {
-
             var mvm = DataContext as ViewModel.ProjectTabVM;
 
             SetupData data = mvm.model.data;
@@ -54,6 +51,19 @@ namespace VisualTeensy
         {
             var vm = DataContext as ViewModel.ProjectTabVM;
             if (vm != null) vm.MessageHandler -= handleMessages;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var fdm = Application.Current.Windows.OfType<FileDisplayWindow>().FirstOrDefault();
+            if (fdm == null)
+            {
+                new FileDisplayWindow() { DataContext = this.DataContext }.Show();
+            }
+            else
+            {
+                fdm.Close();
+            }
         }
     }
 }

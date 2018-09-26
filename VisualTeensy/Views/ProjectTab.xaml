@@ -8,63 +8,51 @@
              mc:Ignorable="d" 
              Background="White"
              d:DataContext="{d:DesignInstance vm:ProjectTabVM, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
+             d:DesignHeight="600" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
 
-    
+
     <Grid Margin="10" >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <!--<ColumnDefinition Width="auto"/>-->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
 
-        <Border Grid.Column="0" Grid.Row="1" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
+        <Border Grid.Column="0" Grid.Row="0" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
             <Grid VerticalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <!--<RowDefinition Height="auto"/>-->
+                <Grid.RowDefinitions>                    
                     <RowDefinition Height="*"/>
-
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Grid.Row="0" Width="300">
-                   
-
-
-                    <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" Margin="0,10,0,5">
+                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch"   Margin="0,0,50,0">
+                    <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}">
                         <RadioButton.ToolTip>
                             Quick Setup uses your Arduino installation to generate the project.
                         </RadioButton.ToolTip>
                     </RadioButton>
-                    <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" >
+                    <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="20,0,0,0" >
                         <RadioButton.ToolTip>
-                            Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation. 
+                            Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
                         </RadioButton.ToolTip>
                     </RadioButton>
+                    </StackPanel>
 
-                    <TextBlock Text="Project Folder:" FontWeight="Bold" FontSize="11" Margin="0,20,0,0"/>
+                    <TextBlock Text="Project Folder:" FontWeight="Bold" FontSize="11" Margin="0,15,0,0"/>
                     <!--<Label   Content="Project Folder" HorizontalAlignment="Left" FontSize="10" Padding="0" Margin="0,5,0,0" />-->
                     <local:PSelector SelectedPath="{Binding projectPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
 
-
-                    <!--<Button Content="New" Width="50" HorizontalAlignment="Right" Margin="0,3,31,0" />-->
-                    
-
-                    <!--Project Information ____________________________-->
-                    
-                    <!--<TextBlock Text="Project Information:" FontWeight="Bold" FontSize="11" Margin="0,20,0,5"/>
-                    <StackPanel Width="auto"  HorizontalAlignment="Stretch" x:Name="ProjectSettings" Style="{DynamicResource ValidatingControl}" >
-                        --><!--<TextBlock Text="Project" FontWeight="Bold" />--><!--
-
-                        <Label   Content="Project Name (defines names of output files *.hex, *.elf ...)" HorizontalAlignment="Left" FontSize="10" Padding="0" Margin="0,5,0,0" />
-                        <TextBox Text="{Binding projectName, ValidatesOnDataErrors=True}" Margin="0,0,33,0"  />
-
-                        <Label   Content="Project Path" FontSize="10" Padding="0" Margin="0,5,0,0"  />
-                        <local:PSelector SelectedPath="{Binding  projectPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-                    </StackPanel>-->
-
+          
                     <!--Expert Setup ____________________________________ -->
-
-                    <StackPanel Width="auto" Margin="0,20,0,0"  HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
+                    <StackPanel Width="auto" Margin="0,15,0,0"  HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
                         <TextBlock Text="Details:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
                         <Label   Content="Path to boards.txt" FontSize="10" Padding="0" />
                         <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
@@ -79,11 +67,10 @@
                     </StackPanel>
 
                     <!--Quick Setup ____________________________________ -->
-                    
                     <StackPanel Width="auto" Margin="0,15,0,0" HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton}" x:Name="Quick_Settings">
                         <TextBlock Text="Arduino Folder:" FontWeight="Bold" FontSize="11" Margin="0,0,0,0"/>
                         <!--<Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" />-->
-                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />                     
+                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
                     </StackPanel>
 
                     <TextBlock Text="Board Properties:" FontWeight="Bold" FontSize="11" Margin="0,15,0,5"/>
@@ -104,86 +91,28 @@
 
 
                 </StackPanel>
-                <Button Grid.Row="1" Margin="0,0,0,0"  HorizontalAlignment="Right" Background="Transparent" Command="{Binding cmdGenerate}" >
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="/img/content-save.png"  Width="24" Height="24" />
-                        <TextBlock Text="Generate / Update Project" VerticalAlignment="Center" Margin="5,0,10,0"/>
-                    </StackPanel>
-                </Button>
+                <StackPanel Grid.Column="1" Grid.Row="0" >
+                    <TextBlock  FontWeight="Bold" FontSize="14" Text="Libraries"/>
+                    <ListBox Height="200" Width="200" HorizontalAlignment="Left" ItemsSource="{Binding libManagerVM.libs}" DisplayMemberPath="name"/>
+                </StackPanel>
+
                 <!--</Grid>-->
             </Grid>
         </Border>
-        <Border Grid.Column="1" Grid.Row="1" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
-            <Grid Margin="1,-1,-1,1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
+        
+        <Button Grid.Row="1" Margin="0,0,10,0"  HorizontalAlignment="Right" Background="Transparent" Command="{Binding cmdGenerate}" BorderBrush="DarkGray"  >
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/img/content-save.png"  Width="24" Height="24" />
+                <TextBlock Text="Generate Project" VerticalAlignment="Center" Margin="5,0,10,0"/>
+            </StackPanel>
+        </Button>
+        <Button Grid.Row="1" Margin="10,0,0,0"  HorizontalAlignment="Left" Background="Transparent" Click="Button_Click" BorderBrush="DarkGray" >
+            <StackPanel Orientation="Horizontal">
+                <!--<Image Source="/img/content-save.png"  Width="24" Height="24" />-->
+                <TextBlock Text="Show Files" VerticalAlignment="Center" Margin="5,0,10,0"/>
+            </StackPanel>
+        </Button>
 
 
-               
-                <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2" >
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">
-                        <TextBox Background="Transparent" FontFamily="Courier New" FontSize="13" BorderThickness="0" 
-                         Text="{Binding makefile, Mode=OneWay}" IsReadOnly="True"  />
-                    </ScrollViewer>
-                </Border>
-
-
-                <!--<TextBlock Text="{Binding propFileName}" Grid.Column="1" Grid.Row="0" Margin="10,0" />
-                <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="1" Grid.Column="1" Margin="10,0">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"  Padding="5">
-                        <TextBox Background="Transparent" FontFamily="Courier New" FontSize="11" BorderThickness="0" 
-                         Text="{Binding propFile, Mode=OneWay}" IsReadOnly="True"  />
-                    </ScrollViewer>
-                </Border>
-
-                <TextBlock Text="{Binding taskFileName}" Grid.Column="1" Grid.Row="2" Margin="10,20,0,0" />
-                <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="3" Grid.Column="1" Margin="10,0" >
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"  Padding="5">
-                        <TextBox Background="Transparent" FontFamily="Courier New" FontSize="11" BorderThickness="0" 
-                         Text="{Binding taskFile, Mode=OneWay}" IsReadOnly="True"  />
-                    </ScrollViewer>
-                </Border>-->
-
-
-                <!--<Separator Margin="0,10" Grid.Row="1" Foreground="Gray"  />-->
-                <!--<StackPanel Grid.Row="2">
-                   <TextBlock Text="Output" Margin="0,0,0,-9" FontSize="10"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBox  VerticalAlignment="Center" Height="24" VerticalContentAlignment="Center" Text="{Binding outputFilename}" Width="450" HorizontalAlignment="Left" />
-                        <Button Grid.Column="1" Margin="4,10,10,10" Background="Transparent" BorderThickness="0"  Click="OpenOutput" HorizontalAlignment="Left">
-                            <Image Source="/img/folder-open.png"  Width="24" Height="20" />
-                        </Button>
-                        <Button Grid.Column="2" Margin="0,0,10,0"  Click="OpenOutput"  HorizontalAlignment="Right" Height="30">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="/img/content-save.png"  Width="24" Height="24" />
-                                <TextBlock Text="Save" VerticalAlignment="Center" Margin="5,0,10,0"/>
-                            </StackPanel>
-                        </Button>
-                    </Grid>
-                </StackPanel>-->
-
-                <!--<Button Grid.Row="4" Margin="0,0,10,0"  Click="OpenOutput"  HorizontalAlignment="Right" Height="30" Background="Transparent">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="/img/content-save.png"  Width="24" Height="24" />
-                        <TextBlock Text="Save Makefile" VerticalAlignment="Center" Margin="5,0,10,0"/>
-                    </StackPanel>
-                </Button>-->
-
-            </Grid>
-        </Border>
     </Grid>
 </UserControl>
