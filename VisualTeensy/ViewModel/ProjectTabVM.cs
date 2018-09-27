@@ -1,8 +1,8 @@
-﻿using VisualTeensy.Model;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using VisualTeensy.Model;
 
 namespace ViewModel
 {
@@ -62,6 +62,8 @@ namespace ViewModel
         public RelayCommand cmdGenerate { get; private set; }
         void doGenerate(object obj)
         {
+            repositoryVM.update();
+
             Message("Generate");
         }
 
@@ -72,7 +74,7 @@ namespace ViewModel
         }
 
         #region Properties ------------------------------------------------------
-        public LibManagerVM libManagerVM {get;}
+        public RepositoryVM repositoryVM { get; }
 
 
         public String makefile => model.data.makefile;
@@ -259,7 +261,8 @@ namespace ViewModel
         public ProjectTabVM(Model model)
         {
             this.model = model;
-            libManagerVM = new LibManagerVM(model);
+            repositoryVM = new RepositoryVM(model.libManager.repositories[0]);
+            repositoryVM.PropertyChanged += RepositoryVM_PropertyChanged;
 
             cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
             cmdClose = new RelayCommand(doClose);
@@ -267,6 +270,13 @@ namespace ViewModel
             updateBoards();
         }
 
+        private void RepositoryVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "libraries")
+            {
+                updateFiles();
+            }
+        }
 
         public event EventHandler<string> MessageHandler;
         protected void Message(string message)

@@ -1,30 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using VisualTeensy.Model;
+using System.Linq;
 
 namespace ViewModel
 {
-    public class LibManagerVM : BaseViewModel
+    public class RepositoryVM : BaseViewModel
     {
-        public ObservableCollection<Library> libs { get;  }
+        public ObservableCollection<LibraryVM> libs { get; }
 
-
-        public LibManagerVM(Model model)
+        public void update()
         {
-            this.model = model;
+            repository.data.libraries.Clear();            
+            repository.data.libraries.AddRange((libs.Where(l => l.selected).Select(l => l.lib)));           
+        }
 
-            libs = new ObservableCollection<Library>();
-            foreach(var lib in model.libManager.libraries)
+        public RepositoryVM(PjrcLibs repository)
+        {
+            this.repository = repository;
+
+            libs = new ObservableCollection<LibraryVM>();
+            foreach (var lib in repository.libraries)
             {
-                libs.Add(lib);
+                var lvm = new LibraryVM(lib);
+                lvm.PropertyChanged += Lvm_PropertyChanged;
+
+                libs.Add(lvm);
+
             }
         }
 
+        private void Lvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var lib = sender as LibraryVM;
+            if(lib != null)
+            {
+                if(lib.selected)
+                {
+                    repository.data.libraries.Add(lib.lib);
+                }
+                else
+                {
+                    repository.data.libraries.Remove(lib.lib);
+                }
+            }
+            OnPropertyChanged("libraries");
+        }
 
-        Model model;
+        PjrcLibs repository;
+
+       
     }
 }

@@ -22,17 +22,24 @@ namespace WpfApplication1
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            string makefile = null;
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
+            try
             {
-                makefile = reader.ReadToEnd();
+                string makefile = null;
+                using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
+                {
+                    makefile = reader.ReadToEnd();
+                }
+
+                var data = new SetupData { makefile_fixed = makefile };
+                var model = new Model(data);
+                var mainVM = new MainVM(model);
+
+                new MainWindow { DataContext = mainVM }.Show();
             }
-
-            var data = new SetupData { makefile_fixed = makefile };
-            var model = new Model(data);
-            var mainVM = new MainVM(model);
-
-            new MainWindow { DataContext = mainVM }.Show();
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)

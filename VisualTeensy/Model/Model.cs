@@ -155,7 +155,6 @@ namespace VisualTeensy.Model
 
         public Model(SetupData data)
         {
-
             boards = new List<Board>();
             this.data = data;
             loadSettings();
@@ -165,7 +164,6 @@ namespace VisualTeensy.Model
                 selectedBoard = boards?.FirstOrDefault();
                 generateFiles();
             }
-
             libManager = new LibManager(data);
         }
 
@@ -295,8 +293,10 @@ namespace VisualTeensy.Model
 
             mf.Append($"TARGET_NAME      := {data.projectName.Replace(" ", "_")}\n\n");
 
-            mf.Append($"LIBS_SHARED_BASE := \n");
-            mf.Append($"LIBS_SHARED      := \n\n");
+            mf.Append($"LIBS_SHARED_BASE := {data.libBaseShort}\n");
+            mf.Append($"LIBS_SHARED      := ");
+            data.libraries.ForEach(l =>mf.Append($"{l.path} ")); 
+            mf.Append("\n\n");
 
             mf.Append($"LIBS_LOCAL_BASE  := lib\n");
             mf.Append($"LIBS_LOCAL       := \n\n");
