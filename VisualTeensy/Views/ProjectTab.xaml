@@ -82,7 +82,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10"  >
-                                    <Label Content="{Binding name}" Width="75" Padding="0" />
+                                    <Label Content="{Binding name}" Width="100" Padding="0" />
                                     <ComboBox ItemsSource="{Binding options}" DisplayMemberPath="name" Width="200" SelectedItem="{Binding selectedOption}"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -91,7 +91,7 @@
 
                 </StackPanel>
                 <StackPanel Grid.Column="1" Grid.Row="0" Margin="100,0,0,0">
-                    <TextBlock  FontWeight="Bold" FontSize="14" Text="Libraries NOT FUNCTIONAL YET"/>
+                    <TextBlock  FontWeight="Bold" FontSize="14" Text="Libraries" Margin="0,0,0,15" />
                     <ListBox Height="500" HorizontalAlignment="Left" ItemsSource="{Binding repositoryVM.libs}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
