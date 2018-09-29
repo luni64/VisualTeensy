@@ -8,11 +8,11 @@ namespace ViewModel
     {
         public ObservableCollection<LibraryVM> libs { get; }
 
-        public void update()
-        {
-            repository.data.libraries.Clear();            
-            repository.data.libraries.AddRange((libs.Where(l => l.selected).Select(l => l.lib)));           
-        }
+        //public void update()
+        //{
+        //    repository.data.libraries.Clear();            
+        //    repository.data.libraries.AddRange((libs.Where(l => l.selected).Select(l => l.lib)));           
+        //}
 
         public RepositoryVM(PjrcLibs repository)
         {
@@ -22,11 +22,18 @@ namespace ViewModel
             foreach (var lib in repository.libraries)
             {
                 var lvm = new LibraryVM(lib);
+                if(repository.data.libraries.Contains(lib))
+                {
+                    lvm.selected = true;
+                }
+
+
                 lvm.PropertyChanged += Lvm_PropertyChanged;
 
                 libs.Add(lvm);
-
             }
+
+            
         }
 
         private void Lvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

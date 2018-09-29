@@ -116,7 +116,7 @@
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\ValidatedPath.cs" />
     <Compile Include="Model\vtTransferData.cs" />
-    <Compile Include="ViewModel\LibManagerVM.cs" />
+    <Compile Include="ViewModel\RepositoryVM.cs" />
     <Compile Include="ViewModel\LibraryVM.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
     <Compile Include="ViewModel\SetupTabVM.cs" />
@@ -221,7 +221,28 @@
     <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.dll" />
     <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.Shell.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PublishFile Include="Microsoft.WindowsAPICodePack">
+      <Visible>False</Visible>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="Microsoft.WindowsAPICodePack.Shell">
+      <Visible>False</Visible>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>

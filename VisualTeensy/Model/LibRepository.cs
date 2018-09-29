@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Script.Serialization;
 
 namespace VisualTeensy.Model
 {
-   
+
 
 
     class libTransfer
@@ -13,17 +14,18 @@ namespace VisualTeensy.Model
         public string name { get; set; }
     }
 
-    
-    public class PjrcLibs 
+
+    public class PjrcLibs
     {
         public string name => "PJRC Libraries";
         public List<Library> libraries { get; }
         public List<Library> selected { get; }
-                
+
 
         public PjrcLibs(SetupData data)
-        {            
-            var path = Path.Combine(data.arduinoBase, "hardware", "teensy", "avr", "libraries");
+        {
+            var path = data.libBase;
+            
             if (!Directory.Exists(path)) return;
 
             this.data = data;
@@ -44,7 +46,7 @@ namespace VisualTeensy.Model
                         var lib = json.Deserialize<Library>(reader.ReadToEnd());
                         lib.path = Path.GetFileName(libDir);
                         libraries.Add(lib);
-                    }
+                        }
                 }
                 else
                 {
@@ -68,11 +70,11 @@ namespace VisualTeensy.Model
                                 var tok = line.Split('=');
                                 if (tok[0] == "name")
                                 {
-                                    lib.name = tok[1];
+                                    lib.name = tok[1].Trim();
                                 }
                                 else if (tok[0] == "sentence")
                                 {
-                                    lib.description = tok[1];
+                                    lib.description = tok[1].Trim();
                                 }
                                 if (name != null && description != null) break;
                             }

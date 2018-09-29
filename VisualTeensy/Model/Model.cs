@@ -10,7 +10,7 @@ namespace VisualTeensy.Model
 {
     public class Model
     {
-        public LibManager libManager { get; }
+        public LibManager libManager { get; private set; }
 
         public SetupData data { get; }
 
@@ -67,6 +67,9 @@ namespace VisualTeensy.Model
                 if (String.IsNullOrWhiteSpace(data.compilerBase)) data.compilerBase = Path.Combine(FileHelpers.getToolsFromArduino(data.arduinoBase), "arm");
             }
 
+            // data.libBase = Path.Combine(FileHelpers.getSketchbookFolder(), "libraries"); //HACK need to be user settable        
+            data.libBase = Path.Combine(data.arduinoBase,"hardware","Teensy","avr", "libraries"); //HACK need to be user settable        
+
             data.fromArduino = true;
 
         }
@@ -96,8 +99,24 @@ namespace VisualTeensy.Model
 
                     data.boardTxtPath = transferData.boardTxtPath.StartsWith("\\") ? Path.Combine(data.projectBase, transferData.boardTxtPath.Substring(1)) : transferData.boardTxtPath;
                     data.coreBase = transferData.coreBase.StartsWith("\\") ? Path.Combine(data.projectBase, transferData.coreBase.Substring(1)) : transferData.coreBase;
-
+                    
                     parseBoardsTxt();
+
+
+                    //if (data.libBase != transferData.libraryBase)
+                    //{
+                    //    data.libBase = transferData.libraryBase;
+                    //    libManager = new LibManager(data);
+                    //}
+
+                    var libs = libManager.repositories[0].libraries;
+
+                    foreach (string libName in transferData.libraries[0].libraries)
+                    {
+                        var lib = libs.FirstOrDefault(l => l.name == libName);
+                        if (lib != null) data.libraries.Add(lib);                        
+                    }
+                    
 
                     selectedBoard = boards?.FirstOrDefault(b => b.name == transferData.board.name);
                     if (selectedBoard != null)
@@ -120,11 +139,6 @@ namespace VisualTeensy.Model
             {
                 return false;
             }
-
-
-
-
-
         }
         public void generateFiles()
         {
@@ -158,13 +172,13 @@ namespace VisualTeensy.Model
             boards = new List<Board>();
             this.data = data;
             loadSettings();
+            libManager = new LibManager(data);
             if (!openProjectPath())
             {
                 parseBoardsTxt();
                 selectedBoard = boards?.FirstOrDefault();
                 generateFiles();
             }
-            libManager = new LibManager(data);
         }
 
         public void parseBoardsTxt()
@@ -249,7 +263,8 @@ namespace VisualTeensy.Model
                         {
                             "src/**",
                             "lib/**",
-                            data.coreBase?.Replace('\\','/') + "/**"
+                            data.coreBase?.Replace('\\','/') + "/**",
+                            data.libBase?.Replace('\\','/') + "/**"
                         },
                         defines = new List<string>()
                     }
@@ -269,7 +284,7 @@ namespace VisualTeensy.Model
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
             props.configurations[0].defines.Add("ARDUINO");
-            
+
             //props.configurations[0].defines.Add("F_CPU=" + options["build.fcpu"]);
             //props.configurations[0].defines.Add(options["build.usbtype"]);
             //props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
@@ -295,7 +310,7 @@ namespace VisualTeensy.Model
 
             mf.Append($"LIBS_SHARED_BASE := {data.libBaseShort}\n");
             mf.Append($"LIBS_SHARED      := ");
-            data.libraries.ForEach(l =>mf.Append($"{l.path} ")); 
+            data.libraries.ForEach(l => mf.Append($"{l.path} "));
             mf.Append("\n\n");
 
             mf.Append($"LIBS_LOCAL_BASE  := lib\n");
@@ -323,7 +338,7 @@ namespace VisualTeensy.Model
             mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
 
             mf.Append("\n");
-            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) +  " -DARDUINO \n");
+            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + " -DARDUINO \n");
             mf.Append("DEFINES     += ");
             mf.Append(makeEntry("-DF_CPU=", "build.fcpu", options) + " " + makeEntry("-D", "build.usbtype", options) + " " + makeEntry("-DLAYOUT_", "build.keylayout", options) + "\n");
 
@@ -349,8 +364,7 @@ namespace VisualTeensy.Model
                 return "";
             }
         }
-
-        void addConfigOption(Dictionary<string, string> options, PropertiesJson props, string prefix, string key)
+        private void addConfigOption(Dictionary<string, string> options, PropertiesJson props, string prefix, string key)
         {
             var option = options.FirstOrDefault(o => o.Key == key).Value;
 

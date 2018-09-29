@@ -109,6 +109,33 @@ namespace VisualTeensy.Model
             string path = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "cores", "teensy3");
             return Directory.Exists(path) ? path : null;
         }
+        public static string getSketchbookFolder()
+        {
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var preferencesPath = Path.Combine(localAppData, "Arduino15", "preferences.txt");            
+
+            string sketchbookPath = "";
+
+            if (File.Exists(preferencesPath))
+            {
+                using (TextReader reader = new StreamReader(preferencesPath))
+                {
+                    string line;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        var parts = line.Split('=');
+
+                        if (parts.Length == 2 && parts[0] == "sketchbook.path")
+                        {
+                            sketchbookPath = parts[1];
+                            break;
+                        }
+                    }
+                }
+            }
+            return sketchbookPath;
+        }
 
         public static string findArduinoFolder()
         {
@@ -135,6 +162,7 @@ namespace VisualTeensy.Model
 
             return null;
         }
+
         
         private static bool isArduinoFolder(string folder)
         {

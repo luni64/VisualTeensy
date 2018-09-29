@@ -87,13 +87,9 @@ namespace VisualTeensy.Model
         }
         public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : compilerBase;
 
-
-        public string libBase
-        {
-            get =>  Path.Combine(arduinoBase, "hardware", "teensy", "avr", "libraries") ;           
-        }                
+        public string libBase { get; set; }
         public string libBaseShort => libBase.Contains(" ") ? FileHelpers.getShortPath(libBase) : libBase;
-
+       
         public string makeExePath { get; set; }
         public string makeExePathError => makeExePath != null ? (File.Exists(makeExePath) ? null : "Error") : "Error";
 
@@ -180,6 +176,7 @@ namespace VisualTeensy.Model
         public string props_json { get; set; }
         public string vsSetup_json { get; set; }
 
+        
         public List<Library> libraries { get; } = new List<Library>();
 
 

@@ -62,7 +62,7 @@ namespace ViewModel
         public RelayCommand cmdGenerate { get; private set; }
         void doGenerate(object obj)
         {
-            repositoryVM.update();
+            //repositoryVM.update();
 
             Message("Generate");
         }

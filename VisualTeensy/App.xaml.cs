@@ -46,9 +46,9 @@ namespace WpfApplication1
         {
             String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
 
-            var x = Assembly.GetExecutingAssembly().GetManifestResourceNames().ToList();
+            //var x = Assembly.GetExecutingAssembly().GetManifestResourceNames().ToList();
 
-            x.ForEach(y => Console.WriteLine(y));
+            //x.ForEach(y => Console.WriteLine(y));
 
 
 

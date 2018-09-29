@@ -10,6 +10,13 @@ namespace VisualTeensy.Model
         public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
     }
 
+    public class LibraryRepositiory
+    {
+        public string repository { get; set; }
+        public string path { get; set; }
+        public List<string> libraries { get; set; }
+    }
+
     public class vtTransferData
     {
         public bool quickSetup { get; set; }
@@ -20,6 +27,8 @@ namespace VisualTeensy.Model
         public string compilerBase { get; set; }
         public string makeExePath { get; set; }
         public string projectName { get; set; }
+        public List<LibraryRepositiory> libraries { get; set; }
+
 
         public vsBoard board { get; set; }
 
@@ -30,12 +39,29 @@ namespace VisualTeensy.Model
 
             quickSetup = oldSetup;
             arduinoBase = data.arduinoBase;
-            
+
             compilerBase = data.compilerBase;
             makeExePath = data.makeExePath;
-            
 
-            if(data.coreBase != null)
+            libraries = new List<LibraryRepositiory>()
+            {
+                new LibraryRepositiory()
+                {
+                    repository = "Library Storage",
+                    path = data.libBase,
+                    libraries = data.libraries.Select(l => l.name).ToList(),
+                },
+
+                new LibraryRepositiory() ///ToDo not yet functional
+                {
+                    repository = "local",
+                    path = "lib",
+                    //libraries = data.libraries.Select(l => l.name).ToList(),
+                }
+            };
+
+
+            if (data.coreBase != null)
             {
                 coreBase = (data.copyCore || data.coreBase.StartsWith(data.projectBase)) ? "\\core" : data.coreBase;
             }
@@ -44,7 +70,7 @@ namespace VisualTeensy.Model
             {
                 boardTxtPath = (data.copyBoardTxt || data.boardTxtPath.StartsWith(data.projectBase)) ? "\\boards.txt" : data.boardTxtPath;
             }
-            
+
             board = new vsBoard()
             {
                 name = _board.name,

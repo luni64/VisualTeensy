@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VisualTeensy"
         xmlns:vm="clr-namespace:ViewModel"
-         WindowStartupLocation="CenterScreen" Title="{Binding Title, Mode=OneWay}"
+        Title="{Binding Title, Mode=OneWay}"
         mc:Ignorable="d"
         Height="auto" Width="1000" Closing="Window_Closing">
 
@@ -13,6 +13,10 @@
         <TabItem Header="Project">
             <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
         </TabItem>
+        
+        <TabItem Header="Library Manager">            
+        </TabItem>
+        
         <TabItem Header="Settings">           
             <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
         </TabItem>
