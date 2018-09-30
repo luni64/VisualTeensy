@@ -2,35 +2,20 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="VisualTeensy.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="makeExePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="arduinoBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="uplPjrcBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="uplTyBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="projectBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="boardsTxtPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="coreBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="compilerBase" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="updateNeeded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="fileWinBounds" Type="System.Windows.Rect" Scope="User">
       <Value Profile="(Default)">100,100,800,1000</Value>
+    </Setting>
+    <Setting Name="projectData" Type="VisualTeensy.Model.ProjectData" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="setupData" Type="VisualTeensy.Model.SetupData" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="mainWinBounds" Type="System.Windows.Rect" Scope="User">
+      <Value Profile="(Default)">100,100,1000,800</Value>
     </Setting>
   </Settings>
 </SettingsFile>

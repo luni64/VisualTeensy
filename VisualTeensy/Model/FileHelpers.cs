@@ -8,6 +8,8 @@ namespace VisualTeensy.Model
 {
     static class FileHelpers
     {
+        public static string arduinoPath { set; get; }
+
         public static string formatOutput(string jsonString)
         {
             var stringBuilder = new StringBuilder();
@@ -79,7 +81,7 @@ namespace VisualTeensy.Model
             return stringBuilder.ToString();
         }
 
-        public static string getBoardFromArduino(string arduinoPath)
+        public static string getBoardFromArduino()
         {
             if (arduinoPath == null)
             {
@@ -89,7 +91,7 @@ namespace VisualTeensy.Model
             string boardPath = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "boards.txt");
             return File.Exists(boardPath) ? boardPath : null;
         }
-        public static string getToolsFromArduino(string arduinoPath)
+        public static string getToolsFromArduino()
         {
             if (String.IsNullOrWhiteSpace(arduinoPath))
             {
@@ -99,7 +101,7 @@ namespace VisualTeensy.Model
             string path = Path.Combine(arduinoPath, "hardware", "tools");
             return Directory.Exists(path) ? path : null;
         }
-        public static string getCoreFromArduino(string arduinoPath)
+        public static string getCoreFromArduino()
         {
             if (arduinoPath == null)
             {
@@ -112,7 +114,7 @@ namespace VisualTeensy.Model
         public static string getSketchbookFolder()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var preferencesPath = Path.Combine(localAppData, "Arduino15", "preferences.txt");            
+            var preferencesPath = Path.Combine(localAppData, "Arduino15", "preferences.txt");
 
             string sketchbookPath = "";
 
@@ -139,7 +141,7 @@ namespace VisualTeensy.Model
 
         public static string findArduinoFolder()
         {
-            string folder;            
+            string folder;
 
             folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
             if (folder != null) return folder;
@@ -153,7 +155,7 @@ namespace VisualTeensy.Model
         public static string findTyToolsFolder()
         {
             string folder;
-            
+
             folder = checkFolder(@"C:\Program Files", f => isTyToolsFolder(f));
             if (folder != null) return folder;
 
@@ -163,7 +165,7 @@ namespace VisualTeensy.Model
             return null;
         }
 
-        
+
         private static bool isArduinoFolder(string folder)
         {
             if (folder == null || !Directory.Exists(folder)) return false;
@@ -179,7 +181,7 @@ namespace VisualTeensy.Model
         private static bool isTyToolsFolder(string folder)
         {
             if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "TyTools" || !Directory.Exists(folder)) return false;
-            
+
             var tyCommanderC = Path.Combine(folder, "TyCommanderC.exe");
             return (File.Exists(tyCommanderC));
         }
@@ -216,7 +218,7 @@ namespace VisualTeensy.Model
             return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
 
         }
-        
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
     }

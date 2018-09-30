@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using VisualTeensy.Model;
 
@@ -21,27 +22,27 @@ namespace ViewModel
                 switch (columnName)
                 {
                     case "projectPath":
-                        error = model.data.projectBaseError;
+                        error = model.project.pathError;
                         break;
 
                     case "arduinoBase":
-                        error = quickSetup ? model.data.arduinoBaseError : null;
+                        error = model.setup.arduinoBaseError;
                         break;
 
                     case "boardTxtPath":
-                        error = model.data.boardTxtPathError;
+                        error = model.project.boardTxtPathError;
                         break;
 
                     case "corePath":
-                        error = quickSetup ? null : model.data.corePathError;
+                        error = model.project.setupType == SetupTypes.expert ? model.project.corePathError : null;
                         break;
 
                     case "compilerPath":
-                        error = model.data.compilerPathError;
+                        error = model.project.compilerPathError;
                         break;
 
                     case "makePath":
-                        error = model.data.makeExePathError;
+                        error = model.setup.makeExePathError;
                         break;
 
                     case "boardVMs":
@@ -70,26 +71,26 @@ namespace ViewModel
         public RelayCommand cmdClose { get; private set; }
         void doClose(object o)
         {
-            model.saveSettings();
+           // model.saveSettings();
         }
 
         #region Properties ------------------------------------------------------
         public RepositoryVM repositoryVM { get; }
 
 
-        public String makefile => model.data.makefile;
-        public String propFile => model.data.props_json;
-        public String taskFile => model.data.tasks_json;
-        public String settFile => model.data.vsSetup_json;
+        public String makefile => model.project.makefile;
+        public String propFile => model.project.props_json;
+        public String taskFile => model.project.tasks_json;
+        public String settFile => model.project.vsSetup_json;
 
         public String projectPath
         {
-            get => model.data.projectBase;
+            get => model.project.path;
             set
             {
-                if (value != model.data.projectBase)
+                if (value != model.project.path)
                 {
-                    model.data.projectBase = value.Trim();
+                    model.project.path = value.Trim();
                     selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
                     model.openProjectPath();
                     updateBoards();
@@ -98,14 +99,17 @@ namespace ViewModel
             }
         }
 
+        public String projectDescription => Path.GetFileName(projectPath);
+
         public String arduinoBase
         {
-            get => model.data.arduinoBase;
+            get => model.setup.arduinoBase;
             set
             {
-                if (value != model.data.arduinoBase)
+                if (value != model.setup.arduinoBase)
                 {
-                    model.data.arduinoBase = value.Trim();
+                    model.setup.arduinoBase = value.Trim();
+                    FileHelpers.arduinoPath = model.setup.arduinoBase;
 
                     ///Hack
                     var board = selectedBoard?.board;
@@ -119,12 +123,12 @@ namespace ViewModel
         }
         public String boardTxtPath
         {
-            get => model.data.boardTxtPath;
+            get => model.project.boardTxtPath;
             set
             {
-                if (value != model.data.boardTxtPath)
+                if (value != model.project.boardTxtPath)
                 {
-                    model.data.boardTxtPath = value.Trim();
+                    model.project.boardTxtPath = value.Trim();
                     OnPropertyChanged();
                     updateAll();
                 }
@@ -132,12 +136,12 @@ namespace ViewModel
         }
         public bool copyBoardTxt
         {
-            get => model.data.copyBoardTxt;
+            get => model.project.copyBoardTxt;
             set
             {
-                if (value != model.data.copyBoardTxt)
+                if (value != model.project.copyBoardTxt)
                 {
-                    model.data.copyBoardTxt = value;
+                    model.project.copyBoardTxt = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -146,12 +150,12 @@ namespace ViewModel
 
         public bool copyCore
         {
-            get => model.data.copyCore;
+            get => model.project.copyCore;
             set
             {
-                if (value != model.data.copyCore)
+                if (value != model.project.copyCore)
                 {
-                    model.data.copyCore = value;
+                    model.project.copyCore = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -160,12 +164,12 @@ namespace ViewModel
 
         public String corePath
         {
-            get => model.data.coreBase;
+            get => model.project.coreBase;
             set
             {
-                if (value != model.data.coreBase)
+                if (value != model.project.coreBase)
                 {
-                    model.data.coreBase = value.Trim();
+                    model.project.coreBase = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -173,12 +177,12 @@ namespace ViewModel
         }
         public String compilerPath
         {
-            get => model.data.compilerBase;
+            get => model.project.compilerBase;
             set
             {
-                if (value != model.data.compilerBase)
+                if (value != model.project.compilerBase)
                 {
-                    model.data.compilerBase = value.Trim();
+                    model.project.compilerBase = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -188,12 +192,13 @@ namespace ViewModel
 
         public bool quickSetup
         {
-            get => model.data.fromArduino;
+            get => model.project.setupType == SetupTypes.quick ? true : false;
             set
             {
-                if (model.data.fromArduino != value)
+                SetupTypes newType = value == true ? SetupTypes.quick : SetupTypes.expert;  // hack, valueConverter would be better
+                if (model.project.setupType != newType)
                 {
-                    model.data.fromArduino = value;
+                    model.project.setupType = newType;
                     updateAll();
                     OnPropertyChanged("");
                 }
@@ -264,10 +269,22 @@ namespace ViewModel
             repositoryVM = new RepositoryVM(model.libManager.repositories[0]);
             repositoryVM.PropertyChanged += RepositoryVM_PropertyChanged;
 
-            cmdGenerate = new RelayCommand(doGenerate, o => model.data.projectBaseError == null && !String.IsNullOrWhiteSpace(model.data.makefile) && !String.IsNullOrWhiteSpace(model.data.tasks_json) && !String.IsNullOrWhiteSpace(model.data.props_json));
+            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.project.makefile) && !String.IsNullOrWhiteSpace(model.project.tasks_json) && !String.IsNullOrWhiteSpace(model.project.props_json));
             cmdClose = new RelayCommand(doClose);
 
+            updateBoards();            
+        }
+
+        public ProjectTabVM()
+        {
+            model = new Model(new ProjectData(), new SetupData());
+            
+            model.project.setupType = SetupTypes.quick;
+            model.project.path = @"c:\users\lutz\source";
+
             updateBoards();
+
+
         }
 
         private void RepositoryVM_PropertyChanged(object sender, PropertyChangedEventArgs e)

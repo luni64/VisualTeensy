@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using ViewModel;
 using System.Linq;
+using System.Windows.Navigation;
+using System.Diagnostics;
 
 namespace VisualTeensy
 {
@@ -32,13 +34,12 @@ namespace VisualTeensy
         {
             var mvm = DataContext as ViewModel.ProjectTabVM;
 
-            SetupData data = mvm.model.data;
+            // data = mvm.model.data;
 
-            var vm = new SaveWinVM(data);
+            var vm = new SaveWinVM(mvm.model.project, mvm.model.setup);
 
             var dlg = new SaveProjectWin(vm);
             dlg.ShowDialog();
-
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -65,5 +66,13 @@ namespace VisualTeensy
                 fdm.Close();
             }
         }
+
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
+
     }
 }

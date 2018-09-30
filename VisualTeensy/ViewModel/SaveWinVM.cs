@@ -41,12 +41,14 @@ namespace ViewModel
             
             try
             {
-                string vsCodeFolder = Path.Combine(data.projectBase, ".vscode");
-                string srcFolder = Path.Combine(data.projectBase, "src");
-                string libFolder = Path.Combine(data.projectBase, "lib");
-                string binCoreFolder = Path.Combine(data.projectBase, "bin", "core");
-                string binUserFolder = Path.Combine(data.projectBase, "bin", "src");
-                string binLibFolder = Path.Combine(data.projectBase, "bin", "lib");
+                string projectBase = project.path;
+
+                string vsCodeFolder = Path.Combine(projectBase, ".vscode");
+                string srcFolder = Path.Combine(projectBase, "src");
+                string libFolder = Path.Combine(projectBase, "lib");
+                string binCoreFolder = Path.Combine(projectBase, "bin", "core");
+                string binUserFolder = Path.Combine(projectBase, "bin", "src");
+                string binLibFolder = Path.Combine(projectBase, "bin", "lib");
 
                 Directory.CreateDirectory(vsCodeFolder);
                 Directory.CreateDirectory(srcFolder);
@@ -71,7 +73,7 @@ namespace ViewModel
             }
             catch (Exception e)
             {
-                error = $"Error while setting up the project folder ({data.projectBase}). {e.GetBaseException().Message}";
+                error = $"Error while setting up the project folder ({project.path}). {e.GetBaseException().Message}";
                 return;
             }
 
@@ -81,7 +83,7 @@ namespace ViewModel
 
             await writeProjectFiles();
 
-            if (!data.fromArduino && data.copyCore)
+            if (project.setupType == SetupTypes.expert && project.copyCore)
             {
                 await copyCoreFiles();
             }
@@ -96,7 +98,7 @@ namespace ViewModel
             await Delay(50);
             mainCppPath.status = true;
 
-            if (!data.fromArduino && data.copyBoardTxt)
+            if (project.setupType == SetupTypes.expert && project.copyBoardTxt)
             {
                 copyBoardFile();
             }
@@ -141,8 +143,8 @@ namespace ViewModel
         public DisplayText compilerBase { get; }
         public DisplayText makeExePath { get; }
 
-        public bool copyBoardTxt => data.copyBoardTxt && !data.fromArduino;
-        public bool copyCore => data.copyCore && !data.fromArduino;
+        public bool copyBoardTxt => project.copyBoardTxt && project.setupType == SetupTypes.expert;
+        public bool copyCore => project.copyCore && project.setupType == SetupTypes.expert;
 
         public double perc
         {
@@ -160,15 +162,15 @@ namespace ViewModel
 
         private void copyBoardFile()
         {
-            string SourcePath = data.boardTxtPath;
-            string DestinationPath = Path.Combine(data.projectBase, Path.GetFileName(SourcePath));
+            string SourcePath = project.boardTxtPath;
+            string DestinationPath = Path.Combine(project.path, Path.GetFileName(SourcePath));
             File.Copy(SourcePath, DestinationPath, overwrite: true);
         }
         private async Task copyCoreFiles()
         {
             showProg = true;
-            string SourcePath = data.coreBase;
-            string DestinationPath = Path.Combine(data.projectBase, "core");
+            string SourcePath = project.coreBase;
+            string DestinationPath = Path.Combine(project.path, "core");
 
             foreach (string dirPath in Directory.GetDirectories(SourcePath, "*.*", SearchOption.AllDirectories))
             {
@@ -188,10 +190,10 @@ namespace ViewModel
         }
         private async Task writeProjectFiles()
         {         
-            await writeFile(makefilePath, data.makefile);
-            await writeFile(buildTaskPath, data.tasks_json);
-            await writeFile(intellisensePath, data.props_json);
-            await writeFile(setupFilePath, data.vsSetup_json);
+            await writeFile(makefilePath, project.makefile);
+            await writeFile(buildTaskPath, project.tasks_json);
+            await writeFile(intellisensePath, project.props_json);
+            await writeFile(setupFilePath, project.vsSetup_json);
 
         }
 
@@ -209,7 +211,7 @@ namespace ViewModel
 
         void writeMainCpp()
         {
-            string mainCppPath = Path.Combine(data.projectBase, "src", "main.cpp");
+            string mainCppPath = Path.Combine(project.path, "src", "main.cpp");
 
             if (!File.Exists(mainCppPath))
             {
@@ -221,15 +223,17 @@ namespace ViewModel
             }
         }
 
-        public SaveWinVM(SetupData data)
+        public SaveWinVM(ProjectData project, SetupData setup)
         {
             cmdSave = new AsyncCommand(doSave);
-            this.data = data;
+           
+            this.project = project;
+            this.setup = setup;
 
             projectFolder = new DisplayText()
             {
-                text = data.projectBaseError == null ? data.projectBase : "MISSING",
-                action = Directory.Exists(data.projectBase) ? "use existing" : "generate",
+                text = project.pathError == null ? project.path : "MISSING",
+                action = Directory.Exists(project.path) ? "use existing" : "generate",
                 status = false
             };
 
@@ -254,21 +258,23 @@ namespace ViewModel
             setupFilePath.action = File.Exists(setupFilePath.text) ? "overwrite" : "generate";
 
 
-            coreBase = new DisplayText() { text = data.coreBase };
-            coreBase.action = data.copyCore ? "copy from" : "link to";
+            coreBase = new DisplayText() { text = project.coreBase };
+            coreBase.action = project.copyCore ? "copy from" : "link to";
             coreTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "core") };
 
-            mainCppPath = new DisplayText() { text = Path.Combine(data.projectBase, "src", "main.cpp") };
+            mainCppPath = new DisplayText() { text = Path.Combine(project.path, "src", "main.cpp") };
             mainCppPath.action = File.Exists(mainCppPath.text) ? "skip (exists)" : "generate";
 
-            boardDefintionPath = new DisplayText() { text = data.boardTxtPath };
-            boardDefintionPath.action = data.copyBoardTxt ? "copy from" : "link to";
+            boardDefintionPath = new DisplayText() { text = project.boardTxtPath };
+            boardDefintionPath.action = project.copyBoardTxt ? "copy from" : "link to";
             boardDefintionTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "boards.txt") };
 
-            compilerBase = new DisplayText() { text = data.compilerBase };
-            makeExePath = new DisplayText() { text = data.makeExePath };
+            compilerBase = new DisplayText() { text = project.compilerBase };
+            makeExePath = new DisplayText() { text = setup.makeExePath };
         }
 
-        private SetupData data;
+        // private SetupData data;
+        private ProjectData project;
+        private SetupData setup;
     }
 }

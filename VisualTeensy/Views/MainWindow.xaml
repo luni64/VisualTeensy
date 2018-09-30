@@ -7,18 +7,33 @@
         xmlns:vm="clr-namespace:ViewModel"
         Title="{Binding Title, Mode=OneWay}"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainVM, IsDesignTimeCreatable=False}"
         Height="auto" Width="1000" Closing="Window_Closing">
+    <DockPanel>
 
-    <TabControl Margin="20">
-        <TabItem Header="Project">
-            <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
-        </TabItem>
-        
-        <TabItem Header="Library Manager">            
-        </TabItem>
-        
-        <TabItem Header="Settings">           
-            <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
-        </TabItem>
-    </TabControl>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Click="FileOpenClick" />
+                <MenuItem Header="New"/>
+                <Separator/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="TBD"/>
+            </MenuItem>
+        </Menu>
+
+        <TabControl Margin="20">
+            <TabItem Header="Project">
+                <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
+            </TabItem>
+
+            <TabItem Header="Library Manager">
+            </TabItem>
+
+            <TabItem Header="Settings">
+                <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>

@@ -6,15 +6,11 @@ using System.Web.Script.Serialization;
 
 namespace VisualTeensy.Model
 {
-
-
-
     class libTransfer
     {
         public string name { get; set; }
     }
-
-
+    
     public class PjrcLibs
     {
         public string name => "PJRC Libraries";
@@ -22,16 +18,18 @@ namespace VisualTeensy.Model
         public List<Library> selected { get; }
 
 
-        public PjrcLibs(SetupData data)
+        public PjrcLibs(ProjectData project, SetupData setup)
         {
-            var path = data.libBase;
-            
-            if (!Directory.Exists(path)) return;
-
-            this.data = data;
 
             libraries = new List<Library>();
             selected = new List<Library>();
+
+            var path = setup.libBase;
+            this.project = project; 
+            
+            if (!Directory.Exists(path)) return;
+
+            //this.data = data;
 
             var json = new JavaScriptSerializer();
 
@@ -85,7 +83,9 @@ namespace VisualTeensy.Model
             }
         }
 
-        public SetupData data { get; }
+        public ProjectData project { get; }
+
+        //public SetupData data { get; }
     }
 }
 

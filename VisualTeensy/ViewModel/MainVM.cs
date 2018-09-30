@@ -12,6 +12,18 @@ namespace ViewModel
 {
     class MainVM : BaseViewModel
     {
+        public RelayCommand cmdFileOpen { get; set; }
+        void doFileOpen(object path)
+        {            
+            projecTabVM.projectPath = path as string;
+            OnPropertyChanged("Title");
+        }
+        public RelayCommand cmdFileNew { get; set; }
+        void doFileNew(object o)
+        {
+
+        }
+
         public SetupTabVM setupTabVM { get; }
         public ProjectTabVM projecTabVM { get; }
 
@@ -20,22 +32,23 @@ namespace ViewModel
             get
             {
                 var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return $"lunOptics - VisualTeensy v{v.Major}.{v.Minor}";
+                return $"{model.project.path} - VisualTeensy v{v.Major}.{v.Minor} (lunOptics)";
             }
         }
 
         public MainVM(Model model = null)
         {
-            if (Debugger.IsAttached)
-            {
-                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
-            }
+            cmdFileOpen = new RelayCommand(doFileOpen);
+            cmdFileNew = new RelayCommand(doFileNew);
 
+            this.model = model;
             
             projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
                        
             setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
         }
+
+        public Model model { get; }
     }
 }

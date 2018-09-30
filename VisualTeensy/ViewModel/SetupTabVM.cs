@@ -67,14 +67,27 @@ namespace ViewModel
         }
 
 
-        public String makePath
+        public String arduinoBase
         {
-            get => data.makeExePath;
+            get => setup.arduinoBase;
             set
             {
-                if (value != data.makeExePath)
+                if (value != setup.arduinoBase)
                 {
-                    data.makeExePath = value.Trim();
+                    setup.arduinoBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public String makePath
+        {
+            get => setup.makeExePath;
+            set
+            {
+                if (value != setup.makeExePath)
+                {
+                    setup.makeExePath = value.Trim();
                     OnPropertyChanged();
                 }
             }
@@ -83,36 +96,36 @@ namespace ViewModel
 
         public String uploadTyPath
         {
-            get => data.uplTyBase;
+            get => setup.uplTyBase;
             set
             {
-                if (value != data.uplTyBase)
+                if (value != setup.uplTyBase)
                 {
-                    data.uplTyBase = value;
+                    setup.uplTyBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadPjrcPath
         {
-            get => data.uplPjrcBase;
+            get => setup.uplPjrcBase;
             set
             {
-                if (value != data.uplPjrcBase)
+                if (value != setup.uplPjrcBase)
                 {
-                    data.uplPjrcBase = value;
+                    setup.uplPjrcBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String projectBaseDefault
         {
-            get => data.projectBaseDefault;
+            get => setup.projectBaseDefault;
             set
             {
-                if (value != data.projectBaseDefault)
+                if (value != setup.projectBaseDefault)
                 {
-                    data.projectBaseDefault = value;
+                    setup.projectBaseDefault = value;
                     OnPropertyChanged();
                 }
             }
@@ -129,19 +142,19 @@ namespace ViewModel
                 switch (columnName)
                 {
                     case "projectPathDefault":
-                        error = data.projectBaseError;
+                        error = project.pathError;
                         break;
 
                     case "makePath":
-                        error = data.makeExePathError;
+                        error = setup.makeExePathError;
                         break;
 
                     case "uploadTyPath":
-                        error = data.uplTyBaseError;
+                        error = setup.uplTyBaseError;
                         break;
 
                     case "uploadPjrcPath":
-                        error = data.uplPjrcBaseError;
+                        error = setup.uplPjrcBaseError;
                         break;
 
                     default:
@@ -154,13 +167,16 @@ namespace ViewModel
 
         public SetupTabVM(Model model)
         {
-            this.data = model.data;
+            this.project = model.project;
+            this.setup = model.setup;
 
             cmdDownloadMake = new AsyncCommand(doDownload);
         }
 
+        ProjectData project;
+        SetupData setup;
 
-        SetupData data;
+        //SetupData data;
     }
 }
 

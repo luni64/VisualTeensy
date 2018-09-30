@@ -22,7 +22,7 @@ namespace ViewModel
             foreach (var lib in repository.libraries)
             {
                 var lvm = new LibraryVM(lib);
-                if(repository.data.libraries.Contains(lib))
+                if(repository.project.libraries.Contains(lib))
                 {
                     lvm.selected = true;
                 }
@@ -31,9 +31,7 @@ namespace ViewModel
                 lvm.PropertyChanged += Lvm_PropertyChanged;
 
                 libs.Add(lvm);
-            }
-
-            
+            }            
         }
 
         private void Lvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -43,18 +41,16 @@ namespace ViewModel
             {
                 if(lib.selected)
                 {
-                    repository.data.libraries.Add(lib.lib);
+                    repository.project.libraries.Add(lib.lib);
                 }
                 else
                 {
-                    repository.data.libraries.Remove(lib.lib);
+                    repository.project.libraries.Remove(lib.lib);
                 }
             }
             OnPropertyChanged("libraries");
         }
 
-        PjrcLibs repository;
-
-       
+        PjrcLibs repository;       
     }
 }

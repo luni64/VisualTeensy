@@ -7,125 +7,135 @@
              xmlns:vm="clr-namespace:ViewModel"
              mc:Ignorable="d"  
              Background="White"
-             d:DataContext="{d:DesignInstance vm:ProjectTabVM, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance vm:ProjectTabVM, IsDesignTimeCreatable=True}"
              d:DesignHeight="600" d:DesignWidth="800" Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded">
-
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
 
     <Grid Margin="10" >
         <Grid.ColumnDefinitions>
-            <!--<ColumnDefinition Width="auto"/>-->
+            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
+        <Grid.RowDefinitions>           
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Column="0" Grid.Row="0" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
-            <Grid VerticalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch"   Margin="0,0,50,0">
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}">
-                            <RadioButton.ToolTip>
-                                Quick Setup uses your Arduino installation to generate the project.
-                            </RadioButton.ToolTip>
-                        </RadioButton>
-                        <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="20,0,0,0" >
-                            <RadioButton.ToolTip>
-                                Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
-                            </RadioButton.ToolTip>
-                        </RadioButton>
-                    </StackPanel>
-
-                    <TextBlock Text="Project Folder:" FontWeight="Bold" FontSize="11" Margin="0,15,0,0"/>
-                    <!--<Label   Content="Project Folder" HorizontalAlignment="Left" FontSize="10" Padding="0" Margin="0,5,0,0" />-->
-                    <local:PSelector SelectedPath="{Binding projectPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-
-
-                    <!--Expert Setup ____________________________________ -->
-                    <StackPanel Width="auto" Margin="0,15,0,0"  HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
-                        <TextBlock Text="Details:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
-                        <Label   Content="Path to boards.txt" FontSize="10" Padding="0" />
-                        <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
-                        <CheckBox Content="Copy to project folder? (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>
-
-                        <Label   Content="Path to Teensy Core Library" FontSize="10" Padding="0" Margin="0,15,0,0" />
-                        <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True"  />
-                        <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyCore}"/>
-
-                        <Label   Content="Compiler Folder" FontSize="10" Padding="0" Margin="0,15,0,0" />
-                        <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
-                    </StackPanel>
-
-                    <!--Quick Setup ____________________________________ -->
-                    <StackPanel Width="auto" Margin="0,15,0,0" HorizontalAlignment="Stretch"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton}" x:Name="Quick_Settings">
-                        <TextBlock Text="Arduino Folder:" FontWeight="Bold" FontSize="11" Margin="0,0,0,0"/>
-                        <!--<Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" />-->
-                        <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
-                    </StackPanel>
-
-                    <TextBlock Text="Board Properties:" FontWeight="Bold" FontSize="11" Margin="0,15,0,5"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10"  HorizontalAlignment="Left"  >
-                        <Label Content="Board:" Width="100" Padding="0" />
-                        <ComboBox ItemsSource="{Binding boardVMs, ValidatesOnDataErrors=True}" DisplayMemberPath="boardName" Width="200" SelectedItem="{Binding selectedBoard}" />
-                    </StackPanel>
-                    <ItemsControl ItemsSource="{Binding selectedBoard.optionSetVMs, ValidatesOnDataErrors=True}" Margin="0,0,0,15">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10"  >
-                                    <Label Content="{Binding name}" Width="100" Padding="0" />
-                                    <ComboBox ItemsSource="{Binding options}" DisplayMemberPath="name" Width="200" SelectedItem="{Binding selectedOption}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                </StackPanel>
-                <StackPanel Grid.Column="1" Grid.Row="0" Margin="100,0,0,0">
-                    <TextBlock  FontWeight="Bold" FontSize="14" Text="Library Storage" Margin="0,0,0,15" />
-                    <ListBox Height="500" HorizontalAlignment="Left" ItemsSource="{Binding repositoryVM.libs}" ScrollViewer.CanContentScroll="False">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="Gray" BorderThickness="0" >
-                                    <StackPanel Orientation="Vertical" Margin="0,0,0,0" HorizontalAlignment="Stretch" Width="380" >
-                                        <CheckBox x:Name="lib" Content="{Binding name}" IsChecked="{Binding selected }" FontSize="13" FontWeight="Bold" Foreground="#FF3949AB"/>
-                                        <TextBlock  Text="{Binding description}" Margin="20,2,0,5" TextWrapping="WrapWithOverflow"/>
-                                        <Viewbox Height="14"  Margin="20,2,0,10" HorizontalAlignment="Left">
-                                            <CheckBox Content="Copy to project" FontSize="10" IsEnabled="False"/>
-                                        </Viewbox>
-                                        <!--<Label Content="{Binding name}" Width="100" Padding="0" />-->
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </StackPanel>
-                <!--</Grid>-->
-            </Grid>
-        </Border>
-
-        <Button Grid.Row="1" Margin="0,0,10,0"  HorizontalAlignment="Right" Background="Transparent" Command="{Binding cmdGenerate}" BorderBrush="DarkGray"  >
-            <StackPanel Orientation="Horizontal">
-                <Image Source="/img/content-save.png"  Width="24" Height="24" />
-                <TextBlock Text="Generate Project" VerticalAlignment="Center" Margin="5,0,10,0"/>
+        <GridSplitter Grid.Column="1" Width="60" Grid.RowSpan="3" HorizontalAlignment="Center" Background="Transparent"/>
+        <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,20">
+                <TextBlock  FontWeight="Bold" FontSize="18" Text="{Binding projectDescription}" />
+                <TextBlock  FontSize="10"   >
+                        <Hyperlink NavigateUri="{Binding projectPath}" RequestNavigate="Hyperlink_RequestNavigate" >
+                            <TextBlock Text="{Binding projectPath}"/>
+                        </Hyperlink>
+                    </TextBlock>
             </StackPanel>
-        </Button>
-        <Button Grid.Row="1" Margin="10,0,0,0"  HorizontalAlignment="Left" Background="Transparent" Click="Button_Click" BorderBrush="DarkGray" >
+
+            <Label Grid.Row="1" Content="Board:" Padding="0" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding boardVMs, ValidatesOnDataErrors=True}" DisplayMemberPath="boardName" SelectedItem="{Binding selectedBoard}" HorizontalAlignment="Stretch"/>
+
+            <ItemsControl Grid.Row="2" Grid.ColumnSpan="2"  ItemsSource="{Binding selectedBoard.optionSetVMs, ValidatesOnDataErrors=True}" VerticalAlignment="Top" Margin="0,0,0,15">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition  Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding name}"  Padding="0" Grid.Column="0" Margin="0,0,0,5"  />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding options}" DisplayMemberPath="name" HorizontalAlignment="Stretch" SelectedItem="{Binding selectedOption}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--Expert Setup ____________________________________-->
+            <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Width="auto" Margin="0,15,0,0"   Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
+                <TextBlock Text="Details:" FontWeight="Bold" FontSize="11" Margin="0,0,0,5"/>
+                <Label   Content="Path to boards.txt" FontSize="10" Padding="0" />
+                <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
+                <CheckBox Content="Copy to project folder? (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>
+
+                <Label   Content="Path to Teensy Core Library" FontSize="10" Padding="0" Margin="0,15,0,0" />
+                <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True"  />
+                <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyCore}"/>
+
+                <Label   Content="Compiler Folder" FontSize="10" Padding="0" Margin="0,15,0,0" />
+                <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
+            </StackPanel>
+
+            <Button Grid.Row="4" Grid.ColumnSpan="4" Margin="0,20,0,0" VerticalAlignment="Bottom"  HorizontalAlignment="Right" Background="Transparent" Command="{Binding cmdGenerate}" BorderBrush="DarkGray" Width="150"  >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/img/content-save.png"  Width="24" Height="24" />
+                    <TextBlock Text="Generate Project" VerticalAlignment="Center" Margin="5,0,10,0"/>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+        <Grid Grid.Column="2"  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>                
+            </Grid.RowDefinitions>
+
+
+            <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" Margin="0,-5,0,0" >
+                    <RadioButton.ToolTip>
+                        Quick Setup uses your Arduino installation to generate the project.
+                    </RadioButton.ToolTip>
+                </RadioButton>
+                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="20,-5,0,0" >
+                    <RadioButton.ToolTip>
+                        Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
+                    </RadioButton.ToolTip>
+                </RadioButton>
+            </StackPanel>
+
+            <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="18" Text="Installed Libraries" Margin="0,0,0,15" HorizontalAlignment="Left" />
+            <ListBox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding repositoryVM.libs}" ScrollViewer.CanContentScroll="False" BorderThickness="1" BorderBrush="LightGray" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="0" >
+                            <StackPanel Orientation="Vertical" Margin="0,0,0,0" HorizontalAlignment="Stretch" >
+                                <CheckBox x:Name="lib" Content="{Binding name}" IsChecked="{Binding selected }" FontSize="13" FontWeight="Bold" Foreground="#FF3949AB"/>
+                                <TextBlock  HorizontalAlignment="Stretch" Text="{Binding description}" Margin="20,2,0,5" TextWrapping="WrapWithOverflow"/>
+                                <Viewbox Height="14"  Margin="20,2,0,10" HorizontalAlignment="Left" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" >
+                                    <CheckBox Content="Copy to project" FontSize="10" IsEnabled="False"/>
+                                </Viewbox>                                
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+
+        </Grid>
+
+       
+        <Button Grid.Row="3" Grid.ColumnSpan="2" Margin="10,0,0,0"  HorizontalAlignment="Left" Background="Transparent" Click="Button_Click" BorderBrush="DarkGray" >
             <StackPanel Orientation="Horizontal">
                 <!--<Image Source="/img/content-save.png"  Width="24" Height="24" />-->
                 <TextBlock Text="Show Files" VerticalAlignment="Center" Margin="5,0,10,0"/>
             </StackPanel>
         </Button>
 
-
     </Grid>
+
 </UserControl>

@@ -19,7 +19,7 @@ namespace VisualTeensy.Model
 
     public class vtTransferData
     {
-        public bool quickSetup { get; set; }
+        public SetupTypes quickSetup { get; set; }
 
         public string arduinoBase { get; set; }
         public string coreBase { get; set; }
@@ -32,24 +32,24 @@ namespace VisualTeensy.Model
 
         public vsBoard board { get; set; }
 
-        public vtTransferData(SetupData data, Board _board)
+        public vtTransferData(ProjectData project, SetupData setup, Board _board)
         {
-            bool oldSetup = data.fromArduino;
-            data.fromArduino = false;
+            var oldSetup = project.setupType;
+            project.setupType = SetupTypes.expert;
 
             quickSetup = oldSetup;
-            arduinoBase = data.arduinoBase;
+            arduinoBase = setup.arduinoBase;
 
-            compilerBase = data.compilerBase;
-            makeExePath = data.makeExePath;
+            compilerBase = project.compilerBase;
+            makeExePath = setup.makeExePath;
 
             libraries = new List<LibraryRepositiory>()
             {
                 new LibraryRepositiory()
                 {
                     repository = "Library Storage",
-                    path = data.libBase,
-                    libraries = data.libraries.Select(l => l.name).ToList(),
+                    path = setup.libBase,
+                    libraries = project.libraries.Select(l => l.name).ToList(),
                 },
 
                 new LibraryRepositiory() ///ToDo not yet functional
@@ -59,16 +59,15 @@ namespace VisualTeensy.Model
                     //libraries = data.libraries.Select(l => l.name).ToList(),
                 }
             };
-
-
-            if (data.coreBase != null)
+            
+            if (project.coreBase != null)
             {
-                coreBase = (data.copyCore || data.coreBase.StartsWith(data.projectBase)) ? "\\core" : data.coreBase;
+                coreBase = (project.copyCore || project.coreBase.StartsWith(project.path)) ? "\\core" : project.coreBase;
             }
 
-            if (data.boardTxtPath != null)
+            if (project.boardTxtPath != null)
             {
-                boardTxtPath = (data.copyBoardTxt || data.boardTxtPath.StartsWith(data.projectBase)) ? "\\boards.txt" : data.boardTxtPath;
+                boardTxtPath = (project.copyBoardTxt || project.boardTxtPath.StartsWith(project.path)) ? "\\boards.txt" : project.boardTxtPath;
             }
 
             board = new vsBoard()
@@ -77,7 +76,7 @@ namespace VisualTeensy.Model
                 options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name)
             };
 
-            data.fromArduino = oldSetup;
+            project.setupType = oldSetup;
         }
 
         public vtTransferData() { }
