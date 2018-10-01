@@ -82,10 +82,10 @@ namespace VisualTeensy.Model
                     }
                 }
             }
-
+			
             //Hack, would be better to change the build.flags.ld entry instead of replacing
             allOptions.Remove("build.flags.ld");
-            allOptions.Add("build.flags.ld", "-Wl,--gc-sections,--relax,--defsym=__rtc_localtime=0");
+            allOptions.Add("build.flags.ld", "-Wl,--gc-sections,--relax,--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s))");
 
             return allOptions;
         }
