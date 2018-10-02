@@ -83,6 +83,14 @@ namespace ViewModel
         public String taskFile => model.project.tasks_json;
         public String settFile => model.project.vsSetup_json;
 
+        public void update()
+        {
+            updateBoards();
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
+            OnPropertyChanged("");
+        }
+
+
         public String projectPath
         {
             get => model.project.path;
@@ -212,9 +220,9 @@ namespace ViewModel
             get => boardVMs.FirstOrDefault(b => b.board == model.selectedBoard);
             set
             {
-                if (value?.board != model.selectedBoard)
+                if (value != null && value.board != model.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
                 {
-                    model.selectedBoard = value?.board;
+                    model.selectedBoard = value.board;
                     OnPropertyChanged();
                     updateFiles();
                 }
