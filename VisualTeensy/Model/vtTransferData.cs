@@ -4,62 +4,60 @@ using System.Linq;
 
 namespace VisualTeensy.Model
 {
-    public class vsBoard
-    {
-        public string name { get; set; }
-        public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
-    }
-
-    public class LibraryRepositiory
-    {
-        public string repository { get; set; }
-        public string path { get; set; }
-        public List<string> libraries { get; set; }
-    }
 
     public class vtTransferData
     {
+        public class vsBoard
+        {
+            public string name { get; set; }
+            public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
+        }
+
+        public class LibraryRepositiory
+        {
+            public string repository { get; set; }
+           // public string path { get; set; }
+            public List<string> libraries { get; set; }
+        }
+
         public SetupTypes quickSetup { get; set; }
 
-        public string arduinoBase { get; set; }
+        //public string arduinoBase { get; set; }
         public string coreBase { get; set; }
         public string boardTxtPath { get; set; }
         public string compilerBase { get; set; }
-        public string makeExePath { get; set; }
+        //public string makeExePath { get; set; }
         public string projectName { get; set; }
         public List<LibraryRepositiory> libraries { get; set; }
 
 
         public vsBoard board { get; set; }
 
-        public vtTransferData(ProjectData project, SetupData setup, Board _board)
+        public vtTransferData(ProjectData project, /*SetupData setup,*/ Board _board)
         {
-            var oldSetup = project.setupType;
-            project.setupType = SetupTypes.expert;
-
-            quickSetup = oldSetup;
-            arduinoBase = setup.arduinoBase;
+            //var oldSetup = project.setupType;
+            //project.setupType = SetupTypes.expert;
+            //quickSetup = oldSetup;           
 
             compilerBase = project.compilerBase;
-            makeExePath = setup.makeExePath;
 
             libraries = new List<LibraryRepositiory>()
             {
                 new LibraryRepositiory()
                 {
-                    repository = "Library Storage",
-                    path = setup.libBase,
+                    repository = "Shared",
+                  //  path = setup.libBase,
                     libraries = project.libraries.Select(l => l.name).ToList(),
                 },
 
                 new LibraryRepositiory() ///ToDo not yet functional
                 {
-                    repository = "local",
-                    path = "lib",
+                    repository = "Local",
+                  //  path = "lib",
                     //libraries = data.libraries.Select(l => l.name).ToList(),
                 }
             };
-            
+
             if (project.coreBase != null)
             {
                 coreBase = (project.copyCore || project.coreBase.StartsWith(project.path)) ? "\\core" : project.coreBase;
@@ -76,7 +74,7 @@ namespace VisualTeensy.Model
                 options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name)
             };
 
-            project.setupType = oldSetup;
+            // project.setupType = oldSetup;
         }
 
         public vtTransferData() { }
@@ -84,7 +82,10 @@ namespace VisualTeensy.Model
 
         string makeRelative(string path, string basePath)
         {
-            if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(basePath)) return path;
+            if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(basePath))
+            {
+                return path;
+            }
 
             if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(basePath)))
             {
@@ -93,7 +94,10 @@ namespace VisualTeensy.Model
 
                 return p1.MakeRelativeUri(baseUri).ToString();
             }
-            else return path;
+            else
+            {
+                return path;
+            }
         }
 
     }

@@ -17,5 +17,8 @@
     <Setting Name="mainWinBounds" Type="System.Windows.Rect" Scope="User">
       <Value Profile="(Default)">100,100,1000,800</Value>
     </Setting>
+    <Setting Name="defaultProjectBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

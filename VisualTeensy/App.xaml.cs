@@ -26,8 +26,10 @@ namespace WpfApplication1
                 Settings.Default.Reload();
             }
 
-            projectData = Settings.Default.projectData ?? ProjectData.getDefault();
+            setupData = Settings.Default.setupData;
+
             setupData = Settings.Default.setupData ?? SetupData.getDefault();
+            projectData = Settings.Default.projectData ?? ProjectData.getDefault(setupData);
 
             FileHelpers.arduinoPath = setupData.arduinoBase;
 
@@ -54,7 +56,7 @@ namespace WpfApplication1
                 var mainVM = new MainVM(model);
 
                 var mainWin = new MainWindow()
-                {
+                { 
                     DataContext = mainVM,
                     Left = Settings.Default.mainWinBounds.Left,
                     Top = Settings.Default.mainWinBounds.Top,
@@ -74,8 +76,7 @@ namespace WpfApplication1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
-                throw (ex);
+                MessageBox.Show(ex.ToString());                
             }
         }
 

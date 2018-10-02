@@ -24,12 +24,14 @@
         </Menu>
 
         <TabControl Margin="20">
+            <TabControl.Effect>
+                <DropShadowEffect BlurRadius="15" Direction="314" Color="#FFA6A6A6"/>
+            </TabControl.Effect>
             <TabItem Header="Project">
                 <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Library Manager">
-            </TabItem>
+            <TabItem Header="Library Manager"/>
 
             <TabItem Header="Settings">
                 <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Linq;
 
 namespace VisualTeensy.Model
 {
@@ -81,36 +81,13 @@ namespace VisualTeensy.Model
             return stringBuilder.ToString();
         }
 
-        public static string getBoardFromArduino()
-        {
-            if (arduinoPath == null)
-            {
-                return null;
-            }
+        //public static string getBoardFromArduino()
+        //{
+        //    return getBoardFromArduino(arduinoPath);
+        //}
 
-            string boardPath = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "boards.txt");
-            return File.Exists(boardPath) ? boardPath : null;
-        }
-        public static string getToolsFromArduino()
-        {
-            if (String.IsNullOrWhiteSpace(arduinoPath))
-            {
-                return null;
-            }
-
-            string path = Path.Combine(arduinoPath, "hardware", "tools");
-            return Directory.Exists(path) ? path : null;
-        }
-        public static string getCoreFromArduino()
-        {
-            if (arduinoPath == null)
-            {
-                return null;
-            }
-
-            string path = Path.Combine(arduinoPath, "hardware", "teensy", "avr", "cores", "teensy3");
-            return Directory.Exists(path) ? path : null;
-        }
+      
+        
         public static string getSketchbookFolder()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -144,11 +121,16 @@ namespace VisualTeensy.Model
             string folder;
 
             folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
-            if (folder != null) return folder;
+            if (folder != null)
+            {
+                return folder;
+            }
 
             folder = checkFolder(@"C:\Program Files (x86)", f => isArduinoFolder(f));
-            if (folder != null) return folder;
-
+            if (folder != null)
+            {
+                return folder;
+            }
 
             return null;
         }
@@ -157,10 +139,16 @@ namespace VisualTeensy.Model
             string folder;
 
             folder = checkFolder(@"C:\Program Files", f => isTyToolsFolder(f));
-            if (folder != null) return folder;
+            if (folder != null)
+            {
+                return folder;
+            }
 
             folder = checkFolder(@"C:\Program Files (x86)", f => isTyToolsFolder(f));
-            if (folder != null) return folder;
+            if (folder != null)
+            {
+                return folder;
+            }
 
             return null;
         }
@@ -168,19 +156,31 @@ namespace VisualTeensy.Model
 
         private static bool isArduinoFolder(string folder)
         {
-            if (folder == null || !Directory.Exists(folder)) return false;
+            if (folder == null || !Directory.Exists(folder))
+            {
+                return false;
+            }
 
             var arduinoExe = Path.Combine(folder, "arduino.exe");
-            if (!File.Exists(arduinoExe)) return false;
+            if (!File.Exists(arduinoExe))
+            {
+                return false;
+            }
 
             var boardsTxt = Path.Combine(folder, "hardware", "teensy", "avr", "boards.txt");
-            if (!File.Exists(boardsTxt)) return false;
+            if (!File.Exists(boardsTxt))
+            {
+                return false;
+            }
 
             return true;
         }
         private static bool isTyToolsFolder(string folder)
         {
-            if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "TyTools" || !Directory.Exists(folder)) return false;
+            if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "TyTools" || !Directory.Exists(folder))
+            {
+                return false;
+            }
 
             var tyCommanderC = Path.Combine(folder, "TyCommanderC.exe");
             return (File.Exists(tyCommanderC));
@@ -191,13 +191,20 @@ namespace VisualTeensy.Model
             {
                 foreach (string dir in Directory.GetDirectories(baseFolder).Where(d => !d.Contains("Recycle.Bin")))
                 {
-                    if (isValid(dir)) return dir;
+                    if (isValid(dir))
+                    {
+                        return dir;
+                    }
+
                     {
                         try
                         {
                             foreach (string subDir in Directory.GetDirectories(dir))
                             {
-                                if (isValid(subDir)) return subDir;
+                                if (isValid(subDir))
+                                {
+                                    return subDir;
+                                }
                             }
                         }
                         catch { }

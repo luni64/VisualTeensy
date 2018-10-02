@@ -33,16 +33,27 @@ namespace VisualTeensy.Model
                 if (transferData != null)
                 {
                     project.setupType = transferData.quickSetup;
-                    setup.arduinoBase = transferData.arduinoBase;
+                   // setup.arduinoBase = transferData.arduinoBase;
                     project.compilerBase = transferData.compilerBase;
-                    setup.makeExePath = transferData.makeExePath;
+                    //setup.makeExePath = transferData.makeExePath;
 
                     project.boardTxtPath = transferData.boardTxtPath.StartsWith("\\") ? Path.Combine(project.path, transferData.boardTxtPath.Substring(1)) : transferData.boardTxtPath;
                     project.coreBase = transferData.coreBase.StartsWith("\\") ? Path.Combine(project.path, transferData.coreBase.Substring(1)) : transferData.coreBase;
 
-                    parseBoardsTxt();
+                    parseBoardsTxt();                    
 
-
+                    selectedBoard = boards?.FirstOrDefault(b => b.name == transferData.board.name);
+                    if (selectedBoard != null)
+                    {
+                        foreach (var option in transferData.board.options)
+                        {
+                            var optionSet = selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
+                            if (optionSet != null)
+                            {
+                                optionSet.selectedOption = optionSet.options.FirstOrDefault(x => x.name == option.Value);
+                            }
+                        }
+                    }
 
                     var libs = libManager.repositories[0].libraries;
 
@@ -50,20 +61,6 @@ namespace VisualTeensy.Model
                     {
                         var lib = libs.FirstOrDefault(l => l.name == libName);
                         if (lib != null) project.libraries.Add(lib);
-                    }
-
-
-                    selectedBoard = boards?.FirstOrDefault(b => b.name == transferData.board.name);
-                    if (selectedBoard != null)
-                    {
-                        foreach (var tos in transferData.board.options)
-                        {
-                            var os = selectedBoard.optionSets.FirstOrDefault(x => x.name == tos.Key);
-                            if (os != null)
-                            {
-                                os.selectedOption = os.options.FirstOrDefault(x => x.name == tos.Value);
-                            }
-                        }
                     }
                 }
 
@@ -123,13 +120,13 @@ namespace VisualTeensy.Model
         {
             Console.WriteLine("parseBoardsTxt");
 
-            string boardTxtPath = project.setupType == SetupTypes.quick ? setup.boardFromArduino : project.boardTxtPath;
+            string boardTxtPath = project.setupType == SetupTypes.quick ? setup.getBoardFromArduino() : project.boardTxtPath;
             boards = FileContent.parse(boardTxtPath).Where(b => b.core == "teensy3").ToList();
         }
         private string generateVisualTeensySetup()
         {
             var json = new JavaScriptSerializer();
-            return FileHelpers.formatOutput(json.Serialize(new vtTransferData(project, setup, selectedBoard)));
+            return FileHelpers.formatOutput(json.Serialize(new vtTransferData(project, /*setup,*/ selectedBoard)));
         }
         private string generateTasksFile()
         {
