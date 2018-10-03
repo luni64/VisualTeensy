@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,8 +9,15 @@ namespace VisualTeensy.Model
 
     public class vtTransferData
     {
+        public int version { get; } = 1;
+
         public class vsBoard
         {
+            public vsBoard(Board board)
+            {
+                name = board?.name;
+                options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name);
+            }
             public string name { get; set; }
             public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
         }
@@ -16,46 +25,39 @@ namespace VisualTeensy.Model
         public class LibraryRepositiory
         {
             public string repository { get; set; }
-           // public string path { get; set; }
+            // public string path { get; set; }
             public List<string> libraries { get; set; }
         }
 
-        public SetupTypes quickSetup { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SetupTypes setupType { get; set; }
 
-        //public string arduinoBase { get; set; }
+
         public string coreBase { get; set; }
         public string boardTxtPath { get; set; }
         public string compilerBase { get; set; }
-        //public string makeExePath { get; set; }
+
         public string projectName { get; set; }
         public List<LibraryRepositiory> libraries { get; set; }
+
+        // public Dictionary<string, List<string>> libraries;
 
 
         public vsBoard board { get; set; }
 
-        public vtTransferData(ProjectData project, /*SetupData setup,*/ Board _board)
+        public vtTransferData(ProjectData project)
         {
-            //var oldSetup = project.setupType;
-            //project.setupType = SetupTypes.expert;
-            //quickSetup = oldSetup;           
+            setupType = project.setupType;
 
-            compilerBase = project.compilerBase;
+
+            compilerBase = project.compilerBase;//.Replace('\\','/');
+
+
 
             libraries = new List<LibraryRepositiory>()
             {
-                new LibraryRepositiory()
-                {
-                    repository = "Shared",
-                  //  path = setup.libBase,
-                    libraries = project.libraries.Select(l => l.name).ToList(),
-                },
-
-                new LibraryRepositiory() ///ToDo not yet functional
-                {
-                    repository = "Local",
-                  //  path = "lib",
-                    //libraries = data.libraries.Select(l => l.name).ToList(),
-                }
+                project.sharedLibraries,
+                project.localLibraries,
             };
 
             if (project.coreBase != null)
@@ -68,13 +70,7 @@ namespace VisualTeensy.Model
                 boardTxtPath = (project.copyBoardTxt || project.boardTxtPath.StartsWith(project.path)) ? "\\boards.txt" : project.boardTxtPath;
             }
 
-            board = new vsBoard()
-            {
-                name = _board.name,
-                options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name)
-            };
-
-            // project.setupType = oldSetup;
+            board = new vsBoard(project.selectedBoard);
         }
 
         public vtTransferData() { }

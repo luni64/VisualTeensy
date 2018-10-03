@@ -9,96 +9,6 @@ namespace VisualTeensy.Model
         quick, expert
     }
 
-    public class ProjectData
-    {
-        public SetupTypes setupType { get; set; }
-
-        public string path { get; set; } = string.Empty;
-        public string pathError
-        {
-            get
-            {
-                try
-                {
-                    Path.GetFullPath(path);
-                    return null;
-                }
-                catch { return "Path to the project folder not valid"; }
-            }
-        }
-        public string name => Path.GetFileName(path ?? "ERROR");
-
-        public List<Library> libraries { get; } = new List<Library>();
-
-        // boards.txt ---------------------------
-        public string boardTxtPath { get; set; }
-        public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
-        public bool copyBoardTxt { get; set; }
-
-        // compilerBase ---------------------------
-        public string compilerBase { get; set; }        
-        public string compilerPathError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(compilerBase) && (Directory.Exists(compilerBase)))
-                {
-                    string gcc = Path.Combine(compilerBase, @"bin\arm-none-eabi-gcc.exe");
-                    if (File.Exists(gcc))
-                    {
-                        return null;
-                    }
-                    return @".\bin\arm-none-eabi-gcc.exe not found in the specified directory. Please select a valid arm-none-eabi gcc folder";
-                }
-                return "Folder doesn't exist";
-            }
-        }
-        public string compilerBaseShort => compilerBase.Contains(" ") ? FileHelpers.getShortPath(compilerBase) : compilerBase;
-
-        // core -------------------------------------
-        public string coreBase { get; set; }        
-        public string corePathError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(coreBase) && (Directory.Exists(coreBase)))
-                {
-                    string uploader = Path.Combine(coreBase, "Arduino.h");
-                    if (File.Exists(uploader))
-                    {
-                        return null;
-                    }
-                    return "Arduino.h not found in the specified folder. Doesn't seem to be valid arduino core";
-                }
-                return "Folder doesn't exist";
-            }
-        }
-        public bool copyCore { get; set; }
-        public string coreBaseShort => coreBase.Contains(" ") ? FileHelpers.getShortPath(coreBase) : coreBase;
-
-        public string makefile { get; set; }
-        public string tasks_json { get; set; }
-        public string props_json { get; set; }
-        public string vsSetup_json { get; set; }
-
-        public static ProjectData getDefault(SetupData setupData)
-        {
-            var pd = new ProjectData();
-                       
-            pd.setupType = SetupTypes.quick;
-
-            // Project Path ----------------------------------------------------------------------------------------------------
-            int i = 1;
-            pd.path = Path.Combine(setupData.projectBaseDefault, $"newProject");
-            while (Directory.Exists(pd.path)) { pd.path = Path.Combine(setupData.projectBaseDefault, $"newProject({i})"); }
-
-            pd.boardTxtPath = setupData.getBoardFromArduino();
-            pd.coreBase = setupData.getCoreFromArduino();
-            pd.compilerBase = setupData.getCompilerFromArduino();
-
-            return pd;
-        }
-    }
 
     public class SetupData
     {
@@ -132,7 +42,7 @@ namespace VisualTeensy.Model
                 return "Folder doesn't exist";
             }
         }
-        public string uplTyBaseShort => (uplTyBase ?? "").Contains(" ") ? FileHelpers.getShortPath(uplTyBase) : uplTyBase;
+        public string uplTyBaseShort => (uplTyBase ?? "").Contains(" ") ? Helpers.getShortPath(uplTyBase) : uplTyBase;
 
 
         // upload PJRC 
@@ -159,7 +69,7 @@ namespace VisualTeensy.Model
             {
                 //string path = setupType == SetupTypes.quick ? FileHelpers.getToolsFromArduino() : uplPjrcBase;
                 string path = uplPjrcBase;
-                return (path ?? "").Contains(" ") ? FileHelpers.getShortPath(path) : path;
+                return (path ?? "").Contains(" ") ? Helpers.getShortPath(path) : path;
             }
         }
 
@@ -191,10 +101,10 @@ namespace VisualTeensy.Model
 
 
         public string libBase { get; set; }
-        public string libBaseShort => libBase.Contains(" ") ? FileHelpers.getShortPath(libBase) : libBase;
+        public string libBaseShort => libBase.Contains(" ") ? Helpers.getShortPath(libBase) : libBase;
 
         public string sharedLibBase { get; set; }
-        public string sharedLibBaseShort => (sharedLibBase ?? "").Contains(" ") ? FileHelpers.getShortPath(sharedLibBase) : sharedLibBase;
+        public string sharedLibBaseShort => (sharedLibBase ?? "").Contains(" ") ? Helpers.getShortPath(sharedLibBase) : sharedLibBase;
 
 
         public string makefile_fixed { get; set; }
@@ -234,22 +144,18 @@ namespace VisualTeensy.Model
         }
 
 
-
-
-
-
         public static SetupData getDefault()
         {
             SetupData sd = new SetupData();
 
-            sd.arduinoBase = FileHelpers.findArduinoFolder();
-            FileHelpers.arduinoPath = sd.arduinoBase;
+            sd.arduinoBase = Helpers.findArduinoFolder().Trim();
+            Helpers.arduinoPath = sd.arduinoBase;
 
             sd.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
 
 
             sd.uplPjrcBase = sd.getToolsFromArduino();
-            sd.uplTyBase = FileHelpers.findTyToolsFolder();
+            sd.uplTyBase = Helpers.findTyToolsFolder();
 
             sd.makeExePath = Path.Combine(Directory.GetCurrentDirectory(), "make.exe");
 

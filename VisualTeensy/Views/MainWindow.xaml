@@ -14,7 +14,7 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="FileOpenClick" />
-                <MenuItem Header="New"/>
+                <MenuItem Header="New" Command="{Binding cmdFileNew}"/>
                 <Separator/>
                 <MenuItem Header="Exit"/>
             </MenuItem>

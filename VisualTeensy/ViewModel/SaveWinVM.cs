@@ -190,10 +190,10 @@ namespace ViewModel
         }
         private async Task writeProjectFiles()
         {         
-            await writeFile(makefilePath, project.makefile);
-            await writeFile(buildTaskPath, project.tasks_json);
-            await writeFile(intellisensePath, project.props_json);
-            await writeFile(setupFilePath, project.vsSetup_json);
+            await writeFile(makefilePath, model.makefile);
+            await writeFile(buildTaskPath, model.tasks_json);
+            await writeFile(intellisensePath, model.props_json);
+            await writeFile(setupFilePath, model.vsSetup_json);
 
         }
 
@@ -223,12 +223,13 @@ namespace ViewModel
             }
         }
 
-        public SaveWinVM(ProjectData project, SetupData setup)
+        public SaveWinVM(Model model)
         {
             cmdSave = new AsyncCommand(doSave);
-           
-            this.project = project;
-            this.setup = setup;
+
+            this.model = model;
+            this.project = model.project;
+            this.setup = model.setup;
 
             projectFolder = new DisplayText()
             {
@@ -276,5 +277,6 @@ namespace ViewModel
         // private SetupData data;
         private ProjectData project;
         private SetupData setup;
+        private Model model;
     }
 }

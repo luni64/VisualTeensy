@@ -8,16 +8,31 @@
     <Setting Name="fileWinBounds" Type="System.Windows.Rect" Scope="User">
       <Value Profile="(Default)">100,100,800,1000</Value>
     </Setting>
-    <Setting Name="projectData" Type="VisualTeensy.Model.ProjectData" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="setupData" Type="VisualTeensy.Model.SetupData" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="mainWinBounds" Type="System.Windows.Rect" Scope="User">
       <Value Profile="(Default)">100,100,1000,800</Value>
     </Setting>
     <Setting Name="defaultProjectBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="lastProject" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="arduinoBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="uplPjrcBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="uplTyBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="makeExePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="projectBaseDefault" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="libBase" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

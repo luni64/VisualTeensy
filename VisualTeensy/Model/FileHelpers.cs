@@ -6,7 +6,7 @@ using System.Text;
 
 namespace VisualTeensy.Model
 {
-    static class FileHelpers
+    static class Helpers
     {
         public static string arduinoPath { set; get; }
 
@@ -86,8 +86,8 @@ namespace VisualTeensy.Model
         //    return getBoardFromArduino(arduinoPath);
         //}
 
-      
-        
+
+
         public static string getSketchbookFolder()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -220,9 +220,14 @@ namespace VisualTeensy.Model
         {
             const int maxPath = 255;
 
-            StringBuilder shortPath = new StringBuilder(maxPath);
-            int i = GetShortPathName(longPath, shortPath, maxPath);
-            return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
+            if (longPath.Contains(' '))
+            {
+                StringBuilder shortPath = new StringBuilder(maxPath);
+                int i = GetShortPathName(longPath, shortPath, maxPath);
+                return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
+            }
+            else return longPath;
+
 
         }
 

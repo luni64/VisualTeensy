@@ -12,7 +12,7 @@ namespace VisualTeensy.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -49,28 +49,6 @@ namespace VisualTeensy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::VisualTeensy.Model.ProjectData projectData {
-            get {
-                return ((global::VisualTeensy.Model.ProjectData)(this["projectData"]));
-            }
-            set {
-                this["projectData"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::VisualTeensy.Model.SetupData setupData {
-            get {
-                return ((global::VisualTeensy.Model.SetupData)(this["setupData"]));
-            }
-            set {
-                this["setupData"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100,100,1000,800")]
         public global::System.Windows.Rect mainWinBounds {
             get {
@@ -90,6 +68,90 @@ namespace VisualTeensy.Properties {
             }
             set {
                 this["defaultProjectBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastProject {
+            get {
+                return ((string)(this["lastProject"]));
+            }
+            set {
+                this["lastProject"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string arduinoBase {
+            get {
+                return ((string)(this["arduinoBase"]));
+            }
+            set {
+                this["arduinoBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string uplPjrcBase {
+            get {
+                return ((string)(this["uplPjrcBase"]));
+            }
+            set {
+                this["uplPjrcBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string uplTyBase {
+            get {
+                return ((string)(this["uplTyBase"]));
+            }
+            set {
+                this["uplTyBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string makeExePath {
+            get {
+                return ((string)(this["makeExePath"]));
+            }
+            set {
+                this["makeExePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string projectBaseDefault {
+            get {
+                return ((string)(this["projectBaseDefault"]));
+            }
+            set {
+                this["projectBaseDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string libBase {
+            get {
+                return ((string)(this["libBase"]));
+            }
+            set {
+                this["libBase"] = value;
             }
         }
     }

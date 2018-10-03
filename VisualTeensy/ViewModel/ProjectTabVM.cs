@@ -71,22 +71,22 @@ namespace ViewModel
         public RelayCommand cmdClose { get; private set; }
         void doClose(object o)
         {
-           // model.saveSettings();
+            // model.saveSettings();
         }
 
         #region Properties ------------------------------------------------------
         public RepositoryVM repositoryVM { get; }
 
 
-        public String makefile => model.project.makefile;
-        public String propFile => model.project.props_json;
-        public String taskFile => model.project.tasks_json;
-        public String settFile => model.project.vsSetup_json;
+        public String makefile => model.makefile;
+        public String propFile => model.props_json;
+        public String taskFile => model.tasks_json;
+        public String settFile => model.vsSetup_json;
 
         public void update()
         {
             updateBoards();
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
             OnPropertyChanged("");
         }
 
@@ -100,7 +100,7 @@ namespace ViewModel
                 {
                     model.project.path = value.Trim();
                     selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
-                    model.openProjectPath();
+                    //model.openProjectPath();
                     updateBoards();
                     OnPropertyChanged(""); // update all
                 }
@@ -117,12 +117,12 @@ namespace ViewModel
                 if (value != model.setup.arduinoBase)
                 {
                     model.setup.arduinoBase = value.Trim();
-                    FileHelpers.arduinoPath = model.setup.arduinoBase;
+                    Helpers.arduinoPath = model.setup.arduinoBase;
 
                     ///Hack
                     var board = selectedBoard?.board;
                     selectedBoard = null;
-                    model.selectedBoard = board;
+                    model.project.selectedBoard = board;
 
                     updateAll();
                     OnPropertyChanged("");
@@ -137,8 +137,8 @@ namespace ViewModel
                 if (value != model.project.boardTxtPath)
                 {
                     model.project.boardTxtPath = value.Trim();
-                    OnPropertyChanged();
                     updateAll();
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -217,12 +217,12 @@ namespace ViewModel
 
         public BoardVM selectedBoard
         {
-            get => boardVMs.FirstOrDefault(b => b.board == model.selectedBoard);
+            get => boardVMs.FirstOrDefault(b => b.board == model.project.selectedBoard);
             set
             {
-                if (value != null && value.board != model.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
+                if (value != null && value.board != model.project.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
                 {
-                    model.selectedBoard = value.board;
+                    model.project.selectedBoard = value.board;
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -242,9 +242,11 @@ namespace ViewModel
 
         void updateAll()
         {
-            model.parseBoardsTxt();
+            model.project.parseBoardsTxt();
             updateBoards();
+            updateFiles();
         }
+                
 
         void updateBoards()
         {
@@ -252,41 +254,48 @@ namespace ViewModel
             {
                 foreach (var optionSetVM in boardVM.optionSetVMs)
                 {
-                    optionSetVM.PropertyChanged -= (s, e) => updateFiles();
+                    optionSetVM.PropertyChanged -= onOptionSetChanged;
+                    optionSetVM.selectedOption = null;
                 }
             }
 
             boardVMs.Clear();
 
-            foreach (var board in model.boards)
+            foreach (var board in model.project.boards)
             {
                 var boardVM = new BoardVM(board);
                 boardVMs.Add(boardVM);
                 foreach (var optionSetVM in boardVM.optionSetVMs)
                 {
-                    optionSetVM.PropertyChanged += (s, e) => updateFiles();
+                    optionSetVM.PropertyChanged += onOptionSetChanged;  // can't use a simple lambda here since we have no chance to remove it :-(
                 }
-            }
+            } 
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
+        }
 
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
+        private void onOptionSetChanged(object sender, PropertyChangedEventArgs e)
+        {
+            updateFiles();
         }
 
         public ProjectTabVM(Model model)
         {
             this.model = model;
-            repositoryVM = new RepositoryVM(model.libManager.repositories[0]);
+            repositoryVM = new RepositoryVM(model.sharedLibraries);
             repositoryVM.PropertyChanged += RepositoryVM_PropertyChanged;
 
-            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.project.makefile) && !String.IsNullOrWhiteSpace(model.project.tasks_json) && !String.IsNullOrWhiteSpace(model.project.props_json));
+            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.makefile) && !String.IsNullOrWhiteSpace(model.tasks_json) && !String.IsNullOrWhiteSpace(model.props_json));
             cmdClose = new RelayCommand(doClose);
 
-            updateBoards();            
+            updateBoards();
         }
 
         public ProjectTabVM()
         {
-            model = new Model(new ProjectData(), new SetupData());
-            
+            var sud = new SetupData();
+
+            model = new Model(new ProjectData(sud), sud);
+
             model.project.setupType = SetupTypes.quick;
             model.project.path = @"c:\users\lutz\source";
 
