@@ -1,6 +1,8 @@
 ﻿using log4net;
+using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
+using log4net.Repository.Hierarchy;
 using System;
 using System.Globalization;
 using System.IO;
@@ -8,7 +10,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using ViewModel;
-using VisualTeensy;
 using VisualTeensy.Model;
 using VisualTeensy.Properties;
 
@@ -31,16 +32,16 @@ namespace VisualTeensy
             }
 
             var setupData = new SetupData();
-            
+
 
             setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder().Trim() : Settings.Default.arduinoBase;
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-            setupData.uplPjrcBase = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.getToolsFromArduino() : Settings.Default.uplPjrcBase;
+            setupData.uplPjrcBase = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
             setupData.uplTyBase = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
             setupData.makeExePath = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Path.Combine(Directory.GetCurrentDirectory(), "make.exe") : Settings.Default.makeExePath;
-            setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(setupData.arduinoBase ?? "", "hardware", "Teensy", "avr", "libraries") : Settings.Default.libBase;
+            setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
             {
@@ -61,15 +62,22 @@ namespace VisualTeensy
             Settings.Default.libBase = setupData.libBase;
         }
 
-         
         protected override void OnStartup(StartupEventArgs e)
         {
             XmlConfigurator.Configure();
-            LogManager.GetRepository().Threshold = Level.All;
+
+            var repository = (Hierarchy) LogManager.GetRepository();
+            repository.Threshold = Level.All;
+
+            var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
+
+            fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
+            fa.ActivateOptions();            
+
+
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             log.Info($"------------------------------------------");
             log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
-                  
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             base.OnStartup(e);
@@ -78,8 +86,9 @@ namespace VisualTeensy
             try
             {
                 var setupData = loadSetup();
-                var project = new ProjectData(setupData);
-                if (project.open(Settings.Default.lastProject) == false) project = ProjectData.getDefault(setupData);
+                var project = ProjectData.open(Settings.Default.lastProject, setupData) ?? ProjectData.getDefault(setupData);
+
+                //  var project = Project.open(Settings.Default.lastProject, setupData) == false) project = ProjectData.getDefault(setupData);
 
                 var model = new Model.Model(project, setupData);
                 var mainVM = new MainVM(model);
@@ -114,19 +123,17 @@ namespace VisualTeensy
         }
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-
-        //private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        //{
-        //    String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
-
-        //    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-        //    {
-        //        Byte[] assemblyData = new Byte[stream.Length];
-        //        stream.Read(assemblyData, 0, assemblyData.Length);
-        //        return Assembly.Load(assemblyData);
-        //    }
-        //}
     }
 }
 
+//private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+//{
+//    String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
+
+//    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+//    {
+//        Byte[] assemblyData = new Byte[stream.Length];
+//        stream.Read(assemblyData, 0, assemblyData.Length);
+//        return Assembly.Load(assemblyData);
+//    }
+//}

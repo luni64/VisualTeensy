@@ -10,84 +10,83 @@ namespace VisualTeensy.Model
     {
         public static string arduinoPath { set; get; }
 
-        public static string formatOutput(string jsonString)
-        {
-            var stringBuilder = new StringBuilder();
-
-            bool escaping = false;
-            bool inQuotes = false;
-            int indentation = 0;
-
-            foreach (char character in jsonString)
-            {
-                if (escaping)
-                {
-                    escaping = false;
-                    stringBuilder.Append(character);
-                }
-                else
-                {
-                    if (character == '\\')
-                    {
-                        escaping = true;
-                        stringBuilder.Append(character);
-                    }
-                    else if (character == '\"')
-                    {
-                        inQuotes = !inQuotes;
-                        stringBuilder.Append(character);
-                    }
-                    else if (!inQuotes)
-                    {
-                        if (character == ',')
-                        {
-                            stringBuilder.Append(character);
-                            stringBuilder.Append("\n");
-                            stringBuilder.Append(' ', indentation);
-                            stringBuilder.Append(' ', indentation);
-                        }
-                        else if (character == '[' || character == '{')
-                        {
-                            stringBuilder.Append(character);
-                            stringBuilder.Append("\r\n");
-                            stringBuilder.Append(' ', ++indentation);
-                            stringBuilder.Append(' ', indentation);
-                        }
-                        else if (character == ']' || character == '}')
-                        {
-                            stringBuilder.Append("\r\n");
-                            stringBuilder.Append(' ', --indentation);
-                            stringBuilder.Append(' ', indentation);
-                            stringBuilder.Append(character);
-                        }
-                        else if (character == ':')
-                        {
-                            stringBuilder.Append(character);
-                            stringBuilder.Append(' ');
-                            //stringBuilder.Append(' ');
-                        }
-                        else
-                        {
-                            stringBuilder.Append(character);
-                        }
-                    }
-                    else
-                    {
-                        stringBuilder.Append(character);
-                    }
-                }
-            }
-
-            return stringBuilder.ToString();
-        }
-
-        //public static string getBoardFromArduino()
+        //public static string formatOutput(string jsonString)
         //{
-        //    return getBoardFromArduino(arduinoPath);
+        //    var stringBuilder = new StringBuilder();
+
+        //    bool escaping = false;
+        //    bool inQuotes = false;
+        //    int indentation = 0;
+
+        //    foreach (char character in jsonString)
+        //    {
+        //        if (escaping)
+        //        {
+        //            escaping = false;
+        //            stringBuilder.Append(character);
+        //        }
+        //        else
+        //        {
+        //            if (character == '\\')
+        //            {
+        //                escaping = true;
+        //                stringBuilder.Append(character);
+        //            }
+        //            else if (character == '\"')
+        //            {
+        //                inQuotes = !inQuotes;
+        //                stringBuilder.Append(character);
+        //            }
+        //            else if (!inQuotes)
+        //            {
+        //                if (character == ',')
+        //                {
+        //                    stringBuilder.Append(character);
+        //                    stringBuilder.Append("\n");
+        //                    stringBuilder.Append(' ', indentation);
+        //                    stringBuilder.Append(' ', indentation);
+        //                }
+        //                else if (character == '[' || character == '{')
+        //                {
+        //                    stringBuilder.Append(character);
+        //                    stringBuilder.Append("\r\n");
+        //                    stringBuilder.Append(' ', ++indentation);
+        //                    stringBuilder.Append(' ', indentation);
+        //                }
+        //                else if (character == ']' || character == '}')
+        //                {
+        //                    stringBuilder.Append("\r\n");
+        //                    stringBuilder.Append(' ', --indentation);
+        //                    stringBuilder.Append(' ', indentation);
+        //                    stringBuilder.Append(character);
+        //                }
+        //                else if (character == ':')
+        //                {
+        //                    stringBuilder.Append(character);
+        //                    stringBuilder.Append(' ');
+        //                    //stringBuilder.Append(' ');
+        //                }
+        //                else
+        //                {
+        //                    stringBuilder.Append(character);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                stringBuilder.Append(character);
+        //            }
+        //        }
+        //    }
+
+        //    return stringBuilder.ToString();
         //}
 
+        ////public static string getBoardFromArduino()
+        ////{
+        ////    return getBoardFromArduino(arduinoPath);
+        ////}
 
-
+            
         public static string getSketchbookFolder()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -196,19 +195,17 @@ namespace VisualTeensy.Model
                         return dir;
                     }
 
+                    try
                     {
-                        try
+                        foreach (string subDir in Directory.GetDirectories(dir))
                         {
-                            foreach (string subDir in Directory.GetDirectories(dir))
+                            if (isValid(subDir))
                             {
-                                if (isValid(subDir))
-                                {
-                                    return subDir;
-                                }
+                                return subDir;
                             }
                         }
-                        catch { }
                     }
+                    catch { }
                 }
             }
             return null;
@@ -218,17 +215,16 @@ namespace VisualTeensy.Model
         private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
         public static string getShortPath(string longPath)
         {
-            const int maxPath = 255;
 
-            if (longPath.Contains(' '))
+            if (longPath == null || !longPath.Contains(' '))
             {
-                StringBuilder shortPath = new StringBuilder(maxPath);
-                int i = GetShortPathName(longPath, shortPath, maxPath);
-                return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
+                return longPath;
             }
-            else return longPath;
 
-
+            const int maxPath = 255;
+            StringBuilder shortPath = new StringBuilder(maxPath);
+            int i = GetShortPathName(longPath, shortPath, maxPath);
+            return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]

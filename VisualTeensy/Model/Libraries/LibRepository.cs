@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Web.Script.Serialization;
 
 namespace VisualTeensy.Model
@@ -11,54 +9,51 @@ namespace VisualTeensy.Model
         public string name { get; set; }
     }
 
-    public class Repo
+    public class Repository
     {
         public string name { get; }
+        public string path { get; set; }
         public List<Library> libraries { get; }
         public List<Library> selected { get; }
 
 
-        public Repo(string repoName, string repoBase)
+        public Repository(string name, string path)
         {
-            this.name = repoName;
+            this.name = name;
+            this.path = path;
+
             libraries = new List<Library>();
             selected = new List<Library>();
-            
+
             //this.project = project; 
 
-            if (!Directory.Exists(repoBase)) return;
+            if (!Directory.Exists(path))
+            {
+                return;
+            }
 
             //this.data = data;
 
             var json = new JavaScriptSerializer();
 
-            foreach (var libDir in Directory.GetDirectories(repoBase))
+            foreach (var libDir in Directory.GetDirectories(path))
             {
-                var libDirSrc = Path.Combine(libDir, "src");
-                //if (Directory.Exists(libDirSrc))
-                //{
+             //   var libDirSrc = Path.Combine(libDir, "src");
+             
+                Library lib;
+                string p;
 
-                //}
-                //else
-                //{
-
-                //}
-
-
-                string p = Path.Combine(libDir, "library.json");
-
-                if (File.Exists(p))
+                if (File.Exists(p = Path.Combine(libDir, "library.json")))
                 {
                     using (TextReader reader = new StreamReader(p))
                     {
-                        var lib = json.Deserialize<Library>(reader.ReadToEnd());
+                        lib = json.Deserialize<Library>(reader.ReadToEnd());
                         lib.path = Path.GetFileName(libDir);
-                        libraries.Add(lib);
                     }
                 }
-                else if (File.Exists( p = Path.Combine(libDir, "library.properties")))
+                else if (File.Exists(p = Path.Combine(libDir, "library.properties")))
                 {
-                    var lib = new Library()
+                    lib = new Library()
                     {
                         path = Path.GetFileName(libDir)
                     };
@@ -67,12 +62,16 @@ namespace VisualTeensy.Model
                     {
                         var lines = reader.ReadToEnd().Split('\n');
 
-                        string name = null;
-                        string description = null;
-
+                        //string name = null;
+                        //string description = null;
                         foreach (var line in lines)
                         {
                             var tok = line.Split('=');
+                            if (tok.Length < 2)
+                            {
+                                break;
+                            }
+
                             if (tok[0] == "name")
                             {
                                 lib.name = tok[1].Trim();
@@ -81,22 +80,24 @@ namespace VisualTeensy.Model
                             {
                                 lib.description = tok[1].Trim();
                             }
-                            if (name != null && description != null) break;
+                            if (lib.name != null && lib.description != null)
+                            {
+                                break;
+                            }
                         }
-                        libraries.Add(lib);
                     }
-
                 }
                 else
                 {
-                    var lib = new Library()
+                    lib = new Library()
                     {
                         name = Path.GetFileName(libDir),
                         path = libDir,
                         description = "no information"
-                    };                    
-                    libraries.Add(lib);
+                    };
                 }
+
+                libraries.Add(lib);
             }
         }
 

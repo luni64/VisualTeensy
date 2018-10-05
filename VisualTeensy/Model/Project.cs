@@ -1,13 +1,11 @@
-﻿using System;
+﻿using log4net;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web.Script.Serialization;
-using log4net;
-using Newtonsoft.Json;
 
 namespace VisualTeensy.Model
 {
@@ -29,7 +27,7 @@ namespace VisualTeensy.Model
             }
         }
         public string name => Path.GetFileName(path ?? "ERROR");
-              
+
         // boards.txt ---------------------------
         public string boardTxtPath { get; set; }
         public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
@@ -53,7 +51,6 @@ namespace VisualTeensy.Model
                 return "Folder doesn't exist";
             }
         }
-        public string compilerBaseShort => (compilerBase != null && compilerBase.Contains(" ")) ? Helpers.getShortPath(compilerBase) : compilerBase;
 
         // core -------------------------------------
         public string coreBase { get; set; }
@@ -74,35 +71,33 @@ namespace VisualTeensy.Model
             }
         }
         public bool copyCore { get; set; }
-        public string coreBaseShort => coreBase.Contains(" ") ? Helpers.getShortPath(coreBase) : coreBase;
 
         // libraries ---------------------------------
-        //p//ublic List<string> sharedLibs { get; }
+        public Repository sharedLibs { get; }
+        public Repository localLibs { get; }    
 
-        public vtTransferData.LibraryRepositiory sharedLibraries { get; }
-        public vtTransferData.LibraryRepositiory localLibraries { get; }
-
-        public List<Board> boards { get; set; }
+        public List<Board> boards { get; private set; }
         public Board selectedBoard { get; set; }
 
         public ProjectData(SetupData settings)
         {
             this.setup = settings;
-            //sharedLibs = new List<string>();
-            //libraries = new List<vtTransferData.LibraryRepositiory>();
-            sharedLibraries = new vtTransferData.LibraryRepositiory();
-            localLibraries = new vtTransferData.LibraryRepositiory();
+           
+            sharedLibs = new Repository("Shared", settings.libBase);
+            localLibs = new Repository("Local", "lib");
         }
 
-        public bool open(string filename)
+        static public ProjectData open(string projectPath, SetupData setup)
         {
-            log.Info($"open project {filename}");
+            log.Info($"open project {projectPath}");
 
-            var configFile = Path.Combine(filename, ".vscode", "visual_teensy.json");
+            var p = new ProjectData(setup);
+
+            var configFile = Path.Combine(projectPath, ".vscode", "visual_teensy.json");
             if (!File.Exists(configFile))
             {
                 log.Warn($"config file {configFile} does not exist");
-                return false;
+                return null;
             }
             try
             {
@@ -113,22 +108,22 @@ namespace VisualTeensy.Model
 
                 if (transferData != null)
                 {
-                    path = filename;
+                    p.path = projectPath;
 
-                    setupType = transferData.setupType;
-                    compilerBase = transferData.compilerBase;
+                    p.setupType = transferData.setupType;
+                    p.compilerBase = transferData.configurations[0].compilerBase;
 
-                    boardTxtPath = transferData.boardTxtPath.StartsWith("\\") ? Path.Combine(path, transferData.boardTxtPath.Substring(1)) : transferData.boardTxtPath;
-                    coreBase = transferData.coreBase.StartsWith("\\") ? Path.Combine(path, transferData.coreBase.Substring(1)) : transferData.coreBase;
+                    p.boardTxtPath = transferData.configurations[0].boardTxtPath.StartsWith("\\") ? Path.Combine(projectPath, transferData.configurations[0].boardTxtPath.Substring(1)) : transferData.configurations[0].boardTxtPath;
+                    p.coreBase = transferData.configurations[0].coreBase.StartsWith("\\") ? Path.Combine(projectPath, transferData.configurations[0].coreBase.Substring(1)) : transferData.configurations[0].coreBase;
 
-                    parseBoardsTxt();
+                    p.parseBoardsTxt();
 
-                    selectedBoard = boards?.FirstOrDefault(b => b.name == transferData.board.name);
-                    if (selectedBoard != null)
+                    p.selectedBoard = p.boards?.FirstOrDefault(b => b.name == transferData.configurations[0].board.name);
+                    if (p.selectedBoard != null)
                     {
-                        foreach (var option in transferData.board.options)
+                        foreach (var option in transferData.configurations[0].board.options)
                         {
-                            var optionSet = selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
+                            var optionSet = p.selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
                             if (optionSet != null)
                             {
                                 optionSet.selectedOption = optionSet.options.FirstOrDefault(x => x.name == option.Value);
@@ -136,36 +131,31 @@ namespace VisualTeensy.Model
                         }
                     }
 
-                    //var libs = libManager.repositories[0].libraries;
+                    
+                    var tlibs = transferData.configurations[0].repositories.FirstOrDefault(l => l.name == "Shared")?.libraries;
 
-                    //foreach (string libName in transferData.libraries[0].libraries)
-                    //{
-                    //    var lib = libs.FirstOrDefault(l => l.name == libName);
-                    //    if (lib != null) project.libraries.Add(lib);
-                    //}
-
-                    sharedLibraries.libraries.Clear();
-
-                    sharedLibraries.libraries.AddRange(transferData.libraries);
-                    sharedLibraries = transferData.libraries.FirstOrDefault(l => l.repository == "Shared");
-
+                    foreach (var lib in tlibs)
+                    {
+                        var selectedLib = p.sharedLibs.libraries.FirstOrDefault(l =>  l.name.ToUpper() == lib.ToUpper());
+                        if (selectedLib != null) selectedLib.isSelected = true;
+                    }
 
                     log.Info($"{configFile} read sucessfully");
-                    logProject();
+                    p.logProject();
                 }
-                return true;
+                return p;
             }
             catch (Exception ex)
             {
                 log.Error("error opening project", ex);
-                return false;
+                return null;
             }
         }
 
         public void logProject()
         {
             var sb = new StringBuilder();
-            sb.Append("Project Information\n");
+            sb.Append("Data:\n");
             sb.Append($"setupType:\t{setupType}\n");
             sb.Append($"path:\t\t{path}\n");
             sb.Append($"boardTxtPath:\t{boardTxtPath}\n");
@@ -175,26 +165,25 @@ namespace VisualTeensy.Model
             log.Debug(sb.ToString());
         }
 
-
         public static ProjectData getDefault(SetupData setupData)
         {
+            log.Info("enter");
             var pd = new ProjectData(setupData);
 
             pd.setupType = SetupTypes.quick;
 
-            // Project Path ----------------------------------------------------------------------------------------------------
+            // Project Path -------------------------------------
             int i = 1;
             pd.path = Path.Combine(setupData.projectBaseDefault, $"newProject");
             while (Directory.Exists(pd.path)) { pd.path = Path.Combine(setupData.projectBaseDefault, $"newProject({i++})"); }
 
-            pd.boardTxtPath = setupData.getBoardFromArduino();
-            pd.coreBase = setupData.getCoreFromArduino();
-            pd.compilerBase = setupData.getCompilerFromArduino();
+            pd.boardTxtPath = setupData.arduinoBoardsTxt;
+            pd.coreBase = setupData.arduinoCore;
+            pd.compilerBase = setupData.arduinoCompiler;
 
             pd.boards = new List<Board>();
             pd.parseBoardsTxt();
 
-            log.Info("Generated default project");
             pd.logProject();
 
             return pd;
@@ -202,18 +191,18 @@ namespace VisualTeensy.Model
 
         public void parseBoardsTxt()
         {
-            log.Info("parse boards.txt");
+            log.Info("enter");
 
-            vtTransferData.vsBoard tmp = new vtTransferData.vsBoard(selectedBoard);
+            vtTransferData.vtBoard tmp = new vtTransferData.vtBoard(selectedBoard);
 
-            string boardsTxt = setupType == SetupTypes.quick ? setup.getBoardFromArduino() : boardTxtPath;
+            string boardsTxt = setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : boardTxtPath;
             boards = FileContent.parse(boardsTxt).Where(b => b.core == "teensy3").ToList();
 
             setBoardOptions(tmp);
         }
 
 
-        void setBoardOptions(vtTransferData.vsBoard boardInfo)
+        void setBoardOptions(vtTransferData.vtBoard boardInfo)
         {
             selectedBoard = boards?.FirstOrDefault(b => b.name == boardInfo.name) ?? boards?.FirstOrDefault();
             if (selectedBoard != null)
@@ -231,8 +220,8 @@ namespace VisualTeensy.Model
                 }
             }
             else
-            {                
-                    
+            {
+
             };
         }
 

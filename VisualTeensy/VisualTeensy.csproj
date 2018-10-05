@@ -105,24 +105,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Model\Board.cs" />
-    <Compile Include="Model\BuildEntry.cs" />
-    <Compile Include="Model\Entry.cs" />
-    <Compile Include="Model\FileContent.cs" />
+    <Compile Include="Model\Boards\Board.cs" />
+    <Compile Include="Model\Boards\BuildEntry.cs" />
+    <Compile Include="Model\Boards\Entry.cs" />
+    <Compile Include="Model\Boards\FileContent.cs" />
     <Compile Include="Model\FileHelpers.cs" />
-    <Compile Include="Model\LibManager.cs" />
-    <Compile Include="Model\Library.cs" />
-    <Compile Include="Model\LibRepository.cs" />
-    <Compile Include="Model\Menu.cs" />
+    <Compile Include="Model\Libraries\LibManager.cs" />
+    <Compile Include="Model\Libraries\Library.cs" />
+    <Compile Include="Model\Libraries\LibRepository.cs" />
+    <Compile Include="Model\Boards\Menu.cs" />
     <Compile Include="Model\Model.cs" />
-    <Compile Include="Model\Option.cs" />
-    <Compile Include="Model\OptionSet.cs" />
+    <Compile Include="Model\Boards\Option.cs" />
+    <Compile Include="Model\Boards\OptionSet.cs" />
     <Compile Include="Model\Project.cs" />
     <Compile Include="Model\PropertiesJson.cs" />
     <Compile Include="Model\SetupData.cs" />
     <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
-    <Compile Include="Model\ValidatedPath.cs" />
     <Compile Include="Model\vtTransferData.cs" />
     <Compile Include="ViewModel\RepositoryVM.cs" />
     <Compile Include="ViewModel\LibraryVM.cs" />

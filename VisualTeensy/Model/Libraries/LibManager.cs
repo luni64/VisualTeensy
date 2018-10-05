@@ -5,7 +5,7 @@ namespace VisualTeensy.Model
 {
     public class LibManager
     {
-        public List<Repo> repositories { get; }
+        public List<Repository> repositories { get; }
 
 
         public LibManager(ProjectData project, SetupData setup)

@@ -36,7 +36,12 @@ namespace VisualTeensy.Model
         public void openFile(string filename)
         {
             log.Info("open file");
-            project.open(filename);
+            project = ProjectData.open(filename, setup);
+            if (project == null)
+            {
+                project = ProjectData.getDefault(setup);
+                project.path = filename;
+            }
             generateFiles();
         }
 
@@ -45,20 +50,21 @@ namespace VisualTeensy.Model
             this.setup = setup;
             this.project = project;
 
-          
+
             generateFiles();
 
             //libManager = new LibManager(this.project, this.setup);
-            
-            
-            sharedLibraries = new Repo("Shared Libraries", this.setup.libBase);
+
+
+            sharedLibraries = new Repository("Shared Libraries", this.setup.libBase);
         }
 
-        public Repo sharedLibraries { get; }
+        public Repository sharedLibraries { get; }
 
 
         public void generateFiles()
         {
+            log.Info("enter");
             makefile = tasks_json = props_json = null;
 
             bool ok = project.selectedBoard != null && setup.uplTyBaseError == null && project.pathError == null;
@@ -69,11 +75,11 @@ namespace VisualTeensy.Model
             else
             {
                 ok = ok && project.corePathError == null && project.compilerPathError == null;
-            }                                    
+            }
 
             if (ok)
             {
-                log.Info("generateFiles OK");
+                log.Debug("OK (makefile, props_json, vsSetup_json)");
 
                 var options = project.selectedBoard.getAllOptions();
 
@@ -83,8 +89,8 @@ namespace VisualTeensy.Model
             }
             else
             {
-                log.Info("generateFiles NOK");
-                project.logProject();                
+                log.Debug("NOK (makefile, props_json, vsSetup_json)");
+                project.logProject();
             }
 
             tasks_json = generateTasksFile();
@@ -92,11 +98,16 @@ namespace VisualTeensy.Model
 
         private string generateVisualTeensySetup()
         {
+            log.Debug("enter");
             return JsonConvert.SerializeObject(new vtTransferData(project), Formatting.Indented);
         }
         private string generateTasksFile()
         {
-            if (setup.makeExePathError != null) return null;
+            log.Debug("enter");
+            if (setup.makeExePathError != null)
+            {
+                return null;
+            }
 
             string makePath = setup.makeExePath;
 
@@ -148,6 +159,7 @@ namespace VisualTeensy.Model
         }
         private string generatePropertiesFile(Dictionary<string, string> options)
         {
+            log.Debug("enter");
             if (project.compilerPathError != null)
             {
                 return null;
@@ -197,6 +209,7 @@ namespace VisualTeensy.Model
         }
         private string generateMakefile(Dictionary<string, string> options)
         {
+            log.Debug("enter");
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");
@@ -210,25 +223,31 @@ namespace VisualTeensy.Model
 
             mf.Append($"SHELL            := cmd.exe\nexport SHELL\n\n");
 
-            mf.Append($"TARGET_NAME      := {project.name.Replace(" ", "_")}\n");
+            mf.Append($"TARGET_NAME      := {project.name?.Replace(" ", "_")}\n");
 
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
 
-            mf.Append($"LIBS_SHARED_BASE := {setup.libBaseShort}\n");
+            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(project.sharedLibs.path)}\n");
             mf.Append($"LIBS_SHARED      := ");
-            project.sharedLibraries.libraries.ForEach(l => mf.Append($"{l} "));
+            foreach (var lib in project.sharedLibs.libraries.Where(l => l.isSelected))
+            {
+                mf.Append($"{lib.name} ");
+            }
             mf.Append("\n\n");
 
-            mf.Append($"LIBS_LOCAL_BASE  := lib\n");
-            mf.Append($"LIBS_LOCAL       := \n\n");
-
-
+            mf.Append($"LIBS_LOCAL_BASE  := {Helpers.getShortPath(project.localLibs.path)}\n");
+            mf.Append($"LIBS_LOCAL       := ");
+            foreach (var lib in project.localLibs.libraries.Where(l => l.isSelected))
+            {
+                mf.Append($"{lib.name} ");
+            }
+            mf.Append("\n\n");
 
             if (project.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE   := {Helpers.getShortPath(setup.getCoreFromArduino())}\n");
-                mf.Append($"GCC_BASE    := {Helpers.getShortPath(setup.getCompilerFromArduino())}\n");
-                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.getToolsFromArduino())}\n");
+                mf.Append($"CORE_BASE   := {Helpers.getShortPath(setup.arduinoCore)}\n");
+                mf.Append($"GCC_BASE    := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
+                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
@@ -236,7 +255,7 @@ namespace VisualTeensy.Model
                 mf.Append($"GCC_BASE    := {Helpers.getShortPath(project.compilerBase)}\n");
                 mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
-            mf.Append($"UPL_TYCMD_B := {Helpers.getShortPath(setup.uplTyBaseShort)}\n\n");
+            mf.Append($"UPL_TYCMD_B := {Helpers.getShortPath(setup.uplTyBase)}\n\n");
 
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");

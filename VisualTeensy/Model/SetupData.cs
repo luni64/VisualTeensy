@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace VisualTeensy.Model
@@ -8,13 +7,14 @@ namespace VisualTeensy.Model
     {
         quick, expert
     }
-
-
+    
     public class SetupData
     {
+        // project path
         public string projectBaseDefault { get; set; }
         public string projectBaseDefaultError => (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
 
+        // gnu make
         public string makeExePath { get; set; }
         public string makeExePathError => makeExePath != null ? (File.Exists(makeExePath) ? null : "Error") : "Error";
 
@@ -42,9 +42,7 @@ namespace VisualTeensy.Model
                 return "Folder doesn't exist";
             }
         }
-        public string uplTyBaseShort => (uplTyBase ?? "").Contains(" ") ? Helpers.getShortPath(uplTyBase) : uplTyBase;
-
-
+       
         // upload PJRC 
         public string uplPjrcBase { get; set; }
         public string uplPjrcBaseError
@@ -62,18 +60,40 @@ namespace VisualTeensy.Model
                 }
                 return "Folder doesn't exist";
             }
-        }
-        public string uplPjrcBaseShort
+        }       
+
+        // arduinoBase
+        public string arduinoBase
         {
-            get
+            get => _arduinoBase;
+            set
             {
-                //string path = setupType == SetupTypes.quick ? FileHelpers.getToolsFromArduino() : uplPjrcBase;
-                string path = uplPjrcBase;
-                return (path ?? "").Contains(" ") ? Helpers.getShortPath(path) : path;
+                if (value != _arduinoBase)
+                {
+                    _arduinoBase = value;
+
+                    if (arduinoBaseError == null)
+                    {
+                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores", "teensy3");
+                        arduinoCore = Directory.Exists(path) ? path : null;
+
+                        path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
+                        arduinoBoardsTxt = File.Exists(path) ? path : null;
+
+                        path = Path.Combine(arduinoBase, "hardware", "tools");
+                        arduinoTools = Directory.Exists(path) ? path : null;
+
+                        path = Path.Combine(arduinoBase, "hardware", "tools", "arm");
+                        arduinoCompiler = Directory.Exists(path) ? path : null;
+                    }
+                }
+                else
+                {
+                    arduinoCore = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                }
             }
         }
-
-        public string arduinoBase { get; set; } = String.Empty;
+        string _arduinoBase = String.Empty;
         public string arduinoBaseError
         {
             get
@@ -99,50 +119,18 @@ namespace VisualTeensy.Model
             }
         }
 
+        // libraries
+        public string libBase { get; set; }      
+        
+        // settings for quick setup
+        public string arduinoCore { get; private set; }
+        public string arduinoBoardsTxt { get; private set; }
+        public string arduinoTools { get; private set; }
+        public string arduinoCompiler { get; private set; }
 
-        public string libBase { get; set; }
-        public string libBaseShort => libBase.Contains(" ") ? Helpers.getShortPath(libBase) : libBase;
-
-        public string sharedLibBase { get; set; }
-        public string sharedLibBaseShort => (sharedLibBase ?? "").Contains(" ") ? Helpers.getShortPath(sharedLibBase) : sharedLibBase;
-
-
+        // misc
         public string makefile_fixed { get; set; }
-
-
-        public string getCoreFromArduino()
-        {
-            if (String.IsNullOrWhiteSpace(arduinoBase)) { return null; }
-
-            string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores", "teensy3");
-            return Directory.Exists(path) ? path : null;
-        }
-
-        public string getBoardFromArduino()
-        {
-            if (String.IsNullOrWhiteSpace(arduinoBase)) { return null; }
-
-            string boardPath = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
-            return File.Exists(boardPath) ? boardPath : null;
-        }
-
-        public string getToolsFromArduino()
-        {
-            if (String.IsNullOrWhiteSpace(arduinoBase)) { return null; }
-
-            string path = Path.Combine(arduinoBase, "hardware", "tools");
-            return Directory.Exists(path) ? path : null;
-        }
-
-        public string getCompilerFromArduino()
-        {
-            string tools = getToolsFromArduino();
-            if (String.IsNullOrWhiteSpace(tools)) { return null; }
-
-            string path = Path.Combine(tools, "arm");
-            return Directory.Exists(path) ? path : null;
-        }
-
+      
 
         public static SetupData getDefault()
         {
@@ -152,9 +140,8 @@ namespace VisualTeensy.Model
             Helpers.arduinoPath = sd.arduinoBase;
 
             sd.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
-
-
-            sd.uplPjrcBase = sd.getToolsFromArduino();
+            
+            sd.uplPjrcBase = sd.arduinoTools;
             sd.uplTyBase = Helpers.findTyToolsFolder();
 
             sd.makeExePath = Path.Combine(Directory.GetCurrentDirectory(), "make.exe");

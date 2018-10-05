@@ -16,11 +16,7 @@ namespace ViewModel
         void doFileOpen(object path)
         {            
             model.openFile(path as string);
-
-            projecTabVM.update();
-          
-
-            //projecTabVM.projectPath = path as string;
+            projecTabVM.update();            
             OnPropertyChanged("Title");
         }
         public RelayCommand cmdFileNew { get; set; }
@@ -53,7 +49,7 @@ namespace ViewModel
             projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
                        
-            setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
+            //setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
         }
 
         public Model model { get; }
