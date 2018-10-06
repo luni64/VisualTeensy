@@ -292,6 +292,14 @@ namespace VisualTeensy.Model
             mf.Append("S_FLAGS     := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_S)\n");
             mf.Append("LD_FLAGS    := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_LSP) $(FLAGS_LD)\n");
             mf.Append("AR_FLAGS    := rcs\n");
+
+            if (project.setupType == SetupTypes.expert && !String.IsNullOrWhiteSpace(project.makefileExtension))
+            {
+                mf.Append("\n");
+                mf.Append(project.makefileExtension);
+                mf.Append("\n");
+            }
+
             mf.Append(setup.makefile_fixed);
 
             return mf.ToString();

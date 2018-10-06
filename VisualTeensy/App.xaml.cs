@@ -112,7 +112,7 @@ namespace VisualTeensy
                 saveSetup(setupData);
 
                 Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
-                Settings.Default.lastProject = project.path;
+                Settings.Default.lastProject = model.project.path;
                 Settings.Default.Save();
 
                 log.Info("Closed");

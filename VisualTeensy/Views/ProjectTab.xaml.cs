@@ -6,6 +6,7 @@ using ViewModel;
 using System.Linq;
 using System.Windows.Navigation;
 using System.Diagnostics;
+using System.Windows.Data;
 
 namespace VisualTeensy
 {
@@ -17,38 +18,9 @@ namespace VisualTeensy
         public ProjectTab()
         {
             InitializeComponent();
-        }
 
-        private void handleMessages(object sender, string message)
-        {
-            switch (message)
-            {
-                case "Generate":
-                    openOutput();
-                    break;
-            }
-        }
-
-
-        private void openOutput()
-        {
-            var mvm = DataContext as ProjectTabVM;            
-            var dlg = new SaveProjectWin(new SaveWinVM(mvm.model));
-
-            dlg.ShowDialog();
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            var vm = DataContext as ViewModel.ProjectTabVM;
-            if (vm != null) vm.MessageHandler += handleMessages;
-        }
-
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            var vm = DataContext as ViewModel.ProjectTabVM;
-            if (vm != null) vm.MessageHandler -= handleMessages;
-        }
+            Loaded += (s, e) => (DataContext as ProjectTabVM)?.OnPropertyChanged("");
+        }      
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -61,6 +33,19 @@ namespace VisualTeensy
             {
                 fdm.Close();
             }
+        }
+
+        private void StackPanel_Checked(object sender, RoutedEventArgs e)
+        {
+            if (DataContext == null) return;
+
+            var path = (string)(e.OriginalSource as RadioButton)?.Tag;
+
+            file.SetBinding(TextBox.TextProperty, new Binding(path)
+            {
+                Source = DataContext,
+                Mode = BindingMode.OneWay
+            });
         }
 
 

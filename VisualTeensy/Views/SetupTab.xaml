@@ -10,51 +10,68 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" 
              >
-    <Border Grid.Column="0" Grid.Row="1" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
-        <Grid >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <!--<Border Grid.Column="0" Grid.Row="1" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >-->
+    <Grid Margin="20" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <StackPanel Width="auto" Margin="0,0,0,0" HorizontalAlignment="Stretch"  >
-                <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" >
-                   <Run FontSize="16" FontWeight="Bold">  GNU Make </Run><LineBreak/>
-                    The project setup uses GNU Make for Windows to build the project. You can download it from e.g. here:
-                    <Hyperlink NavigateUri="http://www.equation.com/servlet/equation.cmd?fa=make" RequestNavigate="Hyperlink_RequestNavigate" >
-                       http://www.equation.com/servlet/equation.cmd?fa=make
-                    </Hyperlink>
-                </TextBlock>
+        <StackPanel Width="auto" Margin="0,0,0,0" HorizontalAlignment="Stretch"  >
 
-                <Label   Content="Path to GNU Make (required)" FontSize="10" Padding="0" Margin="0,5,0,0" />
-                <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />
 
-                <TextBlock Text="Teensy Uploader"  Margin="0,20,0,0"/>
+            <TextBlock Text="Basic Settings:"  Margin="0,0,0,0" FontSize="13" FontWeight="Bold"/>
 
-                <!--<TextBlock TextWrapping="Wrap" Margin="0,20,0,0" TextAlignment="Justify">
-                   <Run FontSize="16" FontWeight="Bold">  Uploading </Run><LineBreak/>
-                    To upload firmware to the controller, VisualTeensy supports the PJRC Teensy Uploader and TyCommander. TyCommander includes a serial 
-                    terminal and can handle uploads to more than one Controller. (Note: The path to the PJRC Teensy uploader is required for 'Expert Setups' only)
-                    (You can download TyTools here:
-                    <Hyperlink NavigateUri="https://github.com/Koromix/tytools" RequestNavigate="Hyperlink_RequestNavigate" >
-                        https://github.com/Koromix/tytools
-                    </Hyperlink>
-                </TextBlock>-->
-
-                <Label   Content="Path to the Teensy Uploader" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-
-                <Label   Content="Path to the TyTools (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-
-                <Label   Content="Path to the CLI uploader (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadCLIPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
-                
-                <Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
+            <StackPanel>
+                <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" Margin="0,10,0,0" >
+                    <RadioButton.ToolTip>
+                        Quick Setup uses your Arduino installation to generate the project.
+                    </RadioButton.ToolTip>
+                </RadioButton>
+                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="0,5,0,0" >
+                    <RadioButton.ToolTip>
+                        Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
+                    </RadioButton.ToolTip>
+                </RadioButton>
             </StackPanel>
+
+            <Label   Content="Arduino folder:" FontSize="11" FontWeight="SemiBold"  Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
+
+            <Label   Content="GNU make" FontSize="11" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />
+
+            <TextBlock Text="Uploaders:"  Margin="0,20,0,0" FontSize="13" FontWeight="Bold"/>
+
+
+            <Label   Content="PJRC Uploader (Folder containing Teensy.exe)" FontSize="11" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+            <Label   Content="TyCommander - optional (folder containing TyCommanderC.exe)" FontSize="10" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+        </StackPanel>
+
+        <Separator Grid.Column="1" Width="1" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"  />
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Enhanced Settings" Grid.Row="0" Margin="0,0,0,0" FontSize="13" FontWeight="Bold"/>
+
+            
+            <Label   Content="Additional items for makefile" Grid.Row="1" FontSize="11" FontWeight="SemiBold"  Padding="0" Margin="0,10,0,0" />
+            <TextBox VerticalAlignment="Stretch" FontFamily="courier new" FontSize="13" TextWrapping="NoWrap" AcceptsReturn="True" Grid.Row="2"/>
 
 
         </Grid>
-    </Border>
+
+
+
+    </Grid>
+    <!--</Border>-->
 </UserControl>
