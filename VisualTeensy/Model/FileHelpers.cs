@@ -152,6 +152,18 @@ namespace VisualTeensy.Model
             return null;
         }
 
+        public static string findCLIFolder()
+        {
+            string folder;
+
+            folder = checkFolder(@"C:\Users", f => isCLIFolder(f));
+            if (folder != null)
+            {
+                return folder;
+            }
+
+            return null;
+        }
 
         private static bool isArduinoFolder(string folder)
         {
@@ -184,6 +196,12 @@ namespace VisualTeensy.Model
             var tyCommanderC = Path.Combine(folder, "TyCommanderC.exe");
             return (File.Exists(tyCommanderC));
         }
+        private static bool isCLIFolder(string folder)
+        {
+            var cli = Path.Combine(folder, "teensu_loader_cli.exe");
+            return (File.Exists(cli));
+        }
+
         private static string checkFolder(string baseFolder, Predicate<string> isValid)
         {
             if (Directory.Exists(baseFolder))

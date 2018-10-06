@@ -118,6 +118,18 @@ namespace ViewModel
                 }
             }
         }
+        public String uploadCLIPath
+        {
+            get => setup.uplCLIBase;
+            set
+            {
+                if (value != setup.uplCLIBase)
+                {
+                    setup.uplCLIBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public String projectBaseDefault
         {
             get => setup.projectBaseDefault;
@@ -155,6 +167,10 @@ namespace ViewModel
 
                     case "uploadPjrcPath":
                         error = setup.uplPjrcBaseError;
+                        break;
+
+                    case "uploadCLIPath":
+                        error = setup.uplCLIBaseError;
                         break;
 
                     default:

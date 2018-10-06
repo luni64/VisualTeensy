@@ -40,6 +40,7 @@ namespace VisualTeensy
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
             setupData.uplPjrcBase = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
             setupData.uplTyBase = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
+            setupData.uplCLIBase = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
             setupData.makeExePath = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Path.Combine(Directory.GetCurrentDirectory(), "make.exe") : Settings.Default.makeExePath;
             setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
 
@@ -58,6 +59,7 @@ namespace VisualTeensy
             Settings.Default.projectBaseDefault = setupData.projectBaseDefault;
             Settings.Default.uplPjrcBase = setupData.uplPjrcBase;
             Settings.Default.uplTyBase = setupData.uplTyBase;
+            Settings.Default.uplCLIBase = setupData.uplCLIBase;
             Settings.Default.makeExePath = setupData.makeExePath;
             Settings.Default.libBase = setupData.libBase;
         }
