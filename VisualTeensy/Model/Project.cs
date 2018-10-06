@@ -28,12 +28,12 @@ namespace VisualTeensy.Model
         }
         public string name => Path.GetFileName(path ?? "ERROR");
 
-        // boards.txt ---------------------------
+        // boards.txt --------------------------------
         public string boardTxtPath { get; set; }
         public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
         public bool copyBoardTxt { get; set; }
 
-        // compilerBase ---------------------------
+        // compilerBase ------------------------------
         public string compilerBase { get; set; }
         public string compilerPathError
         {
@@ -52,7 +52,7 @@ namespace VisualTeensy.Model
             }
         }
 
-        // core -------------------------------------
+        // core --------------------------------------
         public string coreBase { get; set; }
         public string corePathError
         {
@@ -72,6 +72,9 @@ namespace VisualTeensy.Model
         }
         public bool copyCore { get; set; }
 
+        // makefile extension ------------------------
+        public string makefileExtension { get; set; }
+        
         // libraries ---------------------------------
         public Repository sharedLibs { get; }
         public Repository localLibs { get; }    
@@ -115,6 +118,8 @@ namespace VisualTeensy.Model
 
                     p.boardTxtPath = transferData.configurations[0].boardTxtPath.StartsWith("\\") ? Path.Combine(projectPath, transferData.configurations[0].boardTxtPath.Substring(1)) : transferData.configurations[0].boardTxtPath;
                     p.coreBase = transferData.configurations[0].coreBase.StartsWith("\\") ? Path.Combine(projectPath, transferData.configurations[0].coreBase.Substring(1)) : transferData.configurations[0].coreBase;
+
+                    p.makefileExtension = transferData.configurations[0].makefileExtension;
 
                     p.parseBoardsTxt();
 

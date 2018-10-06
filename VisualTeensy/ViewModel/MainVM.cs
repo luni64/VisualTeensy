@@ -6,7 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO;
+using System.Windows;
 
 namespace ViewModel
 {
@@ -16,16 +17,29 @@ namespace ViewModel
         void doFileOpen(object path)
         {            
             model.openFile(path as string);
-            projecTabVM.update();            
-            OnPropertyChanged("Title");
+            projecTabVM.update();
+            ActionText = Directory.Exists(projectPath) ? "Update Project" : "Generate Project";
+            OnPropertyChanged("");            
         }
         public RelayCommand cmdFileNew { get; set; }
         void doFileNew(object o)
         {
             model.newFile();
             projecTabVM.update();
-            OnPropertyChanged("Title");
+            ActionText = "Generate Project";
+            OnPropertyChanged("");           
         }
+
+        public RelayCommand cmdClose { get; set; }
+        void doClose(object o)
+        {
+            Application.Current.Shutdown();
+        }
+
+        public String ActionText { get; private set; }
+
+        public String projectName => model.project.name;
+        public String projectPath => model.project.path;
 
         public SetupTabVM setupTabVM { get; }
         public ProjectTabVM projecTabVM { get; }
@@ -35,7 +49,7 @@ namespace ViewModel
             get
             {
                 var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return $"{model.project.path} - VisualTeensy v{v.Major}.{v.Minor} (lunOptics)";
+                return $"VisualTeensy V{v.Major}.{v.Minor} - lunOptics";
             }
         }
 
@@ -43,6 +57,7 @@ namespace ViewModel
         {
             cmdFileOpen = new RelayCommand(doFileOpen);
             cmdFileNew = new RelayCommand(doFileNew);
+            cmdClose = new RelayCommand(doClose);
 
             this.model = model;
             

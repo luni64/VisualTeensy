@@ -115,28 +115,29 @@ namespace ViewModel
             }
         }
 
-        public String makefile => model.makefile;
-        public String propFile => model.props_json;
-        public String taskFile => model.tasks_json;
-        public String settFile => model.vsSetup_json;
-                
-        public String projectPath
+        public string makefileExtension
         {
-            get => model.project.path;
+            get => model.project.makefileExtension;
             set
             {
-                if (value != model.project.path)
+                if(value != model.project.makefileExtension)
                 {
-                    model.project.path = value.Trim();
-                    selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
-                    //model.openProjectPath();
-                    updateBoards();
-                    OnPropertyChanged(""); // update all
+                    model.project.makefileExtension = value;
+                    OnPropertyChanged();
+                    updateFiles();
                 }
             }
         }
 
-        public String projectDescription => Path.GetFileName(projectPath);
+        public String makefile => model.makefile;
+        public String propFile => model.props_json;
+        public String taskFile => model.tasks_json;
+        public String settFile => model.vsSetup_json;
+
+                
+        
+
+        //public String projectDescription => Path.GetFileName(projectPath);
 
         public String arduinoBase
         {

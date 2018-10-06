@@ -44,6 +44,9 @@ namespace VisualTeensy.Model
             public string compilerBase { get; set; }
 
             public string projectName { get; set; }
+
+            public string makefileExtension { get; set; }
+
             public List<vtRepo> repositories { get; set; }
             public vtBoard board { get; set; }
 
@@ -65,6 +68,7 @@ namespace VisualTeensy.Model
                     },
                 };
 
+                makefileExtension = project.makefileExtension;
                 compilerBase = project.compilerBase;
 
                 if (project.coreBase != null)

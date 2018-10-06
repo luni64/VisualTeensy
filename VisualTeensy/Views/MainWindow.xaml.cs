@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ViewModel;
 using System.IO;
+using System.Diagnostics;
+using System.Windows.Navigation;
 
 namespace VisualTeensy
 {
@@ -29,11 +31,11 @@ namespace VisualTeensy
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var mvm = DataContext as MainVM;               
+            var mvm = DataContext as MainVM;
             mvm?.projecTabVM?.cmdClose.Execute(null);
         }
 
-       
+
         private void FileOpenClick(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as MainVM;
@@ -56,6 +58,24 @@ namespace VisualTeensy
                 }
             }
 
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            if (Directory.Exists(e.Uri.LocalPath))
+            {
+                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+                e.Handled = true;
+            }
+            else MessageBox.Show($"Path {e.Uri.LocalPath} does not exist", "VisualTeensy", MessageBoxButton.OK,MessageBoxImage.Error);
+        }
+
+        private void openOutputClick(object sender, RoutedEventArgs e)
+        {
+            var mvm = DataContext as MainVM;
+            var dlg = new SaveProjectWin(new SaveWinVM(mvm.model));
+
+            dlg.ShowDialog();
         }
     }
 }
