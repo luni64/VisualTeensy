@@ -47,6 +47,9 @@
                 <Label   Content="Path to the TyTools (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
                 <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
 
+                <Label   Content="Path to the CLI uploader (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
+                <local:PSelector SelectedPath="{Binding  uploadCLIPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+                
                 <Label   Content="Path to your Arduino installation" FontSize="10" Padding="0" Margin="0,10,0,0" />
                 <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
             </StackPanel>
