@@ -50,6 +50,9 @@
 
             <Label   Content="TyCommander - optional (folder containing TyCommanderC.exe)" FontSize="10" Padding="0" Margin="0,10,0,0" />
             <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+            <Label   Content="CLI loader - optional (folder containing Teensy_loader_cli.exe)" FontSize="10" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadCLIPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
         </StackPanel>
 
         <Separator Grid.Column="1" Width="1" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"  />
