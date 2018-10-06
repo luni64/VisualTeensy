@@ -5,13 +5,13 @@ namespace VisualTeensy.Model
 {
     public class LibManager
     {
-        public List<PjrcLibs> repositories { get; }
+        public List<Repository> repositories { get; }
 
 
         public LibManager(ProjectData project, SetupData setup)
         {
-            repositories = new List<PjrcLibs>();
-                repositories.Add(new PjrcLibs(project, setup));
+            //repositories = new List<Repo>();
+            //    repositories.Add(new Repo(project, setup));
 
             //if (!String.IsNullOrWhiteSpace(data.setup.arduinoBase))
             //{

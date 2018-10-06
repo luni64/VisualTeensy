@@ -60,6 +60,8 @@ namespace ViewModel
         }
         #endregion
 
+        #region Commands ------------------------------------------------------
+
         public RelayCommand cmdGenerate { get; private set; }
         void doGenerate(object obj)
         {
@@ -71,26 +73,53 @@ namespace ViewModel
         public RelayCommand cmdClose { get; private set; }
         void doClose(object o)
         {
-           // model.saveSettings();
+            // model.saveSettings();
         }
-
-        #region Properties ------------------------------------------------------
-        public RepositoryVM repositoryVM { get; }
-
-
-        public String makefile => model.project.makefile;
-        public String propFile => model.project.props_json;
-        public String taskFile => model.project.tasks_json;
-        public String settFile => model.project.vsSetup_json;
-
-        public void update()
+        #endregion
+     
+        #region Properties ----------------------------------------------------
+        public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
+        public BoardVM selectedBoard
         {
-            updateBoards();
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
-            OnPropertyChanged("");
+            get => boardVMs.FirstOrDefault(b => b.board == model.project.selectedBoard);
+            set
+            {
+                if (value != null && value.board != model.project.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
+                {
+                    model.project.selectedBoard = value.board;
+                    OnPropertyChanged();
+                    updateFiles();
+                }
+            }
         }
 
+        public RepositoryVM repositoryVM
+        {
+            get => _repositoryVM;
+            private set => SetProperty(ref _repositoryVM, value);
+        }
+        RepositoryVM _repositoryVM;
+        
+        public bool quickSetup
+        {
+            get => model.project.setupType == SetupTypes.quick ? true : false;
+            set
+            {
+                SetupTypes newType = value == true ? SetupTypes.quick : SetupTypes.expert;  // hack, valueConverter would be better
+                if (model.project.setupType != newType)
+                {
+                    model.project.setupType = newType;
+                    updateAll();
+                    OnPropertyChanged("");
+                }
+            }
+        }
 
+        public String makefile => model.makefile;
+        public String propFile => model.props_json;
+        public String taskFile => model.tasks_json;
+        public String settFile => model.vsSetup_json;
+                
         public String projectPath
         {
             get => model.project.path;
@@ -100,7 +129,7 @@ namespace ViewModel
                 {
                     model.project.path = value.Trim();
                     selectedBoard = null;  //HACK, otherwise updateBoards will implicitely delete selectedBoard set by openProjectPath
-                    model.openProjectPath();
+                    //model.openProjectPath();
                     updateBoards();
                     OnPropertyChanged(""); // update all
                 }
@@ -117,12 +146,12 @@ namespace ViewModel
                 if (value != model.setup.arduinoBase)
                 {
                     model.setup.arduinoBase = value.Trim();
-                    FileHelpers.arduinoPath = model.setup.arduinoBase;
+                    Helpers.arduinoPath = model.setup.arduinoBase;
 
                     ///Hack
                     var board = selectedBoard?.board;
                     selectedBoard = null;
-                    model.selectedBoard = board;
+                    model.project.selectedBoard = board;
 
                     updateAll();
                     OnPropertyChanged("");
@@ -137,8 +166,8 @@ namespace ViewModel
                 if (value != model.project.boardTxtPath)
                 {
                     model.project.boardTxtPath = value.Trim();
-                    OnPropertyChanged();
                     updateAll();
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -155,7 +184,7 @@ namespace ViewModel
                 }
             }
         }
-
+        
         public bool copyCore
         {
             get => model.project.copyCore;
@@ -169,7 +198,6 @@ namespace ViewModel
                 }
             }
         }
-
         public String corePath
         {
             get => model.project.coreBase;
@@ -183,6 +211,7 @@ namespace ViewModel
                 }
             }
         }
+
         public String compilerPath
         {
             get => model.project.compilerBase;
@@ -196,42 +225,44 @@ namespace ViewModel
                 }
             }
         }
-
-
-        public bool quickSetup
-        {
-            get => model.project.setupType == SetupTypes.quick ? true : false;
-            set
-            {
-                SetupTypes newType = value == true ? SetupTypes.quick : SetupTypes.expert;  // hack, valueConverter would be better
-                if (model.project.setupType != newType)
-                {
-                    model.project.setupType = newType;
-                    updateAll();
-                    OnPropertyChanged("");
-                }
-            }
-        }
-
-        public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
-
-        public BoardVM selectedBoard
-        {
-            get => boardVMs.FirstOrDefault(b => b.board == model.selectedBoard);
-            set
-            {
-                if (value != null && value.board != model.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
-                {
-                    model.selectedBoard = value.board;
-                    OnPropertyChanged();
-                    updateFiles();
-                }
-            }
-        }
-
+        
         #endregion
+        
+        private void onOptionSetChanged(object sender, PropertyChangedEventArgs e)
+        {
+            updateFiles();
+        }
 
-        public void updateFiles()
+        public void update()
+        {
+            repositoryVM = new RepositoryVM(model.project.sharedLibs);
+            repositoryVM.PropertyChanged += (s, e) => updateFiles();
+
+            updateBoards();
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
+            OnPropertyChanged("");
+        }
+
+        public ProjectTabVM(Model model)
+        {
+            this.model = model;
+
+            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.makefile) && !String.IsNullOrWhiteSpace(model.tasks_json) && !String.IsNullOrWhiteSpace(model.props_json));
+            cmdClose = new RelayCommand(doClose);
+
+            updateBoards();            
+
+            repositoryVM = new RepositoryVM(model.project.sharedLibs);
+            repositoryVM.PropertyChanged += (s, e) => updateFiles();
+        }
+              
+        private void updateAll()
+        {
+            model.project.parseBoardsTxt();
+            updateBoards();
+            updateFiles();
+        }
+        private void updateFiles()
         {
             model.generateFiles();
             OnPropertyChanged("makefile");
@@ -239,68 +270,28 @@ namespace ViewModel
             OnPropertyChanged("taskFile");
             OnPropertyChanged("settFile");
         }
-
-        void updateAll()
-        {
-            model.parseBoardsTxt();
-            updateBoards();
-        }
-
-        void updateBoards()
+        private void updateBoards()
         {
             foreach (var boardVM in boardVMs)  // remove old event handlers
             {
                 foreach (var optionSetVM in boardVM.optionSetVMs)
                 {
-                    optionSetVM.PropertyChanged -= (s, e) => updateFiles();
+                    optionSetVM.PropertyChanged -= onOptionSetChanged;
+                    optionSetVM.selectedOption = null;
                 }
             }
-
             boardVMs.Clear();
 
-            foreach (var board in model.boards)
+            foreach (var board in model.project.boards)
             {
                 var boardVM = new BoardVM(board);
                 boardVMs.Add(boardVM);
                 foreach (var optionSetVM in boardVM.optionSetVMs)
                 {
-                    optionSetVM.PropertyChanged += (s, e) => updateFiles();
+                    optionSetVM.PropertyChanged += onOptionSetChanged;  // can't use a simple lambda here since we have no chance to remove it :-(
                 }
-            }
-
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.selectedBoard) ?? boardVMs?.FirstOrDefault();
-        }
-
-        public ProjectTabVM(Model model)
-        {
-            this.model = model;
-            repositoryVM = new RepositoryVM(model.libManager.repositories[0]);
-            repositoryVM.PropertyChanged += RepositoryVM_PropertyChanged;
-
-            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.project.makefile) && !String.IsNullOrWhiteSpace(model.project.tasks_json) && !String.IsNullOrWhiteSpace(model.project.props_json));
-            cmdClose = new RelayCommand(doClose);
-
-            updateBoards();            
-        }
-
-        public ProjectTabVM()
-        {
-            model = new Model(new ProjectData(), new SetupData());
-            
-            model.project.setupType = SetupTypes.quick;
-            model.project.path = @"c:\users\lutz\source";
-
-            updateBoards();
-
-
-        }
-
-        private void RepositoryVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "libraries")
-            {
-                updateFiles();
-            }
+            } 
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
         }
 
         public event EventHandler<string> MessageHandler;

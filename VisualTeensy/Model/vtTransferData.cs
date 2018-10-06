@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,75 +9,98 @@ namespace VisualTeensy.Model
 
     public class vtTransferData
     {
-        public class vsBoard
+        [JsonProperty(Order = 1)]
+        public string version { get; }
+
+        [JsonProperty(Order = 2)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SetupTypes setupType { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public List<vtConfiguration> configurations;
+        
+        public class vtBoard
         {
+            public vtBoard(Board board)
+            {
+                name = board?.name;
+                options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name);
+            }
             public string name { get; set; }
             public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
+            public override string ToString() => name;
         }
-
-        public class LibraryRepositiory
+        public class vtRepo
         {
-            public string repository { get; set; }
-           // public string path { get; set; }
-            public List<string> libraries { get; set; }
+            public string name { get; set; }            
+            public IEnumerable<string> libraries { get; set; }
         }
-
-        public SetupTypes quickSetup { get; set; }
-
-        //public string arduinoBase { get; set; }
-        public string coreBase { get; set; }
-        public string boardTxtPath { get; set; }
-        public string compilerBase { get; set; }
-        //public string makeExePath { get; set; }
-        public string projectName { get; set; }
-        public List<LibraryRepositiory> libraries { get; set; }
-
-
-        public vsBoard board { get; set; }
-
-        public vtTransferData(ProjectData project, /*SetupData setup,*/ Board _board)
+        public class vtConfiguration
         {
-            //var oldSetup = project.setupType;
-            //project.setupType = SetupTypes.expert;
-            //quickSetup = oldSetup;           
+            public string name { get; set; }
 
-            compilerBase = project.compilerBase;
+            public string coreBase { get; set; }
+            public string boardTxtPath { get; set; }
+            public string compilerBase { get; set; }
 
-            libraries = new List<LibraryRepositiory>()
+            public string projectName { get; set; }
+            public List<vtRepo> repositories { get; set; }
+            public vtBoard board { get; set; }
+
+            public vtConfiguration(ProjectData project)
             {
-                new LibraryRepositiory()
-                {
-                    repository = "Shared",
-                  //  path = setup.libBase,
-                    libraries = project.libraries.Select(l => l.name).ToList(),
-                },
+                if (project == null) return;
 
-                new LibraryRepositiory() ///ToDo not yet functional
+                repositories = new List<vtRepo>()
                 {
-                    repository = "Local",
-                  //  path = "lib",
-                    //libraries = data.libraries.Select(l => l.name).ToList(),
+                    new vtRepo()
+                    {
+                        name = project?.sharedLibs.name,
+                        libraries = project?.sharedLibs.libraries.Where(l=>l.isSelected).Select(l=>l.name)
+                    },
+                    new vtRepo()
+                    {
+                        name = project?.localLibs.name,
+                        libraries = project?.localLibs.libraries.Where(l=>l.isSelected).Select(l=>l.name)
+                    },
+                };
+
+                compilerBase = project.compilerBase;
+
+                if (project.coreBase != null)
+                {
+                    coreBase = (project.copyCore || project.coreBase.StartsWith(project.path)) ? "\\core" : project.coreBase;
                 }
-            };
 
-            if (project.coreBase != null)
-            {
-                coreBase = (project.copyCore || project.coreBase.StartsWith(project.path)) ? "\\core" : project.coreBase;
+                if (project.boardTxtPath != null)
+                {
+                    boardTxtPath = (project.copyBoardTxt || project.boardTxtPath.StartsWith(project.path)) ? "\\boards.txt" : project.boardTxtPath;
+                }
+
+                board = new vtBoard(project.selectedBoard);
+
             }
 
-            if (project.boardTxtPath != null)
-            {
-                boardTxtPath = (project.copyBoardTxt || project.boardTxtPath.StartsWith(project.path)) ? "\\boards.txt" : project.boardTxtPath;
-            }
-
-            board = new vsBoard()
-            {
-                name = _board.name,
-                options = _board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name)
-            };
-
-            // project.setupType = oldSetup;
+            public override string ToString() => name;
         }
+        
+
+        public vtTransferData(ProjectData project)
+        {
+            version = "1";
+            setupType = project.setupType;
+
+            configurations = new List<vtConfiguration>()
+            {
+                new vtConfiguration(project){ name = "default" }
+            };
+        }
+
+
+
+
+
+
 
         public vtTransferData() { }
 

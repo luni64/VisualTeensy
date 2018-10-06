@@ -13,8 +13,9 @@ namespace VisualTeensy.Model
         public string description { get; set; }
         public List<Library> dependencies;
 
-        public override string ToString() { return name; }
-
+        public bool isSelected { get; set; } = false;
+        public override string ToString() => (isSelected ? "+" : "-") + name;
+        
         public Library()
         {
 

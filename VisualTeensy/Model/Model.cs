@@ -1,9 +1,12 @@
-﻿using System;
+﻿using log4net;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Web.Script.Serialization;
+//using System.Web.Script.Serialization;
 
 namespace VisualTeensy.Model
 {
@@ -12,71 +15,59 @@ namespace VisualTeensy.Model
         public ProjectData project { get; private set; }
         public SetupData setup { get; private set; }
 
-        public LibManager libManager { get; private set; }
+        //public LibManager libManager { get; private set; }
 
-        public List<Board> boards { get; private set; }
-        public Board selectedBoard { get; set; }
+        // files ------------------------------------
+        public string makefile { get; set; }
+        public string tasks_json { get; set; }
+        public string props_json { get; set; }
+        public string vsSetup_json { get; set; }
 
-        
-        public bool openProjectPath()
+
+        public void newFile()
         {
-            vtTransferData transferData;
-
-            var configFile = Path.Combine(project.path, ".vscode", "visual_teensy.json");
-            try
-            {
-                var reader = new StreamReader(configFile);
-                var jsonString = reader.ReadToEnd();
-                var json = new JavaScriptSerializer();
-                transferData = json.Deserialize<vtTransferData>(jsonString);
-
-                if (transferData != null)
-                {
-                    project.setupType = transferData.quickSetup;
-                   // setup.arduinoBase = transferData.arduinoBase;
-                    project.compilerBase = transferData.compilerBase;
-                    //setup.makeExePath = transferData.makeExePath;
-
-                    project.boardTxtPath = transferData.boardTxtPath.StartsWith("\\") ? Path.Combine(project.path, transferData.boardTxtPath.Substring(1)) : transferData.boardTxtPath;
-                    project.coreBase = transferData.coreBase.StartsWith("\\") ? Path.Combine(project.path, transferData.coreBase.Substring(1)) : transferData.coreBase;
-
-                    parseBoardsTxt();                    
-
-                    selectedBoard = boards?.FirstOrDefault(b => b.name == transferData.board.name);
-                    if (selectedBoard != null)
-                    {
-                        foreach (var option in transferData.board.options)
-                        {
-                            var optionSet = selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
-                            if (optionSet != null)
-                            {
-                                optionSet.selectedOption = optionSet.options.FirstOrDefault(x => x.name == option.Value);
-                            }
-                        }
-                    }
-
-                    var libs = libManager.repositories[0].libraries;
-
-                    foreach (string libName in transferData.libraries[0].libraries)
-                    {
-                        var lib = libs.FirstOrDefault(l => l.name == libName);
-                        if (lib != null) project.libraries.Add(lib);
-                    }
-                }
-
-                generateFiles();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            log.Info("new file");
+            project.parseBoardsTxt();
+            project.selectedBoard = project.boards.FirstOrDefault();
+            project = ProjectData.getDefault(setup);
+            generateFiles();
         }
+
+        public void openFile(string filename)
+        {
+            log.Info("open file");
+            project = ProjectData.open(filename, setup);
+            if (project == null)
+            {
+                project = ProjectData.getDefault(setup);
+                project.path = filename;
+            }
+            generateFiles();
+        }
+
+        public Model(ProjectData project, SetupData setup)
+        {
+            this.setup = setup;
+            this.project = project;
+
+
+            generateFiles();
+
+            //libManager = new LibManager(this.project, this.setup);
+
+
+            sharedLibraries = new Repository("Shared Libraries", this.setup.libBase);
+        }
+
+        public Repository sharedLibraries { get; }
+
+
         public void generateFiles()
         {
-            project.makefile = project.tasks_json = project.props_json = null;
+            log.Info("enter");
+            makefile = tasks_json = props_json = null;
 
-            bool ok = selectedBoard != null && setup.uplTyBaseError == null && project.pathError == null;
+            bool ok = project.selectedBoard != null && setup.uplTyBaseError == null && project.pathError == null;
             if (project.setupType == SetupTypes.quick)
             {
                 ok = ok && setup.arduinoBaseError == null;
@@ -88,49 +79,35 @@ namespace VisualTeensy.Model
 
             if (ok)
             {
-                Console.WriteLine("generate files");
+                log.Debug("OK (makefile, props_json, vsSetup_json)");
 
-                var options = selectedBoard.getAllOptions();
+                var options = project.selectedBoard.getAllOptions();
 
-                project.makefile = generateMakefile(options);
-                project.props_json = generatePropertiesFile(options);
-                project.vsSetup_json = generateVisualTeensySetup();
+                makefile = generateMakefile(options);
+                props_json = generatePropertiesFile(options);
+                vsSetup_json = generateVisualTeensySetup();
             }
-            project.tasks_json = generateTasksFile();
-        }
-
-        public Model(ProjectData project, SetupData setup)
-        {
-            this.project = project;
-            this.setup = setup;
-
-            boards = new List<Board>();
-
-            loadSettings();
-            libManager = new LibManager(this.project, this.setup);
-            if (!openProjectPath())
+            else
             {
-                parseBoardsTxt();
-                selectedBoard = boards?.FirstOrDefault();
-                generateFiles();
+                log.Debug("NOK (makefile, props_json, vsSetup_json)");
+                project.logProject();
             }
+
+            tasks_json = generateTasksFile();
         }
 
-        public void parseBoardsTxt()
-        {
-            Console.WriteLine("parseBoardsTxt");
-
-            string boardTxtPath = project.setupType == SetupTypes.quick ? setup.getBoardFromArduino() : project.boardTxtPath;
-            boards = FileContent.parse(boardTxtPath).Where(b => b.core == "teensy3").ToList();
-        }
         private string generateVisualTeensySetup()
         {
-            var json = new JavaScriptSerializer();
-            return FileHelpers.formatOutput(json.Serialize(new vtTransferData(project, /*setup,*/ selectedBoard)));
+            log.Debug("enter");
+            return JsonConvert.SerializeObject(new vtTransferData(project), Formatting.Indented);
         }
         private string generateTasksFile()
         {
-            if (setup.makeExePathError != null) return null;
+            log.Debug("enter");
+            if (setup.makeExePathError != null)
+            {
+                return null;
+            }
 
             string makePath = setup.makeExePath;
 
@@ -177,11 +154,12 @@ namespace VisualTeensy.Model
                     }
                 }
             };
-            var json = new JavaScriptSerializer();
-            return FileHelpers.formatOutput(json.Serialize(tasks));
+
+            return JsonConvert.SerializeObject(tasks, Formatting.Indented);
         }
         private string generatePropertiesFile(Dictionary<string, string> options)
         {
+            log.Debug("enter");
             if (project.compilerPathError != null)
             {
                 return null;
@@ -226,38 +204,58 @@ namespace VisualTeensy.Model
             //props.configurations[0].defines.Add(options["build.usbtype"]);
             //props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
 
-            return FileHelpers.formatOutput(new JavaScriptSerializer().Serialize(props));
+            return JsonConvert.SerializeObject(props, Formatting.Indented);
+
         }
         private string generateMakefile(Dictionary<string, string> options)
         {
+            log.Debug("enter");
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");
             mf.Append("# Generated by VisualTeensy (https://github.com/luni64/VisualTeensy)\n");
             mf.Append("#\n");
-            mf.Append($"# {"Board",-18} {selectedBoard.name}\n");
-            selectedBoard.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n"));
+            mf.Append($"# {"Board",-18} {project.selectedBoard.name}\n");
+            project.selectedBoard.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n"));
             mf.Append("#\n");
             mf.Append($"# {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}\n");
             mf.Append("#******************************************************************************\n");
 
-            mf.Append("SHELL := cmd.exe\nexport SHELL\n\n");
+            mf.Append($"SHELL            := cmd.exe\nexport SHELL\n\n");
 
-            mf.Append($"TARGET_NAME      := {project.name.Replace(" ", "_")}\n\n");
+            mf.Append($"TARGET_NAME      := {project.name?.Replace(" ", "_")}\n");
 
-            mf.Append($"LIBS_SHARED_BASE := {setup.libBaseShort}\n");
+            mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
+
+            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(project.sharedLibs.path)}\n");
             mf.Append($"LIBS_SHARED      := ");
-            project.libraries.ForEach(l => mf.Append($"{l.path} "));
+            foreach (var lib in project.sharedLibs.libraries.Where(l => l.isSelected))
+            {
+                mf.Append($"{lib.name} ");
+            }
             mf.Append("\n\n");
 
-            mf.Append($"LIBS_LOCAL_BASE  := lib\n");
-            mf.Append($"LIBS_LOCAL       := \n\n");
+            mf.Append($"LIBS_LOCAL_BASE  := {Helpers.getShortPath(project.localLibs.path)}\n");
+            mf.Append($"LIBS_LOCAL       := ");
+            foreach (var lib in project.localLibs.libraries.Where(l => l.isSelected))
+            {
+                mf.Append($"{lib.name} ");
+            }
+            mf.Append("\n\n");
 
-            mf.Append(makeEntry("BOARD_ID    := ", "build.board", options) + "\n");
-            mf.Append($"CORE_BASE   := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : project.coreBaseShort)}\n");
-            mf.Append($"GCC_BASE    := {project.compilerBaseShort}\n");
-            mf.Append($"UPL_PJRC_B  := {setup.uplPjrcBaseShort}\n");
-            mf.Append($"UPL_TYCMD_B := {setup.uplTyBaseShort}\n\n");
+            if (project.setupType == SetupTypes.quick)
+            {
+                mf.Append($"CORE_BASE   := {Helpers.getShortPath(setup.arduinoCore)}\n");
+                mf.Append($"GCC_BASE    := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
+                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.arduinoTools)}\n");
+            }
+            else
+            {
+                mf.Append($"CORE_BASE   := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : Helpers.getShortPath(project.coreBase))}\n");
+                mf.Append($"GCC_BASE    := {Helpers.getShortPath(project.compilerBase)}\n");
+                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
+            }
+            mf.Append($"UPL_TYCMD_B := {Helpers.getShortPath(setup.uplTyBase)}\n\n");
 
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
@@ -310,10 +308,8 @@ namespace VisualTeensy.Model
                 props.configurations[0].defines.Add(prefix + option);
             }
         }
-        void loadSettings()
-        {
-            setup.libBase = Path.Combine(setup.arduinoBase ??"", "hardware", "Teensy", "avr", "libraries"); //HACK need to be user settable        
-        }
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 

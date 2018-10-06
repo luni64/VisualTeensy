@@ -32,13 +32,9 @@ namespace VisualTeensy
 
         private void openOutput()
         {
-            var mvm = DataContext as ViewModel.ProjectTabVM;
+            var mvm = DataContext as ProjectTabVM;            
+            var dlg = new SaveProjectWin(new SaveWinVM(mvm.model));
 
-            // data = mvm.model.data;
-
-            var vm = new SaveWinVM(mvm.model.project, mvm.model.setup);
-
-            var dlg = new SaveProjectWin(vm);
             dlg.ShowDialog();
         }
 

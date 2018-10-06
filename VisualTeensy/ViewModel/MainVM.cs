@@ -14,20 +14,17 @@ namespace ViewModel
     {
         public RelayCommand cmdFileOpen { get; set; }
         void doFileOpen(object path)
-        {
-            model.project.path = path as string;            
-            model.openProjectPath();
-
-            projecTabVM.update();
-          
-
-            //projecTabVM.projectPath = path as string;
-            //OnPropertyChanged("Title");
+        {            
+            model.openFile(path as string);
+            projecTabVM.update();            
+            OnPropertyChanged("Title");
         }
         public RelayCommand cmdFileNew { get; set; }
         void doFileNew(object o)
         {
-          //  projecTabVM.project
+            model.newFile();
+            projecTabVM.update();
+            OnPropertyChanged("Title");
         }
 
         public SetupTabVM setupTabVM { get; }
@@ -52,7 +49,7 @@ namespace ViewModel
             projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
                        
-            setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
+            //setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
         }
 
         public Model model { get; }

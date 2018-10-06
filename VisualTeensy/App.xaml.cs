@@ -1,62 +1,100 @@
-﻿using System;
+﻿using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Repository.Hierarchy;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using ViewModel;
-using VisualTeensy;
 using VisualTeensy.Model;
 using VisualTeensy.Properties;
 
-namespace WpfApplication1
+namespace VisualTeensy
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        void loadSettings(out ProjectData projectData, out SetupData setupData)
+        SetupData loadSetup()
         {
             if (Settings.Default.updateNeeded)
             {
+                log.Info("Update settings to new version");
                 Settings.Default.Upgrade();
                 Settings.Default.updateNeeded = false;
                 Settings.Default.Save();
                 Settings.Default.Reload();
             }
 
-            setupData = Settings.Default.setupData;
+            var setupData = new SetupData();
 
-            setupData = Settings.Default.setupData ?? SetupData.getDefault();
-            projectData = Settings.Default.projectData ?? ProjectData.getDefault(setupData);
 
-            FileHelpers.arduinoPath = setupData.arduinoBase;
+            setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder().Trim() : Settings.Default.arduinoBase;
+            Helpers.arduinoPath = setupData.arduinoBase;
+
+            setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
+            setupData.uplPjrcBase = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
+            setupData.uplTyBase = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
+            setupData.makeExePath = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Path.Combine(Directory.GetCurrentDirectory(), "make.exe") : Settings.Default.makeExePath;
+            setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
             {
                 setupData.makefile_fixed = reader.ReadToEnd();
             }
+            Helpers.arduinoPath = setupData.arduinoBase;
+
+            return setupData;
         }
 
+        void saveSetup(SetupData setupData)
+        {
+            Settings.Default.arduinoBase = setupData.arduinoBase;
+            Settings.Default.projectBaseDefault = setupData.projectBaseDefault;
+            Settings.Default.uplPjrcBase = setupData.uplPjrcBase;
+            Settings.Default.uplTyBase = setupData.uplTyBase;
+            Settings.Default.makeExePath = setupData.makeExePath;
+            Settings.Default.libBase = setupData.libBase;
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
+            XmlConfigurator.Configure();
+
+            var repository = (Hierarchy) LogManager.GetRepository();
+            repository.Threshold = Level.All;
+
+            var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
+
+            fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
+            fa.ActivateOptions();            
+
+
+            var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            log.Info($"------------------------------------------");
+            log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
-            
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            base.OnStartup(e);
+            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             try
             {
-                loadSettings(out var projectData, out var setupData);
+                var setupData = loadSetup();
+                var project = ProjectData.open(Settings.Default.lastProject, setupData) ?? ProjectData.getDefault(setupData);
 
-                var model = new Model(projectData, setupData);
+                //  var project = Project.open(Settings.Default.lastProject, setupData) == false) project = ProjectData.getDefault(setupData);
+
+                var model = new Model.Model(project, setupData);
                 var mainVM = new MainVM(model);
 
                 var mainWin = new MainWindow()
-                { 
+                {
                     DataContext = mainVM,
                     Left = Settings.Default.mainWinBounds.Left,
                     Top = Settings.Default.mainWinBounds.Top,
@@ -67,30 +105,35 @@ namespace WpfApplication1
                 mainWin.ShowDialog();
 
                 // close open file display windows // hack, move elsewhere
-                Current.Windows.OfType<FileDisplayWindow>().ToList().ForEach(w => w.Close());
-                                 
+                Current?.Windows.OfType<FileDisplayWindow>()?.ToList().ForEach(w => w.Close());
+
+                saveSetup(setupData);
+
                 Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
-                Settings.Default.projectData = projectData;
-                Settings.Default.setupData = setupData;
+                Settings.Default.lastProject = project.path;
                 Settings.Default.Save();
+
+                log.Info("Closed");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());                
+                log.Fatal("Unhandled exception", ex);
+                MessageBox.Show("Unhandled Exception!, Aborting...");
             }
         }
 
-        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
-
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
-            {
-                Byte[] assemblyData = new Byte[stream.Length];
-                stream.Read(assemblyData, 0, assemblyData.Length);
-                return Assembly.Load(assemblyData);
-            }
-        }
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 
+//private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+//{
+//    String resourceName = "VisualTeensy.Embedded." + new AssemblyName(args.Name).Name + ".dll";
+
+//    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+//    {
+//        Byte[] assemblyData = new Byte[stream.Length];
+//        stream.Read(assemblyData, 0, assemblyData.Length);
+//        return Assembly.Load(assemblyData);
+//    }
+//}

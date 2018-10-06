@@ -9,19 +9,24 @@ namespace ViewModel
 
         public bool selected
         {
-            get => _isSelected;
+            get => lib.isSelected;
             set
             {
-                SetProperty(ref _isSelected, value);                                
+                if(value != lib.isSelected)
+                {
+                    lib.isSelected = value;
+                    OnPropertyChanged();
+                }                
             }
-        }
-        bool _isSelected;
+        }        
 
         public LibraryVM(Library lib)
         {
             this.lib = lib;
         }
+        
+        public override string ToString() => name;
 
-        public Library lib { get; }
+        private Library lib { get; }
     }
 }
