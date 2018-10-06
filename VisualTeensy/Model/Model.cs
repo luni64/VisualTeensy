@@ -143,14 +143,20 @@ namespace VisualTeensy.Model
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
                         args = new List<string>{"upload" ,"-j","-Otarget"},
-                    }
-                    ,
+                    },
                     new Task()
                     {
                         label = "Upload (TyCommander)",
                         group = new Group(),
                         command = makePath.Replace('\\','/'),
                         args = new List<string>{"uploadTy" ,"-j","-Otarget"},
+                    },
+                    new Task()
+                    {
+                        label = "Upload (CLI)",
+                        group = new Group(),
+                        command = makePath.Replace('\\','/'),
+                        args = new List<string>{"uploadCLI" ,"-j","-Otarget"},
                     }
                 }
             };
@@ -256,6 +262,9 @@ namespace VisualTeensy.Model
                 mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
             mf.Append($"UPL_TYCMD_B := {Helpers.getShortPath(setup.uplTyBase)}\n\n");
+            mf.Append($"UPL_CLICMD_B := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
+
+            mf.Append(makeEntry("MCU   := ", "build.mcu", options) + "\n\n");
 
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");

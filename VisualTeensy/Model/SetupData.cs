@@ -60,7 +60,26 @@ namespace VisualTeensy.Model
                 }
                 return "Folder doesn't exist";
             }
-        }       
+        }
+
+        // upload PJRC 
+        public string uplCLIBase { get; set; }
+        public string uplCLIBaseError
+        {
+            get
+            {
+                if (!String.IsNullOrEmpty(uplCLIBase) && (Directory.Exists(uplCLIBase)))
+                {
+                    string uploader = Path.Combine(uplCLIBase, "teensy_loader_cli.exe");
+                    if (File.Exists(uploader))
+                    {
+                        return null;
+                    }
+                    return "Teensy_loader_cli.exe not found in the specified directory";
+                }
+                return "Folder doesn't exist";
+            }
+        }
 
         // arduinoBase
         public string arduinoBase
@@ -143,6 +162,7 @@ namespace VisualTeensy.Model
             
             sd.uplPjrcBase = sd.arduinoTools;
             sd.uplTyBase = Helpers.findTyToolsFolder();
+            sd.uplCLIBase = Helpers.findCLIFolder();
 
             sd.makeExePath = Path.Combine(Directory.GetCurrentDirectory(), "make.exe");
 
