@@ -191,9 +191,7 @@ namespace VisualTeensy.Model
                     }
                 }
             };
-
-
-
+            
             if (options.ContainsKey("build.flags.defs"))
             {
                 foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
@@ -251,17 +249,17 @@ namespace VisualTeensy.Model
 
             if (project.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE   := {Helpers.getShortPath(setup.arduinoCore)}\n");
-                mf.Append($"GCC_BASE    := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
-                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.arduinoTools)}\n");
+                mf.Append($"CORE_BASE    := {Helpers.getShortPath(setup.arduinoCore)}\n");
+                mf.Append($"GCC_BASE     := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
+                mf.Append($"UPL_PJRC_B   := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
-                mf.Append($"CORE_BASE   := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : Helpers.getShortPath(project.coreBase))}\n");
-                mf.Append($"GCC_BASE    := {Helpers.getShortPath(project.compilerBase)}\n");
-                mf.Append($"UPL_PJRC_B  := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
+                mf.Append($"CORE_BASE    := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : Helpers.getShortPath(project.coreBase))}\n");
+                mf.Append($"GCC_BASE     := {Helpers.getShortPath(project.compilerBase)}\n");
+                mf.Append($"UPL_PJRC_B   := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
-            mf.Append($"UPL_TYCMD_B := {Helpers.getShortPath(setup.uplTyBase)}\n\n");
+            mf.Append($"UPL_TYCMD_B  := {Helpers.getShortPath(setup.uplTyBase)}\n");
             mf.Append($"UPL_CLICMD_B := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
 
             mf.Append(makeEntry("MCU   := ", "build.mcu", options) + "\n\n");

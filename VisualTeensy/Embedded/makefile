@@ -23,7 +23,7 @@ SIZE        := $(GCC_BASE)\bin\arm-none-eabi-size
 OBJDUMP     := $(GCC_BASE)\bin\arm-none-eabi-objdump
 UPL_PJRC    := "$(UPL_PJRC_B)\teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
 UPL_TYCMD   := $(UPL_TYCMD_B)\tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
-UPL_CLICMD   := $(UPL_CLICMD_B)\teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
+UPL_CLICMD  := $(UPL_CLICMD_B)\teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
 
 #******************************************************************************
 # Source and Include Files
@@ -82,7 +82,7 @@ generateDirs := $(foreach d, $(DIRECTORIES), $(shell if not exist "$d" mkdir "$d
 # Rules:
 #******************************************************************************
 
-.PHONY: directories all rebuild upload uploadTy clean cleanUser cleanCore
+.PHONY: directories all rebuild upload uploadTy uploadCLI clean cleanUser cleanCore
 
 
 all:  $(TARGET_LST) $(TARGET_HEX)
@@ -96,6 +96,9 @@ upload: $(TARGET_LST) $(TARGET_HEX)
 
 uploadTy: $(TARGET_LST) $(TARGET_HEX)
 	@$(UPL_TYCMD)
+
+uploadCLI: $(TARGET_LST) $(TARGET_HEX)
+	@$(UPL_CLICMD)
 
 
 # Core library ----------------------------------------------------------------
