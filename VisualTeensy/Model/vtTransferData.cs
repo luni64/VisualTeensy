@@ -18,7 +18,7 @@ namespace VisualTeensy.Model
 
         [JsonProperty(Order = 3)]
         public List<vtConfiguration> configurations;
-        
+
         public class vtBoard
         {
             public vtBoard(Board board)
@@ -32,9 +32,10 @@ namespace VisualTeensy.Model
         }
         public class vtRepo
         {
-            public string name { get; set; }            
+            public string name { get; set; }
             public IEnumerable<string> libraries { get; set; }
         }
+
         public class vtConfiguration
         {
             public string name { get; set; }
@@ -50,26 +51,30 @@ namespace VisualTeensy.Model
             public List<vtRepo> repositories { get; set; }
             public vtBoard board { get; set; }
 
-            public vtConfiguration(ProjectData project)
+            ProjectData project;
+
+            public vtConfiguration(Model model)
             {
-                if (project == null) return;
+                if (model?.project == null) return;
+
+                this.project = model.project;
+
+                makefileExtension = project.makefileExtension;
+                compilerBase = project.compilerBase;
 
                 repositories = new List<vtRepo>()
                 {
                     new vtRepo()
                     {
-                        name = project?.sharedLibs.name,
-                        libraries = project?.sharedLibs.libraries.Where(l=>l.isSelected).Select(l=>l.name)
+                        name =   "shared",
+                        libraries = model.libManager.projectLibraries.Where(lib => !lib.isLocal).Select(lib => lib.name)
                     },
                     new vtRepo()
                     {
-                        name = project?.localLibs.name,
-                        libraries = project?.localLibs.libraries.Where(l=>l.isSelected).Select(l=>l.name)
+                        name = "local",
+                        libraries = model.libManager.projectLibraries.Where(lib => lib.isLocal).Select(lib => lib.name)
                     },
                 };
-
-                makefileExtension = project.makefileExtension;
-                compilerBase = project.compilerBase;
 
                 if (project.coreBase != null)
                 {
@@ -82,33 +87,24 @@ namespace VisualTeensy.Model
                 }
 
                 board = new vtBoard(project.selectedBoard);
-
             }
-
             public override string ToString() => name;
         }
-        
 
-        public vtTransferData(ProjectData project)
+
+        public vtTransferData(Model model)
         {
             version = "1";
-            setupType = project.setupType;
+            setupType = model.project.setupType;
 
             configurations = new List<vtConfiguration>()
             {
-                new vtConfiguration(project){ name = "default" }
+                new vtConfiguration(model){ name = "default" }
             };
         }
-
-
-
-
-
-
-
+        
         public vtTransferData() { }
-
-
+        
         string makeRelative(string path, string basePath)
         {
             if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(basePath))

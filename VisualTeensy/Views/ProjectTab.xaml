@@ -16,7 +16,7 @@
 
     <Grid Margin="10" >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" MinWidth="250" />
+            <ColumnDefinition Width="2*" MinWidth="250" />
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="4*" MinWidth="250"/>
         </Grid.ColumnDefinitions>
@@ -96,6 +96,8 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                
                 <!--<RowDefinition Height="auto"/>-->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -123,40 +125,14 @@
                          IsReadOnly="True" Text="{Binding makefile, Mode=OneWay}"  />
                 </ScrollViewer>
             </Border>
-            <!--<Button Content="Close"  Grid.Row="2" HorizontalAlignment="Right" Width="80" Margin="0,10,0,0"/>-->
 
-            <!--<ListBox Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding repositoryVM.libs}" ScrollViewer.CanContentScroll="False" BorderThickness="1" BorderBrush="LightGray" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="0" Margin="0" >
-                            <StackPanel Orientation="Vertical" Margin="0,0,0,0" HorizontalAlignment="Stretch" >
-                                <CheckBox x:Name="lib" Content="{Binding name}" IsChecked="{Binding selected }" FontSize="13" FontWeight="Bold" Foreground="#FF3949AB"/>
-                                <TextBlock  HorizontalAlignment="Stretch" Text="{Binding description}" Margin="20,2,0,5" TextWrapping="WrapWithOverflow"/>
-                                <Viewbox Height="14"  Margin="20,2,0,10" HorizontalAlignment="Left" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" >
-                                    <CheckBox Content="Copy to project" FontSize="10" IsEnabled="False"/>
-                                </Viewbox>                                
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>-->
+            <Button Grid.Row="3" Grid.ColumnSpan="4" Margin="0,10,0,0" VerticalAlignment="Bottom"  HorizontalAlignment="Right" Background="Transparent"  BorderBrush="DarkGray"  Click="openOutputClick"  >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/img/content-save.png"  Width="24" Height="24" />
+                    <TextBlock Text="Generate" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                </StackPanel>
+            </Button>
 
-            <!--<TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" FontSize="18" Text="Project Libraries" Margin="0,0,0,15" HorizontalAlignment="Left" />
-            <ListBox Grid.Row="3"  Grid.Column="0" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding repositoryVM.libs}" ScrollViewer.CanContentScroll="False" BorderThickness="1" BorderBrush="LightGray" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="0" Margin="0" >
-                            <StackPanel Orientation="Vertical" Margin="0,0,0,0" HorizontalAlignment="Stretch" >
-                                <CheckBox x:Name="lib" Content="{Binding name}" IsChecked="{Binding selected }" FontSize="13" FontWeight="Bold" Foreground="#FF3949AB"/>
-                                <TextBlock  HorizontalAlignment="Stretch" Text="{Binding description}" Margin="20,2,0,5" TextWrapping="WrapWithOverflow"/>
-                                <Viewbox Height="14"  Margin="20,2,0,10" HorizontalAlignment="Left" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" >
-                                    <CheckBox Content="Copy to project" FontSize="10" IsEnabled="False"/>
-                                </Viewbox>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>-->
         </Grid>
 
 

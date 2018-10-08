@@ -74,11 +74,7 @@ namespace VisualTeensy.Model
 
         // makefile extension ------------------------
         public string makefileExtension { get; set; }
-        
-        // libraries ---------------------------------
-        public Repository sharedLibs { get; }
-        public Repository localLibs { get; }    
-
+              
         public List<Board> boards { get; private set; }
         public Board selectedBoard { get; set; }
 
@@ -86,8 +82,8 @@ namespace VisualTeensy.Model
         {
             this.setup = settings;
            
-            sharedLibs = new Repository("Shared", settings.libBase);
-            localLibs = new Repository("Local", "lib");
+            //sharedLibs = new RepositoryIndexJson("Shared", settings.libBase);
+            //localLibs = new RepositoryIndexJson("Local", "lib");
         }
 
         static public ProjectData open(string projectPath, SetupData setup)
@@ -108,6 +104,7 @@ namespace VisualTeensy.Model
                 log.Debug("config file content:\n" + jsonString);
 
                 var transferData = JsonConvert.DeserializeObject<vtTransferData>(jsonString);
+                log.Debug("Deserialize OK");
 
                 if (transferData != null)
                 {
@@ -136,14 +133,19 @@ namespace VisualTeensy.Model
                         }
                     }
 
-                    
-                    var tlibs = transferData.configurations[0].repositories.FirstOrDefault(l => l.name == "Shared")?.libraries;
 
-                    foreach (var lib in tlibs)
-                    {
-                        var selectedLib = p.sharedLibs.libraries.FirstOrDefault(l =>  l.name.ToUpper() == lib.ToUpper());
-                        if (selectedLib != null) selectedLib.isSelected = true;
-                    }
+                   // model.libManager.open(transferData.configurations[0].repositories);
+
+                    //var x = transferData.configurations[0].repositories;
+
+
+                    //var tlibs = transferData.configurations[0].repositories.FirstOrDefault(l => l.name == "shared")?.libraries;
+
+                    //foreach (var lib in tlibs)
+                    //{
+                    //    //var selectedLib = p.sharedLibs.libraries.FirstOrDefault(l => l.name.ToUpper() == lib.ToUpper());
+                    //    //if (selectedLib != null) selectedLib.isSelected = true;
+                    //}
 
                     log.Info($"{configFile} read sucessfully");
                     p.logProject();

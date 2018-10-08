@@ -67,15 +67,9 @@ namespace VisualTeensy
                 Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
                 e.Handled = true;
             }
-            else MessageBox.Show($"Path {e.Uri.LocalPath} does not exist", "VisualTeensy", MessageBoxButton.OK,MessageBoxImage.Error);
+            else MessageBox.Show($"Path {e.Uri.LocalPath} does not exist", "VisualTeensy", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void openOutputClick(object sender, RoutedEventArgs e)
-        {
-            var mvm = DataContext as MainVM;
-            var dlg = new SaveProjectWin(new SaveWinVM(mvm.model));
-
-            dlg.ShowDialog();
-        }
+       
     }
 }

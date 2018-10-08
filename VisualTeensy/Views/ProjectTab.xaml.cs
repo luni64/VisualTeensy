@@ -1,12 +1,9 @@
-﻿using VisualTeensy;
-using VisualTeensy.Model;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using ViewModel;
-using System.Linq;
-using System.Windows.Navigation;
-using System.Diagnostics;
 using System.Windows.Data;
+using System.Windows.Navigation;
+using ViewModel;
 
 namespace VisualTeensy
 {
@@ -19,20 +16,22 @@ namespace VisualTeensy
         {
             InitializeComponent();
 
-            Loaded += (s, e) => (DataContext as ProjectTabVM)?.OnPropertyChanged("");
-        }      
+            Loaded += (s, e) =>
+            {
+                var dc = DataContext as ProjectTabVM;
+                if (dc != null)
+                {
+                    dc.OnPropertyChanged("");
+                }
+            };
+        }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void openOutputClick(object sender, RoutedEventArgs e)
         {
-            var fdm = Application.Current.Windows.OfType<FileDisplayWindow>().FirstOrDefault();
-            if (fdm == null)
-            {
-                new FileDisplayWindow() { DataContext = this.DataContext }.Show();
-            }
-            else
-            {
-                fdm.Close();
-            }
+            var vm = DataContext as ProjectTabVM;
+            var dlg = new SaveProjectWin(new SaveWinVM(vm.model));
+
+            dlg.ShowDialog();
         }
 
         private void StackPanel_Checked(object sender, RoutedEventArgs e)

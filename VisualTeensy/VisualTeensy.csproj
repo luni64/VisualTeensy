@@ -68,6 +68,9 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.1.0\lib\net46\GongSolutions.Wpf.DragDrop.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
@@ -124,20 +127,25 @@
     <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
     <Compile Include="Model\vtTransferData.cs" />
-    <Compile Include="ViewModel\RepositoryVM.cs" />
-    <Compile Include="ViewModel\LibraryVM.cs" />
-    <Compile Include="ViewModel\MainVM.cs" />
-    <Compile Include="ViewModel\SetupTabVM.cs" />
+    <Compile Include="ViewModel\LibrariesTab\LibrariesTabVM.cs" />
+    <Compile Include="Model\Libraries\LibraryReader.cs" />
+    <Compile Include="ViewModel\LibrariesTab\RepositoryVM.cs" />
+    <Compile Include="ViewModel\LibrariesTab\LibraryVM.cs" />
+    <Compile Include="ViewModel\MainWin\MainVM.cs" />
+    <Compile Include="ViewModel\SetupTab\SetupTabVM.cs" />
     <Compile Include="Views\FileDisplayWindow.xaml.cs">
       <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LibrariesTab.xaml.cs">
+      <DependentUpon>LibrariesTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SetupTab.xaml.cs">
       <DependentUpon>SetupTab.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\BoardVM.cs" />
-    <Compile Include="ViewModel\OptionSetVM.cs" />
-    <Compile Include="ViewModel\SaveWinVM.cs" />
-    <Compile Include="ViewModel\ProjectTabVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\BoardVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\OptionSetVM.cs" />
+    <Compile Include="ViewModel\SaveWin\SaveWinVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\ProjectTabVM.cs" />
     <Compile Include="Views\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
     </Compile>
@@ -156,6 +164,10 @@
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Page Include="Views\FileDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LibrariesTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -226,7 +238,6 @@
   <ItemGroup>
     <Resource Include="app.ico" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
@@ -236,6 +247,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Embedded\makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\rubbish-bin.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

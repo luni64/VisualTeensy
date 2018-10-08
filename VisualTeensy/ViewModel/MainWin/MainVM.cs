@@ -13,6 +13,10 @@ namespace ViewModel
 {
     class MainVM : BaseViewModel
     {
+        public SetupTabVM setupTabVM { get; }
+        public ProjectTabVM projecTabVM { get; }
+        public LibrariesTabVM librariesTabVM { get; }
+
         public RelayCommand cmdFileOpen { get; set; }
         void doFileOpen(object path)
         {            
@@ -41,8 +45,6 @@ namespace ViewModel
         public String projectName => model.project.name;
         public String projectPath => model.project.path;
 
-        public SetupTabVM setupTabVM { get; }
-        public ProjectTabVM projecTabVM { get; }
 
         public String Title
         {
@@ -55,14 +57,15 @@ namespace ViewModel
 
         public MainVM(Model model = null)
         {
-            cmdFileOpen = new RelayCommand(doFileOpen);
-            cmdFileNew = new RelayCommand(doFileNew);
-            cmdClose = new RelayCommand(doClose);
-
             this.model = model;
-            
+
             projecTabVM = new ProjectTabVM(model);
             setupTabVM = new SetupTabVM(model);
+            librariesTabVM = new LibrariesTabVM(model);
+
+            cmdFileOpen = new RelayCommand(doFileOpen);
+            cmdFileNew = new RelayCommand(doFileNew);
+            cmdClose = new RelayCommand(doClose);                       
                        
             //setupTabVM.PropertyChanged += (s, e) => projecTabVM.updateFiles();            
         }

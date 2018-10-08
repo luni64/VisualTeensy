@@ -93,12 +93,12 @@ namespace ViewModel
             }
         }
 
-        public RepositoryVM repositoryVM
-        {
-            get => _repositoryVM;
-            private set => SetProperty(ref _repositoryVM, value);
-        }
-        RepositoryVM _repositoryVM;
+        //public RepositoryVM repositoryVM
+        //{
+        //    get => _repositoryVM;
+        //    private set => SetProperty(ref _repositoryVM, value);
+        //}
+        //RepositoryVM _repositoryVM;
         
         public bool quickSetup
         {
@@ -236,8 +236,8 @@ namespace ViewModel
 
         public void update()
         {
-            repositoryVM = new RepositoryVM(model.project.sharedLibs);
-            repositoryVM.PropertyChanged += (s, e) => updateFiles();
+            //repositoryVM = new RepositoryVM(model.project.sharedLibs);
+            //repositoryVM.PropertyChanged += (s, e) => updateFiles();
 
             updateBoards();
             selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
@@ -253,8 +253,8 @@ namespace ViewModel
 
             updateBoards();            
 
-            repositoryVM = new RepositoryVM(model.project.sharedLibs);
-            repositoryVM.PropertyChanged += (s, e) => updateFiles();
+            //repositoryVM = new RepositoryVM(model.project.sharedLibs);
+            //repositoryVM.PropertyChanged += (s, e) => updateFiles();
         }
               
         private void updateAll()

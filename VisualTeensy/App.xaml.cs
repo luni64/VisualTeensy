@@ -90,7 +90,8 @@ namespace VisualTeensy
                 var setupData = loadSetup();
                 var project = ProjectData.open(Settings.Default.lastProject, setupData) ?? ProjectData.getDefault(setupData);
 
-                //  var project = Project.open(Settings.Default.lastProject, setupData) == false) project = ProjectData.getDefault(setupData);
+                setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
+
 
                 var model = new Model.Model(project, setupData);
                 var mainVM = new MainVM(model);

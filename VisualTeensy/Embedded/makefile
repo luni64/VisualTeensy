@@ -91,13 +91,13 @@ rebuild: cleanUser all
 
 clean:   cleanUser cleanCore cleanLib
 
-upload: $(TARGET_LST) $(TARGET_HEX)
+upload: all
 	@$(UPL_PJRC)
 
-uploadTy: $(TARGET_LST) $(TARGET_HEX)
+uploadTy: all
 	@$(UPL_TYCMD)
 
-uploadCLI: $(TARGET_LST) $(TARGET_HEX)
+uploadCLI: all
 	@$(UPL_CLICMD)
 
 

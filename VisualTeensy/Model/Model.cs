@@ -15,7 +15,7 @@ namespace VisualTeensy.Model
         public ProjectData project { get; private set; }
         public SetupData setup { get; private set; }
 
-        //public LibManager libManager { get; private set; }
+        public LibManager libManager { get; private set; }
 
         // files ------------------------------------
         public string makefile { get; set; }
@@ -36,12 +36,36 @@ namespace VisualTeensy.Model
         public void openFile(string filename)
         {
             log.Info("open file");
-            project = ProjectData.open(filename, setup);
-            if (project == null)
+
+
+            var configFile = Path.Combine(filename, ".vscode", "visual_teensy.json");
+            if (!File.Exists(configFile))
             {
-                project = ProjectData.getDefault(setup);
-                project.path = filename;
+                log.Warn($"config file {configFile} does not exist");
+                return;
             }
+            try
+            {
+                string jsonString = File.ReadAllText(configFile);
+                log.Debug("config file content:\n" + jsonString);
+
+                var transferData = JsonConvert.DeserializeObject<vtTransferData>(jsonString);
+                log.Debug("Deserialize OK");
+
+
+                project = ProjectData.open(filename, setup);
+                if (project == null)
+                {
+                    project = ProjectData.getDefault(setup);
+                    project.path = filename;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("error opening project", ex);
+                return;
+            }
+
             generateFiles();
         }
 
@@ -49,17 +73,14 @@ namespace VisualTeensy.Model
         {
             this.setup = setup;
             this.project = project;
-
+            this.libManager = new LibManager(project, setup);
 
             generateFiles();
 
-            //libManager = new LibManager(this.project, this.setup);
-
-
-            sharedLibraries = new Repository("Shared Libraries", this.setup.libBase);
+            sharedLibraries = new RepositoryIndexJson("Shared Libraries", this.setup.libBase);
         }
 
-        public Repository sharedLibraries { get; }
+        public RepositoryIndexJson sharedLibraries { get; }
 
 
         public void generateFiles()
@@ -99,7 +120,7 @@ namespace VisualTeensy.Model
         private string generateVisualTeensySetup()
         {
             log.Debug("enter");
-            return JsonConvert.SerializeObject(new vtTransferData(project), Formatting.Indented);
+            return JsonConvert.SerializeObject(new vtTransferData(this), Formatting.Indented);
         }
         private string generateTasksFile()
         {
@@ -185,13 +206,13 @@ namespace VisualTeensy.Model
                             "src/**",
                             "lib/**",
                             project.coreBase?.Replace('\\','/') + "/**",
-                            setup.libBase?.Replace('\\','/') + "/**"
+                            libManager.sharedRepositoryPath.Replace('\\','/') + "/**"
                         },
                         defines = new List<string>()
                     }
                 }
             };
-            
+
             if (options.ContainsKey("build.flags.defs"))
             {
                 foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
@@ -231,17 +252,17 @@ namespace VisualTeensy.Model
 
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
 
-            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(project.sharedLibs.path)}\n");
+            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepositoryPath)}\n");
             mf.Append($"LIBS_SHARED      := ");
-            foreach (var lib in project.sharedLibs.libraries.Where(l => l.isSelected))
+            foreach (var lib in libManager.projectLibraries.Where(l => !l.isLocal))
             {
                 mf.Append($"{lib.name} ");
             }
             mf.Append("\n\n");
 
-            mf.Append($"LIBS_LOCAL_BASE  := {Helpers.getShortPath(project.localLibs.path)}\n");
+            mf.Append($"LIBS_LOCAL_BASE  := lib\n");
             mf.Append($"LIBS_LOCAL       := ");
-            foreach (var lib in project.localLibs.libraries.Where(l => l.isSelected))
+            foreach (var lib in libManager.projectLibraries.Where(l => l.isLocal))
             {
                 mf.Append($"{lib.name} ");
             }
@@ -249,18 +270,18 @@ namespace VisualTeensy.Model
 
             if (project.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE    := {Helpers.getShortPath(setup.arduinoCore)}\n");
-                mf.Append($"GCC_BASE     := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
-                mf.Append($"UPL_PJRC_B   := {Helpers.getShortPath(setup.arduinoTools)}\n");
+                mf.Append($"CORE_BASE        := {Helpers.getShortPath(setup.arduinoCore)}\n");
+                mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
+                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
-                mf.Append($"CORE_BASE    := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : Helpers.getShortPath(project.coreBase))}\n");
-                mf.Append($"GCC_BASE     := {Helpers.getShortPath(project.compilerBase)}\n");
-                mf.Append($"UPL_PJRC_B   := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
+                mf.Append($"CORE_BASE        := {((project.copyCore || (Path.GetDirectoryName(project.coreBase) == project.path)) ? "core" : Helpers.getShortPath(project.coreBase))}\n");
+                mf.Append($"GCC_BASE         := {Helpers.getShortPath(project.compilerBase)}\n");
+                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
-            mf.Append($"UPL_TYCMD_B  := {Helpers.getShortPath(setup.uplTyBase)}\n");
-            mf.Append($"UPL_CLICMD_B := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
+            mf.Append($"UPL_TYCMD_B      := {Helpers.getShortPath(setup.uplTyBase)}\n");
+            mf.Append($"UPL_CLICMD_B     := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
 
             mf.Append(makeEntry("MCU   := ", "build.mcu", options) + "\n\n");
 

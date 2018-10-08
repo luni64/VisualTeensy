@@ -86,11 +86,11 @@ namespace VisualTeensy.Model
         ////    return getBoardFromArduino(arduinoPath);
         ////}
 
-            
+        public static string arduinoPrefsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
+        
         public static string getSketchbookFolder()
         {
-            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var preferencesPath = Path.Combine(localAppData, "Arduino15", "preferences.txt");
+            var preferencesPath = Path.Combine(arduinoPrefsPath, "preferences.txt");
 
             string sketchbookPath = "";
 
@@ -151,7 +151,6 @@ namespace VisualTeensy.Model
 
             return null;
         }
-
         public static string findCLIFolder()
         {
             string folder;
@@ -198,7 +197,7 @@ namespace VisualTeensy.Model
         }
         private static bool isCLIFolder(string folder)
         {
-            var cli = Path.Combine(folder, "teensu_loader_cli.exe");
+            var cli = Path.Combine(folder, "teensy_loader_cli.exe");
             return (File.Exists(cli));
         }
 

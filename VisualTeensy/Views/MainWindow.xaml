@@ -11,16 +11,8 @@
         d:DataContext="{d:DesignInstance vm:MainVM, IsDesignTimeCreatable=False}"
         Height="auto" Width="1000" Closing="Window_Closing">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="13*"/>
-            <RowDefinition Height="86*"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
-
-        <Menu Grid.Row="0">
+    <DockPanel>
+        <Menu Grid.Row="0" DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="FileOpenClick" />
                 <MenuItem Header="New" Command="{Binding cmdFileNew}"/>
@@ -31,21 +23,17 @@
                 <MenuItem Header="TBD"/>
             </MenuItem>
         </Menu>
-
-
-       
-
-            <StackPanel  VerticalAlignment="Center" Grid.Row="1"  Margin="20,16,0,16" HorizontalAlignment="Left" >
-                <TextBlock   FontWeight="SemiBold" FontSize="20" Foreground="DarkBlue" Text="{Binding projectName, Mode=OneWay}" />
-                <TextBlock  FontSize="10">
+        <Grid DockPanel.Dock="Top">
+        <StackPanel VerticalAlignment="Center" Grid.Row="1"  Margin="20,16,0,16" Orientation="Horizontal"  HorizontalAlignment="Left" >
+                <TextBlock Text="Project: " Foreground="#FF3949AB" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <TextBlock   FontWeight="SemiBold" FontSize="20" Foreground="#FF3949AB" Text="{Binding projectName, Mode=OneWay}" />
+            <!--<TextBlock  FontSize="10">
                 <Hyperlink NavigateUri="{Binding projectPath}" RequestNavigate="Hyperlink_RequestNavigate" >
                     <TextBlock Text="{Binding projectPath, Mode=OneWay}"/>
                 </Hyperlink>
-            </TextBlock>
-            </StackPanel>
-     
-
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1" Margin="0,0,22,0">
+            </TextBlock>-->
+        </StackPanel>
+        <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1" Margin="0,0,22,0">
             <Image  Grid.Row="1" HorizontalAlignment="Right" Source="/VisualTeensy;component/app.ico" Height="56" Margin="0,10,0,0"/>
             <TextBlock Text="VisualTeensy" FontSize="11" VerticalAlignment="Bottom" Foreground="DarkGray"  >
                 <TextBlock.LayoutTransform>
@@ -58,28 +46,42 @@
                 </TextBlock.LayoutTransform>
             </TextBlock>
         </StackPanel>
+        </Grid>
+        
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="Project path:"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock>
+                <Hyperlink NavigateUri="{Binding projectPath}" RequestNavigate="Hyperlink_RequestNavigate" >
+                    <TextBlock Text="{Binding projectPath, Mode=OneWay}"/>
+                </Hyperlink>
+            </TextBlock>
+            </StatusBarItem>
+            <StatusBarItem>
+           
+            </StatusBarItem>
+        </StatusBar>
 
-        <TabControl  Grid.Row="2" Margin="20,0,20,20" Grid.RowSpan="2">
+        <TabControl  Margin="20,0,20,20" Grid.RowSpan="2">
             <TabControl.Effect>
                 <DropShadowEffect BlurRadius="15" Direction="314" Color="#FFDADADA"/>
             </TabControl.Effect>
+            
             <TabItem Header="Project">
                 <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Library Manager"/>
+            <TabItem Header="Libraries" Selector.IsSelected="False">
+                <local:LibrariesTab DataContext="{Binding librariesTabVM , Mode=OneWay}"/>
+            </TabItem>
 
             <TabItem Header="Settings">
                 <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
 
-        <Button Grid.Row="4" Grid.ColumnSpan="4" Margin="0,0,23,20" VerticalAlignment="Bottom"  HorizontalAlignment="Right" Background="Transparent"  BorderBrush="DarkGray" Width="150" Click="openOutputClick"  >
-            <StackPanel Orientation="Horizontal">
-                <Image Source="/img/content-save.png"  Width="24" Height="24" />
-                <TextBlock Text="{Binding ActionText, Mode=OneWay}" VerticalAlignment="Center" Margin="5,0,10,0"/>
-            </StackPanel>
-        </Button>
 
-    </Grid>
+    </DockPanel>
 </Window>
