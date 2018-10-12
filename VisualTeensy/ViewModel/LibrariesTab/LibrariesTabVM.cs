@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using VisualTeensy.Model;
 
@@ -27,16 +26,17 @@ namespace ViewModel
 
         public ObservableCollection<Library> projectLibraries { get; }
 
-        public LibrariesTabVM(Model model)
+        public LibrariesTabVM(Project project)
         {
-            this.model = model;
+            this.project = project;
 
             cmdDel = new RelayCommand(doDel);
 
-            repositories = model.libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
+            repositories = project.libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
             selectedRepository = repositories.FirstOrDefault();
+            
 
-            projectLibraries = new ObservableCollection<Library>(model.libManager.projectLibraries);
+            projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.sharedLibs);
             projectLibraries.CollectionChanged += projedtLibrariesChanged;
         }
 
@@ -46,23 +46,39 @@ namespace ViewModel
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (Library item in e.NewItems)
+                    foreach (Library library in e.NewItems)
                     {
-                        model.libManager.projectLibraries.Add(item);                        
+                      //  project.libManager.projectLibraries.Add(library);
+                        if (library.isLocal)
+                        {
+                            project.selectedConfiguration.localLibs.Add(library);
+                        }
+                        else
+                        {
+                            project.selectedConfiguration.sharedLibs.Add(library);
+                        }
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (Library item in e.OldItems)
+                    foreach (Library library in e.OldItems)
                     {
-                        model.libManager.projectLibraries.Remove(item);
+                       // project.libManager.projectLibraries.Remove(library);
+                        if (library.isLocal)
+                        {
+                            project.selectedConfiguration.localLibs.Remove(library);
+                        }
+                        else
+                        {
+                            project.selectedConfiguration.sharedLibs.Remove(library);
+                        }
                     }
                     break;
 
                 default:
                     break;
             }
-            model.generateFiles();
+            project.generateFiles();
         }
 
         public void DragOver(IDropInfo dropInfo)
@@ -85,6 +101,6 @@ namespace ViewModel
         }
 
 
-        Model model;
+        Project project;
     }
 }

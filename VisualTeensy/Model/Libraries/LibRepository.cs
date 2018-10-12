@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using ViewModel;
 
 namespace VisualTeensy.Model

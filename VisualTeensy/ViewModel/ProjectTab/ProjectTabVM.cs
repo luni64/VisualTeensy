@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using VisualTeensy.Model;
 
@@ -22,27 +21,27 @@ namespace ViewModel
                 switch (columnName)
                 {
                     case "projectPath":
-                        error = model.project.pathError;
+                        error = project.pathError;
                         break;
 
                     case "arduinoBase":
-                        error = model.setup.arduinoBaseError;
+                        error = project.setup.arduinoBaseError;
                         break;
 
                     case "boardTxtPath":
-                        error = model.project.boardTxtPathError;
+                        error = project.selectedConfiguration.boardTxtPathError;
                         break;
 
                     case "corePath":
-                        error = model.project.setupType == SetupTypes.expert ? model.project.corePathError : null;
+                        error = project.selectedConfiguration.setupType == SetupTypes.expert ? project.selectedConfiguration.corePathError : null;
                         break;
 
                     case "compilerPath":
-                        error = model.project.compilerPathError;
+                        error = project.selectedConfiguration.compilerPathError;
                         break;
 
                     case "makePath":
-                        error = model.setup.makeExePathError;
+                        error = project.setup.makeExePathError;
                         break;
 
                     case "boardVMs":
@@ -81,34 +80,27 @@ namespace ViewModel
         public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
         public BoardVM selectedBoard
         {
-            get => boardVMs.FirstOrDefault(b => b.board == model.project.selectedBoard);
+            get => boardVMs.FirstOrDefault(b => b.board == project.selectedConfiguration.selectedBoard);
             set
             {
-                if (value != null && value.board != model.project.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
+                if (value != null && value.board != project.selectedConfiguration.selectedBoard)  // value != null to avoid deleting model.selectedBoard by chance
                 {
-                    model.project.selectedBoard = value.board;
+                    project.selectedConfiguration.selectedBoard = value.board;
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
-
-        //public RepositoryVM repositoryVM
-        //{
-        //    get => _repositoryVM;
-        //    private set => SetProperty(ref _repositoryVM, value);
-        //}
-        //RepositoryVM _repositoryVM;
         
         public bool quickSetup
         {
-            get => model.project.setupType == SetupTypes.quick ? true : false;
+            get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
             set
             {
                 SetupTypes newType = value == true ? SetupTypes.quick : SetupTypes.expert;  // hack, valueConverter would be better
-                if (model.project.setupType != newType)
+                if (project.selectedConfiguration.setupType != newType)
                 {
-                    model.project.setupType = newType;
+                    project.selectedConfiguration.setupType = newType;
                     updateAll();
                     OnPropertyChanged("");
                 }
@@ -117,42 +109,37 @@ namespace ViewModel
 
         public string makefileExtension
         {
-            get => model.project.makefileExtension;
+            get => project.selectedConfiguration.makefileExtension;
             set
             {
-                if(value != model.project.makefileExtension)
+                if(value != project.selectedConfiguration.makefileExtension)
                 {
-                    model.project.makefileExtension = value;
+                    project.selectedConfiguration.makefileExtension = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
 
-        public String makefile => model.makefile;
-        public String propFile => model.props_json;
-        public String taskFile => model.tasks_json;
-        public String settFile => model.vsSetup_json;
-
-                
+        public String makefile => project.makefile;
+        public String propFile => project.props_json;
+        public String taskFile => project.tasks_json;
+        public String settFile => project.vsSetup_json;
         
-
-        //public String projectDescription => Path.GetFileName(projectPath);
-
         public String arduinoBase
         {
-            get => model.setup.arduinoBase;
+            get => project.setup.arduinoBase;
             set
             {
-                if (value != model.setup.arduinoBase)
+                if (value != project.setup.arduinoBase)
                 {
-                    model.setup.arduinoBase = value.Trim();
-                    Helpers.arduinoPath = model.setup.arduinoBase;
+                    project.setup.arduinoBase = value.Trim();
+                    Helpers.arduinoPath = project.setup.arduinoBase;
 
                     ///Hack
                     var board = selectedBoard?.board;
                     selectedBoard = null;
-                    model.project.selectedBoard = board;
+                    project.selectedConfiguration.selectedBoard = board;
 
                     updateAll();
                     OnPropertyChanged("");
@@ -161,12 +148,12 @@ namespace ViewModel
         }
         public String boardTxtPath
         {
-            get => model.project.boardTxtPath;
+            get => project.selectedConfiguration.boardTxtPath;
             set
             {
-                if (value != model.project.boardTxtPath)
+                if (value != project.selectedConfiguration.boardTxtPath)
                 {
-                    model.project.boardTxtPath = value.Trim();
+                    project.selectedConfiguration.boardTxtPath = value.Trim();
                     updateAll();
                     OnPropertyChanged("");
                 }
@@ -174,12 +161,12 @@ namespace ViewModel
         }
         public bool copyBoardTxt
         {
-            get => model.project.copyBoardTxt;
+            get => project.selectedConfiguration.copyBoardTxt;
             set
             {
-                if (value != model.project.copyBoardTxt)
+                if (value != project.selectedConfiguration.copyBoardTxt)
                 {
-                    model.project.copyBoardTxt = value;
+                    project.selectedConfiguration.copyBoardTxt = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -188,12 +175,12 @@ namespace ViewModel
         
         public bool copyCore
         {
-            get => model.project.copyCore;
+            get => project.selectedConfiguration.copyCore;
             set
             {
-                if (value != model.project.copyCore)
+                if (value != project.selectedConfiguration.copyCore)
                 {
-                    model.project.copyCore = value;
+                    project.selectedConfiguration.copyCore = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -201,12 +188,12 @@ namespace ViewModel
         }
         public String corePath
         {
-            get => model.project.coreBase;
+            get => project.selectedConfiguration.coreBase;
             set
             {
-                if (value != model.project.coreBase)
+                if (value != project.selectedConfiguration.coreBase)
                 {
-                    model.project.coreBase = value.Trim();
+                    project.selectedConfiguration.coreBase = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -215,12 +202,12 @@ namespace ViewModel
 
         public String compilerPath
         {
-            get => model.project.compilerBase;
+            get => project.selectedConfiguration.compilerBase;
             set
             {
-                if (value != model.project.compilerBase)
+                if (value != project.selectedConfiguration.compilerBase)
                 {
-                    model.project.compilerBase = value.Trim();
+                    project.selectedConfiguration.compilerBase = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -236,36 +223,30 @@ namespace ViewModel
 
         public void update()
         {
-            //repositoryVM = new RepositoryVM(model.project.sharedLibs);
-            //repositoryVM.PropertyChanged += (s, e) => updateFiles();
-
             updateBoards();
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == project.selectedConfiguration.selectedBoard) ?? boardVMs?.FirstOrDefault();
             OnPropertyChanged("");
         }
 
-        public ProjectTabVM(Model model)
+        public ProjectTabVM(Project project)
         {
-            this.model = model;
+            this.project = project;
 
-            cmdGenerate = new RelayCommand(doGenerate, o => model.project.pathError == null && !String.IsNullOrWhiteSpace(model.makefile) && !String.IsNullOrWhiteSpace(model.tasks_json) && !String.IsNullOrWhiteSpace(model.props_json));
+            cmdGenerate = new RelayCommand(doGenerate, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
 
             updateBoards();            
-
-            //repositoryVM = new RepositoryVM(model.project.sharedLibs);
-            //repositoryVM.PropertyChanged += (s, e) => updateFiles();
         }
               
         private void updateAll()
         {
-            model.project.parseBoardsTxt();
+            project.selectedConfiguration.parseBoardsTxt(null); //ERRORR!!!!! fix 
             updateBoards();
             updateFiles();
         }
         private void updateFiles()
         {
-            model.generateFiles();
+            project.generateFiles();
             OnPropertyChanged("makefile");
             OnPropertyChanged("propFile");
             OnPropertyChanged("taskFile");
@@ -283,7 +264,7 @@ namespace ViewModel
             }
             boardVMs.Clear();
 
-            foreach (var board in model.project.boards)
+            foreach (var board in project.selectedConfiguration.boards)
             {
                 var boardVM = new BoardVM(board);
                 boardVMs.Add(boardVM);
@@ -292,7 +273,7 @@ namespace ViewModel
                     optionSetVM.PropertyChanged += onOptionSetChanged;  // can't use a simple lambda here since we have no chance to remove it :-(
                 }
             } 
-            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == model.project.selectedBoard) ?? boardVMs?.FirstOrDefault();
+            selectedBoard = boardVMs?.FirstOrDefault(b => b.board == project.selectedConfiguration.selectedBoard) ?? boardVMs?.FirstOrDefault();
         }
 
         public event EventHandler<string> MessageHandler;
@@ -300,7 +281,7 @@ namespace ViewModel
         {
             MessageHandler?.Invoke(this, message);
         }
-        public Model model;
+        public Project project;
     }
 }
 

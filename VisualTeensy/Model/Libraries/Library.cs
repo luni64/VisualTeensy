@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace VisualTeensy.Model
 {
@@ -25,6 +21,7 @@ namespace VisualTeensy.Model
         public string checksum { get; set; }
 
         public string path { get; set; }
+        public string source { get; set; }
         public List<Library> dependencies;
 
         public override string ToString() => $"{(isLocal ? "+" : "-")}{name} {version}";

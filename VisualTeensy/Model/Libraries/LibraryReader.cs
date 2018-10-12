@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using VisualTeensy.Model;
 
 
@@ -21,7 +19,7 @@ namespace ViewModel
     {
         public static ILookup<string, Library> parseLibrary_Index_Json(string library_indexJson)
         {
-            log.Debug(library_indexJson);           
+            log.Debug(library_indexJson);
 
             try
             {
@@ -39,9 +37,9 @@ namespace ViewModel
 
         public static ILookup<string, Library> parseLibraryLocal(string repository)
         {
-            log.Debug(repository);           
+            log.Debug(repository);
 
-           
+
             List<Library> libraries = new List<Library>();
             try
             {
@@ -55,11 +53,15 @@ namespace ViewModel
                         using (TextReader reader = new StreamReader(p))
                         {
                             lib.path = Path.GetFileName(libDir);
+                            lib.source = libDir;
 
                             foreach (var line in reader.ReadToEnd().Split('\n'))
                             {
                                 string[] parts = line.Split('=');
-                                if (parts.Length < 2) break;
+                                if (parts.Length < 2)
+                                {
+                                    break;
+                                }
 
                                 switch (parts[0])
                                 {
@@ -89,21 +91,26 @@ namespace ViewModel
                                         break;
 
                                 }
-                            }                           
-                        }                        
+                            }
+                        }
                     }
                     else
                     {
                         lib = new Library()
                         {
                             name = Path.GetFileName(libDir),
-                            path = libDir,
+                            path = Path.GetFileName(libDir),
+                            source = libDir,
                             sentence = "no information",
                             version = "?"
                         };
                     }
 
-                    if (String.IsNullOrWhiteSpace(lib.website)) lib.website = new Uri(lib.path).LocalPath;
+                    if (String.IsNullOrWhiteSpace(lib.website))
+                    {
+                        lib.website = new Uri(lib.source).LocalPath;
+                    }
+
                     libraries.Add(lib);
 
                 }

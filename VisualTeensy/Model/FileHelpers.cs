@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -10,84 +12,11 @@ namespace VisualTeensy.Model
     {
         public static string arduinoPath { set; get; }
 
-        //public static string formatOutput(string jsonString)
-        //{
-        //    var stringBuilder = new StringBuilder();
 
-        //    bool escaping = false;
-        //    bool inQuotes = false;
-        //    int indentation = 0;
-
-        //    foreach (char character in jsonString)
-        //    {
-        //        if (escaping)
-        //        {
-        //            escaping = false;
-        //            stringBuilder.Append(character);
-        //        }
-        //        else
-        //        {
-        //            if (character == '\\')
-        //            {
-        //                escaping = true;
-        //                stringBuilder.Append(character);
-        //            }
-        //            else if (character == '\"')
-        //            {
-        //                inQuotes = !inQuotes;
-        //                stringBuilder.Append(character);
-        //            }
-        //            else if (!inQuotes)
-        //            {
-        //                if (character == ',')
-        //                {
-        //                    stringBuilder.Append(character);
-        //                    stringBuilder.Append("\n");
-        //                    stringBuilder.Append(' ', indentation);
-        //                    stringBuilder.Append(' ', indentation);
-        //                }
-        //                else if (character == '[' || character == '{')
-        //                {
-        //                    stringBuilder.Append(character);
-        //                    stringBuilder.Append("\r\n");
-        //                    stringBuilder.Append(' ', ++indentation);
-        //                    stringBuilder.Append(' ', indentation);
-        //                }
-        //                else if (character == ']' || character == '}')
-        //                {
-        //                    stringBuilder.Append("\r\n");
-        //                    stringBuilder.Append(' ', --indentation);
-        //                    stringBuilder.Append(' ', indentation);
-        //                    stringBuilder.Append(character);
-        //                }
-        //                else if (character == ':')
-        //                {
-        //                    stringBuilder.Append(character);
-        //                    stringBuilder.Append(' ');
-        //                    //stringBuilder.Append(' ');
-        //                }
-        //                else
-        //                {
-        //                    stringBuilder.Append(character);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                stringBuilder.Append(character);
-        //            }
-        //        }
-        //    }
-
-        //    return stringBuilder.ToString();
-        //}
-
-        ////public static string getBoardFromArduino()
-        ////{
-        ////    return getBoardFromArduino(arduinoPath);
-        ////}
+        //Folders ----------------------------------------
 
         public static string arduinoPrefsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
-        
+
         public static string getSketchbookFolder()
         {
             var preferencesPath = Path.Combine(arduinoPrefsPath, "preferences.txt");
@@ -163,6 +92,45 @@ namespace VisualTeensy.Model
 
             return null;
         }
+
+        // Download libraries ----------------------------
+        public static bool downloadLibrary(Library lib, string targetFolder)
+        {
+            string libFolder = Path.Combine(targetFolder, lib.name);
+            if (Directory.Exists(libFolder)) return false;
+            
+            WebClient client = null;
+            MemoryStream zippedStream = null;
+            ZipArchive libArchive = null;
+            try
+            {
+                client = new WebClient();                
+                zippedStream = new MemoryStream(client.DownloadData(lib.url));
+                libArchive = new ZipArchive(zippedStream);
+                
+                
+                ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
+
+                var extDir = Path.Combine(targetFolder,  Path.GetFileNameWithoutExtension(lib.url));
+
+                Directory.Move(extDir, libFolder);
+
+
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                client?.Dispose();
+                zippedStream?.Dispose();
+                libArchive?.Dispose();
+            }
+        }
+
 
         private static bool isArduinoFolder(string folder)
         {

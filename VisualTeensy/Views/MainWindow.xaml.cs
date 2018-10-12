@@ -1,17 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using ViewModel;
 using System.IO;
 using System.Diagnostics;
@@ -47,8 +35,8 @@ namespace VisualTeensy
                 dialog.AddToMostRecentlyUsedList = true;
                 try
                 {
-                    dialog.InitialDirectory = System.IO.Path.GetDirectoryName(vm.model.project.path);
-                    dialog.DefaultFileName = System.IO.Path.GetFileName(vm.model.project.path);
+                    dialog.InitialDirectory = System.IO.Path.GetDirectoryName(vm.project.path);
+                    dialog.DefaultFileName = System.IO.Path.GetFileName(vm.project.path);
                 }
                 catch { }
 

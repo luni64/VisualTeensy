@@ -115,7 +115,7 @@
                 </StackPanel>
                 <StackPanel Margin="20,0,0,0" >
                     <RadioButton Tag="propFile" Content="_c_cpp_properties.json"  Margin="0,0,0,0" GroupName="files"/>
-                    <RadioButton Tag="settFile" Content="visualTeensy.json" Margin="0,3,0,0" GroupName="files"/>
+                    <RadioButton Tag="settFile" Content="vsteensy.json" Margin="0,3,0,0" GroupName="files"/>
                 </StackPanel>
             </StackPanel>
 

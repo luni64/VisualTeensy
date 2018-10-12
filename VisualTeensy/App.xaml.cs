@@ -88,13 +88,15 @@ namespace VisualTeensy
             try
             {
                 var setupData = loadSetup();
-                var project = ProjectData.open(Settings.Default.lastProject, setupData) ?? ProjectData.getDefault(setupData);
-
+                //var project = Configuration.open(Settings.Default.lastProject, setupData) ?? Configuration.getDefault(setupData);
+                
                 setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
+                var libManager = new LibManager(setupData);
+                             
+                var project = new Model.Project(setupData,libManager);
+                project.openProject(Settings.Default.lastProject);
 
-
-                var model = new Model.Model(project, setupData);
-                var mainVM = new MainVM(model);
+                var mainVM = new MainVM(project);
 
                 var mainWin = new MainWindow()
                 {
@@ -106,14 +108,11 @@ namespace VisualTeensy
                 };
 
                 mainWin.ShowDialog();
-
-                // close open file display windows // hack, move elsewhere
-                Current?.Windows.OfType<FileDisplayWindow>()?.ToList().ForEach(w => w.Close());
-
+                               
                 saveSetup(setupData);
 
                 Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
-                Settings.Default.lastProject = model.project.path;
+                Settings.Default.lastProject = project.path;
                 Settings.Default.Save();
 
                 log.Info("Closed");
@@ -121,7 +120,7 @@ namespace VisualTeensy
             catch (Exception ex)
             {
                 log.Fatal("Unhandled exception", ex);
-                MessageBox.Show("Unhandled Exception!, Aborting...");
+                MessageBox.Show(ex.Message+"\n" + ex.ToString());
             }
         }
 

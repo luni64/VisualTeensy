@@ -29,7 +29,7 @@ namespace VisualTeensy
         private void openOutputClick(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ProjectTabVM;
-            var dlg = new SaveProjectWin(new SaveWinVM(vm.model));
+            var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
 
             dlg.ShowDialog();
         }

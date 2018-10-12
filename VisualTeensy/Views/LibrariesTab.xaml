@@ -110,11 +110,16 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Column="0"  FontSize="14" FontWeight="SemiBold">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Grid.Column="0"  FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center">
                                 <Hyperlink NavigateUri="{Binding selectedVersion.website}" RequestNavigate="Hyperlink_RequestNavigate" >
                                     <TextBlock Text="{Binding name, Mode=OneWay}" ToolTip="{Binding selectedVersion.website}"/>
                                 </Hyperlink>
                             </TextBlock>
+                                <TextBlock Text="by" VerticalAlignment="Center" Margin="3,0"/>
+                                <TextBlock Text="{Binding selectedVersion.author}" VerticalAlignment="Center"/>
+
+                            </StackPanel>
 
                             <!--<TextBlock Grid.Column="0" Text="{Binding name}" Margin="0,0,0,0" FontSize="14" Foreground="DarkBlue" FontWeight="SemiBold"/>-->
                             <ComboBox Padding="2" HorizontalContentAlignment="Center" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,0,0,0"  FontSize="10"  ItemsSource="{Binding versions}" DisplayMemberPath="version" SelectedItem="{Binding selectedVersion}" Background="#FFD82828" />
