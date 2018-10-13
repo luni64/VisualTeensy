@@ -37,17 +37,17 @@ namespace ViewModel
 
 
             projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
-            projectLibraries.CollectionChanged += projectLibrariesChanged;
+            projectLibraries.CollectionChanged += projedtLibrariesChanged;
         }
 
-        private void projectLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void projedtLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (Library library in e.NewItems)
-                    {
+                    {                      
                         if (library.isLocal)
                         {
                             project.selectedConfiguration.localLibs.Add(library);
@@ -61,7 +61,7 @@ namespace ViewModel
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Library library in e.OldItems)
-                    {
+                    {                       
                         if (library.isLocal)
                         {
                             project.selectedConfiguration.localLibs.Remove(library);
@@ -98,16 +98,7 @@ namespace ViewModel
             projectLibraries.Add(lib);
         }
 
-        public void update()
-        {
-            projectLibraries.CollectionChanged -= projectLibrariesChanged;
-            projectLibraries.Clear();
-            foreach (var lib in project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs))
-            {
-                projectLibraries.Add(lib);
-            }
-            projectLibraries.CollectionChanged += projectLibrariesChanged;
-        }
+
         Project project;
     }
 }

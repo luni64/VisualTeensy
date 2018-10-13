@@ -68,13 +68,13 @@ namespace VisualTeensy
         {
             XmlConfigurator.Configure();
 
-            var repository = (Hierarchy)LogManager.GetRepository();
+            var repository = (Hierarchy) LogManager.GetRepository();
             repository.Threshold = Level.All;
 
             var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
 
             fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
-            fa.ActivateOptions();
+            fa.ActivateOptions();            
 
 
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -89,20 +89,12 @@ namespace VisualTeensy
             {
                 var setupData = loadSetup();
                 //var project = Configuration.open(Settings.Default.lastProject, setupData) ?? Configuration.getDefault(setupData);
-
+                
                 setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
                 var libManager = new LibManager(setupData);
-
-                var project = new Model.Project(setupData, libManager);
-
-                if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
-                {
-                    project.openProject(Settings.Default.lastProject);
-                }
-                else
-                {
-                    project.newProject();
-                }
+                             
+                var project = new Model.Project(setupData,libManager);
+                project.openProject(Settings.Default.lastProject);
 
                 var mainVM = new MainVM(project);
 
@@ -116,7 +108,7 @@ namespace VisualTeensy
                 };
 
                 mainWin.ShowDialog();
-
+                               
                 saveSetup(setupData);
 
                 Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
@@ -128,7 +120,7 @@ namespace VisualTeensy
             catch (Exception ex)
             {
                 log.Fatal("Unhandled exception", ex);
-                MessageBox.Show(ex.Message + "\n" + ex.ToString());
+                MessageBox.Show(ex.Message+"\n" + ex.ToString());
             }
         }
 

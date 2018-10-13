@@ -15,7 +15,6 @@ namespace ViewModel
         {            
             project.openProject(path as string);
             projecTabVM.update();
-            librariesTabVM.update();
             ActionText = Directory.Exists(projectPath) ? "Update Project" : "Generate Project";
             OnPropertyChanged("");            
         }
@@ -25,7 +24,6 @@ namespace ViewModel
         {
             project.newProject();
             projecTabVM.update();
-            librariesTabVM.update();
             ActionText = "Generate Project";
             OnPropertyChanged("");           
         }
@@ -47,7 +45,7 @@ namespace ViewModel
             get
             {
                 var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return $"VisualTeensy V{v.Major}.{v.Minor}.{v.Build} - lunOptics";
+                return $"VisualTeensy V{v.Major}.{v.Minor} - lunOptics";
             }
         }
 
