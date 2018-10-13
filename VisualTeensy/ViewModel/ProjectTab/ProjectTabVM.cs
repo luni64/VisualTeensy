@@ -121,7 +121,7 @@ namespace ViewModel
             }
         }
 
-        public String makefile => project.makefile;
+        public String makefile => project.selectedConfiguration.makefile;
         public String propFile => project.props_json;
         public String taskFile => project.tasks_json;
         public String settFile => project.vsSetup_json;
@@ -232,7 +232,7 @@ namespace ViewModel
         {
             this.project = project;
 
-            cmdGenerate = new RelayCommand(doGenerate, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
+            cmdGenerate = new RelayCommand(doGenerate, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
 
             updateBoards();            

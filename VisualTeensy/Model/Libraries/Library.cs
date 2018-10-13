@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace VisualTeensy.Model
 {
@@ -22,12 +23,17 @@ namespace VisualTeensy.Model
 
         public string path { get; set; }
         public string source { get; set; }
+        public string unversionedLibFolder => versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
+        string versionedLibFolder =>  Path.GetFileNameWithoutExtension(url);
+        
         public List<Library> dependencies;
 
-        public override string ToString() => $"{(isLocal ? "+" : "-")}{name} {version}";
-
+        public override string ToString() => $"{name} {version}";
         
-        public bool isLocal { get; set; } = false;             
-    }
-   
+        public enum SourceType {local, net }
+        
+        public bool isLocal { get; set; } = false;
+
+        public SourceType sourceType = SourceType.net;
+    }   
 }

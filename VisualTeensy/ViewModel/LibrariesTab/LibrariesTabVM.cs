@@ -34,9 +34,9 @@ namespace ViewModel
 
             repositories = project.libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
             selectedRepository = repositories.FirstOrDefault();
-            
 
-            projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.sharedLibs);
+
+            projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projedtLibrariesChanged;
         }
 
@@ -47,8 +47,7 @@ namespace ViewModel
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (Library library in e.NewItems)
-                    {
-                      //  project.libManager.projectLibraries.Add(library);
+                    {                      
                         if (library.isLocal)
                         {
                             project.selectedConfiguration.localLibs.Add(library);
@@ -62,8 +61,7 @@ namespace ViewModel
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Library library in e.OldItems)
-                    {
-                       // project.libManager.projectLibraries.Remove(library);
+                    {                       
                         if (library.isLocal)
                         {
                             project.selectedConfiguration.localLibs.Remove(library);

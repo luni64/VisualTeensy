@@ -23,6 +23,14 @@ namespace VisualTeensy
             mvm?.projecTabVM?.cmdClose.Execute(null);
         }
 
+        private void openOutputClick(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as MainVM;
+            var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
+
+            dlg.ShowDialog();
+        }
+
 
         private void FileOpenClick(object sender, RoutedEventArgs e)
         {

@@ -192,7 +192,7 @@ namespace ViewModel
         }
         private async Task writeProjectFiles()
         {
-            await writeFile(makefilePath, project.makefile);
+            await writeFile(makefilePath, project.selectedConfiguration.makefile);
             await writeFile(buildTaskPath, project.tasks_json);
             await writeFile(intellisensePath, project.props_json);
             await writeFile(setupFilePath, project.vsSetup_json);
@@ -203,23 +203,20 @@ namespace ViewModel
 
             foreach (Library library in configuration.localLibs)
             {
-                if (library.source != null)
+                if (library.sourceType == Library.SourceType.local)
                 {
                     DirectoryInfo source = new DirectoryInfo(library.source);
                     DirectoryInfo target = new DirectoryInfo(Path.Combine(libPath, library.path));
-                    CopyFilesRecursively(source, target);
-                    await Task.Delay(1);
+                    Helpers.copyFilesRecursively(source, target);
                 }
                 else
                 {
                     Helpers.downloadLibrary(library, libPath);
                 }
+                await Task.Delay(1);
             }
-
-
         }
-
-
+        
         async Task writeFile(DisplayText filename, string file)
         {
             using (TextWriter writer = new StreamWriter(filename.text))
@@ -229,26 +226,7 @@ namespace ViewModel
             await Delay(50);
             filename.status = true;
         }
-
-
-        public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {
-            foreach (DirectoryInfo dir in source.GetDirectories())
-            {
-                CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
-            }
-
-            foreach (FileInfo file in source.GetFiles())
-            {
-                string targetFileName = Path.Combine(target.FullName, file.Name);
-                if (!File.Exists(targetFileName))
-                {
-                    file.CopyTo(Path.Combine(target.FullName, file.Name));
-                }
-            }
-        }
-
-
+        
         void writeMainCpp()
         {
             string mainCppPath = Path.Combine(project.path, "src", "main.cpp");

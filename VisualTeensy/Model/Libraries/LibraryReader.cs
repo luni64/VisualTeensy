@@ -5,10 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using VisualTeensy.Model;
 
 
-namespace ViewModel
+namespace VisualTeensy.Model
 {
     internal class libs
     {
@@ -38,8 +37,7 @@ namespace ViewModel
         public static ILookup<string, Library> parseLibraryLocal(string repository)
         {
             log.Debug(repository);
-
-
+            
             List<Library> libraries = new List<Library>();
             try
             {
@@ -54,6 +52,8 @@ namespace ViewModel
                         {
                             lib.path = Path.GetFileName(libDir);
                             lib.source = libDir;
+                            lib.sourceType = Library.SourceType.local;
+                            lib.isLocal = true;
 
                             foreach (var line in reader.ReadToEnd().Split('\n'))
                             {
@@ -72,24 +72,23 @@ namespace ViewModel
                                         lib.version = parts[1].Trim();
                                         break;
                                     case "author":
-                                        lib.author = parts[1];
+                                        lib.author = parts[1].Trim();
                                         break;
                                     case "maintainer":
-                                        lib.maintainer = parts[1];
+                                        lib.maintainer = parts[1].Trim();
                                         break;
                                     case "sentence":
                                         lib.sentence = parts[1].Trim();
                                         break;
                                     case "paragraph":
-                                        lib.paragraph = parts[1];
+                                        lib.paragraph = parts[1].Trim();
                                         break;
                                     case "category":
-                                        lib.category = parts[1];
+                                        lib.category = parts[1].Trim();
                                         break;
                                     case "url":
-                                        lib.website = parts[1];
+                                        lib.website = parts[1].Trim();
                                         break;
-
                                 }
                             }
                         }
@@ -100,6 +99,7 @@ namespace ViewModel
                         {
                             name = Path.GetFileName(libDir),
                             path = Path.GetFileName(libDir),
+                            sourceType = Library.SourceType.local,
                             source = libDir,
                             sentence = "no information",
                             version = "?"
@@ -110,9 +110,7 @@ namespace ViewModel
                     {
                         lib.website = new Uri(lib.source).LocalPath;
                     }
-
                     libraries.Add(lib);
-
                 }
             }
             catch (Exception ex)

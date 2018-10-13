@@ -9,12 +9,16 @@ namespace VisualTeensy.Model
 
         public IRepository sharedRepository { get; }
         public string sharedRepositoryPath { get; }
+
+        public IRepository localRepository { get; set; }
         
 
         public LibManager(SetupData setup)
         {         
             sharedRepositoryPath = Path.Combine(Helpers.getSketchbookFolder(), "libraries");
             sharedRepository = new RepositoryLocal("Shared Libraries", sharedRepositoryPath);
+
+            
             
             repositories = new List<IRepository>();
             repositories.Add(new RepositoryIndexJson("Arduino Repository", Path.Combine(Helpers.arduinoPrefsPath, "library_index.json")));

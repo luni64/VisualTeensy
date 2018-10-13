@@ -94,42 +94,6 @@ namespace VisualTeensy.Model
         }
 
         // Download libraries ----------------------------
-        public static bool downloadLibrary(Library lib, string targetFolder)
-        {
-            string libFolder = Path.Combine(targetFolder, lib.name);
-            if (Directory.Exists(libFolder)) return false;
-            
-            WebClient client = null;
-            MemoryStream zippedStream = null;
-            ZipArchive libArchive = null;
-            try
-            {
-                client = new WebClient();                
-                zippedStream = new MemoryStream(client.DownloadData(lib.url));
-                libArchive = new ZipArchive(zippedStream);
-                
-                
-                ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
-
-                var extDir = Path.Combine(targetFolder,  Path.GetFileNameWithoutExtension(lib.url));
-
-                Directory.Move(extDir, libFolder);
-
-
-
-                return true;
-            }
-            catch(Exception ex)
-            {
-                return false;
-            }
-            finally
-            {
-                client?.Dispose();
-                zippedStream?.Dispose();
-                libArchive?.Dispose();
-            }
-        }
 
 
         private static bool isArduinoFolder(string folder)
@@ -194,6 +158,54 @@ namespace VisualTeensy.Model
                 }
             }
             return null;
+        }
+
+        public static void copyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
+        {
+            foreach (DirectoryInfo dir in source.GetDirectories())
+            {
+                copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+            }
+
+            foreach (FileInfo file in source.GetFiles())
+            {
+                string targetFileName = Path.Combine(target.FullName, file.Name);
+                if (!File.Exists(targetFileName))
+                {
+                    file.CopyTo(Path.Combine(target.FullName, file.Name));
+                }
+            }
+        }
+        public static bool downloadLibrary(Library lib, string targetFolder)
+        {
+            string versionedLibFolder = Path.Combine(targetFolder, Path.GetFileNameWithoutExtension(lib.url));
+            string unversionedLibFolder = versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
+            if (Directory.Exists(unversionedLibFolder)) return false;
+
+            WebClient client = null;
+            MemoryStream zippedStream = null;
+            ZipArchive libArchive = null;
+            try
+            {
+                client = new WebClient();
+                zippedStream = new MemoryStream(client.DownloadData(lib.url));
+                libArchive = new ZipArchive(zippedStream);
+                ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
+
+                Directory.Move(versionedLibFolder, unversionedLibFolder);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            finally
+            {
+                if (Directory.Exists(versionedLibFolder)) Directory.Delete(versionedLibFolder);
+                client?.Dispose();
+                zippedStream?.Dispose();
+                libArchive?.Dispose();
+            }
         }
 
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]

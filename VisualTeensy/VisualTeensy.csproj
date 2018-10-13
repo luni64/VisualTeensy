@@ -74,6 +74,12 @@
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.4.1.1101, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.4.1.1101\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAPICodePack-Core.1.1.0.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -138,6 +144,9 @@
     <Compile Include="Views\FileDisplayWindow.xaml.cs">
       <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\LibInfoWin.xaml.cs">
+      <DependentUpon>LibInfoWin.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LibrariesTab.xaml.cs">
       <DependentUpon>LibrariesTab.xaml</DependentUpon>
     </Compile>
@@ -166,6 +175,10 @@
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Page Include="Views\FileDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LibInfoWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
