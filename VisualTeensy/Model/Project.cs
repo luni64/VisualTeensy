@@ -22,7 +22,7 @@ namespace VisualTeensy.Model
         public string props_json { get; set; }
         public string vsSetup_json { get; set; }
 
-        public string path { get; private set; }
+        public string path { get; set; }
         public string pathError
         {
             get

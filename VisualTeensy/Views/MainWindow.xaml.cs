@@ -31,6 +31,29 @@ namespace VisualTeensy
             dlg.ShowDialog();
         }
 
+        private void saveAs(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext as MainVM;
+
+            using (var dialog = new CommonSaveFileDialog())
+            {                
+                try
+                {
+                    dialog.InitialDirectory = System.IO.Path.GetDirectoryName(vm.project.path);
+                    dialog.DefaultFileName = System.IO.Path.GetFileName(vm.project.path);                    
+                }
+                catch { }
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    Directory.CreateDirectory(dialog.FileName);
+                    vm.project.path = dialog.FileName;
+                    vm.project.generateFiles();
+                    var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
+                    dlg.ShowDialog();
+                }
+            }
+        }
 
         private void FileOpenClick(object sender, RoutedEventArgs e)
         {

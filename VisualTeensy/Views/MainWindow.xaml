@@ -37,6 +37,11 @@
                         <md:PackIcon Kind="ContentSave" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="Save as..." Click="saveAs">
+                    <MenuItem.Icon>
+                        <md:PackIcon Kind="ContentSaveSettings" />
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="Exit" Command="{Binding cmdClose}">
                     <MenuItem.Icon>
