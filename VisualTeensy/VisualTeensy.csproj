@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VisualTeensy</RootNamespace>
     <AssemblyName>VisualTeensy</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -34,6 +34,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -67,16 +68,34 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.WindowsAPICodePack">
-      <HintPath>Embedded\Microsoft.WindowsAPICodePack.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.1.0\lib\net46\GongSolutions.Wpf.DragDrop.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
-      <HintPath>Embedded\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignColors, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.2\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.4.1.1101, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.4.1.1101\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Core.1.1.0.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
@@ -98,30 +117,46 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Model\Board.cs" />
-    <Compile Include="Model\BuildEntry.cs" />
-    <Compile Include="Model\Entry.cs" />
-    <Compile Include="Model\FileContent.cs" />
+    <Compile Include="Model\Boards\Board.cs" />
+    <Compile Include="Model\Boards\BuildEntry.cs" />
+    <Compile Include="Model\Boards\Entry.cs" />
+    <Compile Include="Model\Boards\FileContent.cs" />
     <Compile Include="Model\FileHelpers.cs" />
-    <Compile Include="Model\Menu.cs" />
-    <Compile Include="Model\Model.cs" />
-    <Compile Include="Model\Option.cs" />
-    <Compile Include="Model\OptionSet.cs" />
+    <Compile Include="Model\Libraries\LibManager.cs" />
+    <Compile Include="Model\Libraries\Library.cs" />
+    <Compile Include="Model\Libraries\LibRepository.cs" />
+    <Compile Include="Model\Boards\Menu.cs" />
+    <Compile Include="Model\Project.cs" />
+    <Compile Include="Model\Boards\Option.cs" />
+    <Compile Include="Model\Boards\OptionSet.cs" />
+    <Compile Include="Model\Configuration.cs" />
     <Compile Include="Model\PropertiesJson.cs" />
     <Compile Include="Model\SetupData.cs" />
     <Compile Include="Model\Strings.cs" />
     <Compile Include="Model\tasksJson.cs" />
-    <Compile Include="Model\ValidatedPath.cs" />
     <Compile Include="Model\vtTransferData.cs" />
-    <Compile Include="ViewModel\MainVM.cs" />
-    <Compile Include="ViewModel\SetupTabVM.cs" />
+    <Compile Include="ViewModel\LibrariesTab\LibrariesTabVM.cs" />
+    <Compile Include="Model\Libraries\LibraryReader.cs" />
+    <Compile Include="ViewModel\LibrariesTab\RepositoryVM.cs" />
+    <Compile Include="ViewModel\LibrariesTab\LibraryVM.cs" />
+    <Compile Include="ViewModel\MainWin\MainVM.cs" />
+    <Compile Include="ViewModel\SetupTab\SetupTabVM.cs" />
+    <Compile Include="Views\FileDisplayWindow.xaml.cs">
+      <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LibInfoWin.xaml.cs">
+      <DependentUpon>LibInfoWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LibrariesTab.xaml.cs">
+      <DependentUpon>LibrariesTab.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SetupTab.xaml.cs">
       <DependentUpon>SetupTab.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ViewModel\BoardVM.cs" />
-    <Compile Include="ViewModel\OptionSetVM.cs" />
-    <Compile Include="ViewModel\SaveWinVM.cs" />
-    <Compile Include="ViewModel\ProjectTabVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\BoardVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\OptionSetVM.cs" />
+    <Compile Include="ViewModel\SaveWin\SaveWinVM.cs" />
+    <Compile Include="ViewModel\ProjectTab\ProjectTabVM.cs" />
     <Compile Include="Views\PathSelector.xaml.cs">
       <DependentUpon>PathSelector.xaml</DependentUpon>
     </Compile>
@@ -139,6 +174,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Page Include="Views\FileDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LibInfoWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LibrariesTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MiscRessources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -182,6 +229,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -206,32 +254,6 @@
     <Resource Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.dll" />
-    <EmbeddedResource Include="Embedded\Microsoft.WindowsAPICodePack.Shell.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <PublishFile Include="Microsoft.WindowsAPICodePack">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>Assembly</FileType>
-    </PublishFile>
-    <PublishFile Include="Microsoft.WindowsAPICodePack.Shell">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>Assembly</FileType>
-    </PublishFile>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
@@ -241,7 +263,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Embedded\makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\rubbish-bin.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*.dll', '$(TargetDir)*.exe', '$(TargetDir)*.config' -DestinationPath '$(TargetDir)\VisualTeensy.zip' -Force)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

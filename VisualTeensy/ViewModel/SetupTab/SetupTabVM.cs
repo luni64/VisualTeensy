@@ -66,59 +66,6 @@ namespace ViewModel
             //}
         }
 
-
-        public String makePath
-        {
-            get => data.makeExePath;
-            set
-            {
-                if (value != data.makeExePath)
-                {
-                    data.makeExePath = value.Trim();
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        public String uploadTyPath
-        {
-            get => data.uplTyBase;
-            set
-            {
-                if (value != data.uplTyBase)
-                {
-                    data.uplTyBase = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public String uploadPjrcPath
-        {
-            get => data.uplPjrcBase;
-            set
-            {
-                if (value != data.uplPjrcBase)
-                {
-                    data.uplPjrcBase = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public String projectBaseDefault
-        {
-            get => data.projectBaseDefault;
-            set
-            {
-                if (value != data.projectBaseDefault)
-                {
-                    data.projectBaseDefault = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
         public string Error => throw new NotImplementedException();
         public string this[string columnName]
         {
@@ -129,19 +76,23 @@ namespace ViewModel
                 switch (columnName)
                 {
                     case "projectPathDefault":
-                        error = data.projectBaseError;
+                        error = project.pathError;
                         break;
 
                     case "makePath":
-                        error = data.makeExePathError;
+                        error = project.setup.makeExePathError;
                         break;
 
                     case "uploadTyPath":
-                        error = data.uplTyBaseError;
+                        error = project.setup.uplTyBaseError;
                         break;
 
                     case "uploadPjrcPath":
-                        error = data.uplPjrcBaseError;
+                        error = project.setup.uplPjrcBaseError;
+                        break;
+
+                    case "uploadCLIPath":
+                        error = project.setup.uplCLIBaseError;
                         break;
 
                     default:
@@ -152,15 +103,94 @@ namespace ViewModel
             }
         }
 
-        public SetupTabVM(Model model)
+        public String arduinoBase
         {
-            this.data = model.data;
+            get => project.setup.arduinoBase;
+            set
+            {
+                if (value != project.setup.arduinoBase)
+                {
+                    project.setup.arduinoBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String makePath
+        {
+            get => project.setup.makeExePath;
+            set
+            {
+                if (value != project.setup.makeExePath)
+                {
+                    project.setup.makeExePath = value.Trim();
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String uploadTyPath
+        {
+            get => project.setup.uplTyBase;
+            set
+            {
+                if (value != project.setup.uplTyBase)
+                {
+                    project.setup.uplTyBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String uploadPjrcPath
+        {
+            get => project.setup.uplPjrcBase;
+            set
+            {
+                if (value != project.setup.uplPjrcBase)
+                {
+                    project.setup.uplPjrcBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String uploadCLIPath
+        {
+            get => project.setup.uplCLIBase;
+            set
+            {
+                if (value != project.setup.uplCLIBase)
+                {
+                    project.setup.uplCLIBase = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String projectBaseDefault
+        {
+            get => project.setup.projectBaseDefault;
+            set
+            {
+                if (value != project.setup.projectBaseDefault)
+                {
+                    project.setup.projectBaseDefault = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        public SetupTabVM(Project project)
+        {
+            this.project = project;          
+           // this.setup = project.setup;
 
             cmdDownloadMake = new AsyncCommand(doDownload);
         }
 
+        
+        //SetupData setup;
 
-        SetupData data;
+        Project project;
+
+        
     }
 }
 

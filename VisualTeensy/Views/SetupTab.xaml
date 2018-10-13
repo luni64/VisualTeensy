@@ -1,51 +1,68 @@
 ﻿<UserControl x:Class="VisualTeensy.SetupTab"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="12"
+             TextOptions.TextFormattingMode="Ideal" 
+             TextOptions.TextRenderingMode="Auto"        
+             Background="{DynamicResource MaterialDesignPaper}"
+             FontFamily="{DynamicResource MaterialDesignFont}"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VisualTeensy"
-             xmlns:vm ="clr-namespace:ViewModel"
-             Background="White"
+             xmlns:vm ="clr-namespace:ViewModel"           
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" 
-             >
-    <Border Grid.Column="0" Grid.Row="1" BorderThickness="2" BorderBrush="LightGray" Margin="10" Padding="10" CornerRadius="10" >
-        <Grid >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <StackPanel Width="auto" Margin="0,0,0,0" HorizontalAlignment="Stretch"  >
-                <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" >
-                   <Run FontSize="16" FontWeight="Bold">  GNU Make </Run><LineBreak/>
-                    The project setup uses GNU Make for Windows to build the project. You can download it from e.g. here:
-                    <Hyperlink NavigateUri="http://www.equation.com/servlet/equation.cmd?fa=make" RequestNavigate="Hyperlink_RequestNavigate" >
-                       http://www.equation.com/servlet/equation.cmd?fa=make
-                    </Hyperlink>
-                </TextBlock>
+             d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" >
+   
+    <Grid Margin="20" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-                <Label   Content="Path to GNU Make (required)" FontSize="10" Padding="0" Margin="0,5,0,0" />
-                <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />              
+        <StackPanel Width="auto" Margin="0,0,0,0" HorizontalAlignment="Stretch"  >
 
-                <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" TextAlignment="Justify">
-                   <Run FontSize="16" FontWeight="Bold">  Uploading </Run><LineBreak/>
-                    To upload firmware to the controller, VisualTeensy supports the PJRC Teensy Uploader and TyCommander. TyCommander includes a serial 
-                    terminal and can handle uploads to more than one Controller. (Note: The path to the PJRC Teensy uploader is required for 'Expert Setups' only)
-                    (You can download TyTools here:
-                    <Hyperlink NavigateUri="https://github.com/Koromix/tytools" RequestNavigate="Hyperlink_RequestNavigate" >
-                        https://github.com/Koromix/tytools
-                    </Hyperlink>
-                </TextBlock>
 
-                <Label   Content="Path to the Teensy Uploader" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+            <TextBlock Text="Basic Settings:"  FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
-                <Label   Content="Path to the TyTools (optional)" FontSize="10" Padding="0" Margin="0,10,0,0" />
-                <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />              
-            </StackPanel>
+           
+            <Label   Content="Arduino folder:" FontSize="10" FontWeight="SemiBold"  Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
+
+            <Label   Content="GNU make" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />
+
+            <TextBlock Text="Uploaders:"  Margin="0,20,0,0" FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
+
+
+            <Label   Content="PJRC Uploader (Folder containing Teensy.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+            <Label   Content="TyCommander - optional (folder containing TyCommanderC.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+            <Label   Content="CLI loader - optional (folder containing Teensy_loader_cli.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadCLIPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+        </StackPanel>
+
+        <Separator Grid.Column="1" Width="1" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"  />
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
 
         </Grid>
-    </Border>
+
+
+
+    </Grid>
+    <!--</Border>-->
 </UserControl>

@@ -25,13 +25,61 @@ namespace VisualTeensy.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string makeExePath {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool updateNeeded {
             get {
-                return ((string)(this["makeExePath"]));
+                return ((bool)(this["updateNeeded"]));
             }
             set {
-                this["makeExePath"] = value;
+                this["updateNeeded"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100,100,800,1000")]
+        public global::System.Windows.Rect fileWinBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["fileWinBounds"]));
+            }
+            set {
+                this["fileWinBounds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100,100,1000,800")]
+        public global::System.Windows.Rect mainWinBounds {
+            get {
+                return ((global::System.Windows.Rect)(this["mainWinBounds"]));
+            }
+            set {
+                this["mainWinBounds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string defaultProjectBase {
+            get {
+                return ((string)(this["defaultProjectBase"]));
+            }
+            set {
+                this["defaultProjectBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastProject {
+            get {
+                return ((string)(this["lastProject"]));
+            }
+            set {
+                this["lastProject"] = value;
             }
         }
         
@@ -74,60 +122,48 @@ namespace VisualTeensy.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string projectBase {
+        public string makeExePath {
             get {
-                return ((string)(this["projectBase"]));
+                return ((string)(this["makeExePath"]));
             }
             set {
-                this["projectBase"] = value;
+                this["makeExePath"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string boardsTxtPath {
+        public string projectBaseDefault {
             get {
-                return ((string)(this["boardsTxtPath"]));
+                return ((string)(this["projectBaseDefault"]));
             }
             set {
-                this["boardsTxtPath"] = value;
+                this["projectBaseDefault"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string coreBase {
+        public string libBase {
             get {
-                return ((string)(this["coreBase"]));
+                return ((string)(this["libBase"]));
             }
             set {
-                this["coreBase"] = value;
+                this["libBase"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string compilerBase {
+        public string uplCLIBase {
             get {
-                return ((string)(this["compilerBase"]));
+                return ((string)(this["uplCLIBase"]));
             }
             set {
-                this["compilerBase"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool updateNeeded {
-            get {
-                return ((bool)(this["updateNeeded"]));
-            }
-            set {
-                this["updateNeeded"] = value;
+                this["uplCLIBase"] = value;
             }
         }
     }

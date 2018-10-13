@@ -1,0 +1,49 @@
+﻿<Window x:Class="VisualTeensy.LibInfoWin"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisualTeensy"
+        xmlns:vm="clr-namespace:ViewModel"
+        mc:Ignorable="d"
+          d:DataContext="{d:DesignInstance vm:LibraryVM, IsDesignTimeCreatable=False}"
+        Title="Library Information" Height="350" Width="400">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{Binding name}" FontSize="18" Foreground="DarkBlue" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,10" FontSize="11" Text="{Binding selectedVersion.author}"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding selectedVersion.sentence}" TextWrapping="Wrap" FontWeight="SemiBold"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding selectedVersion.paragraph}" TextWrapping="Wrap"/>
+
+
+
+        <TextBlock Grid.Row="4" Margin="0,10,0,10">
+            <Hyperlink NavigateUri="{Binding selectedVersion.website}" RequestNavigate="Hyperlink_RequestNavigate" >
+                <TextBlock Text="{Binding selectedVersion.website, Mode=OneWay}" ToolTip="{Binding selectedVersion.website}"/>
+            </Hyperlink>
+        </TextBlock>
+
+    </Grid>
+</Window>

@@ -1,7 +1,8 @@
-﻿using VisualTeensy;
-using VisualTeensy.Model;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Navigation;
 using ViewModel;
 
 namespace VisualTeensy
@@ -15,45 +16,43 @@ namespace VisualTeensy
         {
             InitializeComponent();
 
-
-        }
-
-
-        private void handleMessages(object sender, string message)
-        {
-            switch (message)
+            Loaded += (s, e) =>
             {
-                case "Generate":
-                    openOutput();
-                    break;
-            }
+                var dc = DataContext as ProjectTabVM;
+                if (dc != null)
+                {
+                    dc.OnPropertyChanged("");
+                }
+            };
         }
 
-
-        private void openOutput()
+        private void openOutputClick(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as ProjectTabVM;
+            var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
 
-            var mvm = DataContext as ViewModel.ProjectTabVM;
-
-            SetupData data = mvm.model.data;
-
-            var vm = new SaveWinVM(data);
-
-            var dlg = new SaveProjectWin(vm);
             dlg.ShowDialog();
-
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void StackPanel_Checked(object sender, RoutedEventArgs e)
         {
-            var vm = DataContext as ViewModel.ProjectTabVM;
-            if (vm != null) vm.MessageHandler += handleMessages;
+            if (DataContext == null) return;
+
+            var path = (string)(e.OriginalSource as RadioButton)?.Tag;
+
+            file.SetBinding(TextBox.TextProperty, new Binding(path)
+            {
+                Source = DataContext,
+                Mode = BindingMode.OneWay
+            });
         }
 
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            var vm = DataContext as ViewModel.ProjectTabVM;
-            if (vm != null) vm.MessageHandler -= handleMessages;
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
+
     }
 }

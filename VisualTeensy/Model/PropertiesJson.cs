@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace VisualTeensy.Model
 {
-    class Configuration
+    class ConfigurationJson
     {
         public string name { get; set; }
         public List<string> includePath { get; set; } = new List<string>();
@@ -17,7 +13,7 @@ namespace VisualTeensy.Model
 
     class PropertiesJson
     {
-        public List<Configuration> configurations = new List<Configuration>();
+        public List<ConfigurationJson> configurations = new List<ConfigurationJson>();
         public int version => 4;
     }
 }
