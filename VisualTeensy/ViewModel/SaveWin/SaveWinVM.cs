@@ -1,5 +1,6 @@
 ﻿using System.IO;
-using VisualTeensy.Model;
+using vtCore;
+
 using Task = System.Threading.Tasks.Task;
 
 namespace ViewModel
@@ -292,7 +293,7 @@ namespace ViewModel
         }
 
         // private SetupData data;
-        private Configuration configuration;
+        private IConfiguration configuration;
         private SetupData setup;
         private Project project;
     }

@@ -6,9 +6,9 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
-    static class Helpers
+    public static class Helpers
     {
         public static string arduinoPath { set; get; }
 

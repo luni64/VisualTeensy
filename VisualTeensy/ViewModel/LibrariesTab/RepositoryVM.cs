@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using VisualTeensy.Model;
+using vtCore;
 
 namespace ViewModel
 {

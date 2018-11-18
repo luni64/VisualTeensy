@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿//using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
     internal class libs
     {
@@ -18,7 +18,7 @@ namespace VisualTeensy.Model
     {
         public static ILookup<string, Library> parseLibrary_Index_Json(string library_indexJson)
         {
-            log.Debug(library_indexJson);
+            //log.Debug(library_indexJson);
 
             try
             {
@@ -29,14 +29,14 @@ namespace VisualTeensy.Model
             }
             catch (Exception ex)
             {
-                log.Warn($"Parsing of {library_indexJson} failed", ex);
+                //log.Warn($"Parsing of {library_indexJson} failed", ex);
                 return null;
             }
         }
 
         public static ILookup<string, Library> parseLibraryLocal(string repository)
         {
-            log.Debug(repository);
+            //log.Debug(repository);
             
             List<Library> libraries = new List<Library>();
             try
@@ -115,13 +115,13 @@ namespace VisualTeensy.Model
             }
             catch (Exception ex)
             {
-                log.Warn($"Parsing of {repository} failed", ex);
+                //log.Warn($"Parsing of {repository} failed", ex);
                 return null;
             }
             return libraries.ToLookup(k => k.name); // libraries structured by name (more than on version per name possible)
         }
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+       // private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 

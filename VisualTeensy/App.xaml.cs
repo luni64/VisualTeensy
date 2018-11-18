@@ -10,8 +10,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using ViewModel;
-using VisualTeensy.Model;
 using VisualTeensy.Properties;
+using vtCore;
 
 namespace VisualTeensy
 {
@@ -93,7 +93,7 @@ namespace VisualTeensy
                 setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
                 var libManager = new LibManager(setupData);
 
-                var project = new Model.Project(setupData, libManager);
+                var project = new vtCore.Project(setupData, libManager);
 
                 if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
                 {

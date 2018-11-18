@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
     public class Library
     {

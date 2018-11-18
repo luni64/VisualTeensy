@@ -1,4 +1,4 @@
-﻿using VisualTeensy.Model;
+﻿using vtCore;
 using System.IO;
 using System.Windows;
 
@@ -51,7 +51,7 @@ namespace ViewModel
             }
         }
 
-        public MainVM(Project project = null)
+        public MainVM(vtCore.Project project = null)
         {
             this.project = project;
 

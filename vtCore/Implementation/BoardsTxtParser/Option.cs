@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
-    public class Option
+    class Option : IOption
     {
         public string name { get; set; } = null;
-        public List<BuildEntry> paramList { get; }
-        override public string ToString() => name;
 
-        public Option(IEnumerable<Entry> optionEntries)
+        internal List<BuildEntry> paramList { get; }       
+        internal Option(IEnumerable<Entry> optionEntries)
         {
             var titleEntry = optionEntries.FirstOrDefault(m => m.key.Length == 4);
             if (titleEntry != null)

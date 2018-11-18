@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
-    public enum SetupTypes
-    {
-        quick, expert
-    }
+   
     
     public class SetupData
     {

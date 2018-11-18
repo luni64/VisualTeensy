@@ -1,13 +1,14 @@
-﻿using VisualTeensy.Model;
+﻿using vtCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 
 namespace ViewModel
 {
     public class BoardVM : BaseViewModel
     {
-        public Board board { get; }
+        public IBoard board { get; }
         public String boardName => board.name;
         public List<OptionSetVM> optionSetVMs { get; }
 
@@ -18,7 +19,7 @@ namespace ViewModel
         //}
         //String _makefile;
 
-        public BoardVM(Board board)
+        public BoardVM(IBoard board)
         {
             this.board = board;
             optionSetVMs = new List<OptionSetVM>(board.optionSets.Select(b => new OptionSetVM(b)));

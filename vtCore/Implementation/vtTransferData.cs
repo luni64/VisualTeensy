@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
 
-    public class vtBoard
+    internal class vtBoard
     {
         public vtBoard(Board board)
         {
@@ -26,7 +25,7 @@ namespace VisualTeensy.Model
     {
         public class vtBoard
         {
-            public vtBoard(Board board)
+            public vtBoard(IBoard board)
             {
                 name = board?.name;
                 options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name);
@@ -80,7 +79,7 @@ namespace VisualTeensy.Model
             public vtBoard board { get; set; }
 
 
-            public vtConfiguration(Configuration configuration)
+            public vtConfiguration(IConfiguration configuration)
             {
                 if (configuration == null ) return;
                 setupType = configuration.setupType;

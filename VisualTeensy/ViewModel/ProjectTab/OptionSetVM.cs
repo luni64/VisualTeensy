@@ -1,15 +1,16 @@
-﻿using VisualTeensy.Model;
+﻿using vtCore;
 using System;
 using System.Collections.Generic;
+
 
 namespace ViewModel
 {
     public class OptionSetVM : BaseViewModel
     {
         public String name => optionSet.name;
-        public List<Option> options => optionSet.options;
+        public IEnumerable<IOption> options => optionSet.options;
 
-        public Option selectedOption
+        public IOption selectedOption
         {
             get => optionSet.selectedOption;
             set
@@ -22,11 +23,11 @@ namespace ViewModel
             }
         }
         
-        public OptionSetVM(OptionSet optionSet)
+        public OptionSetVM(IOptionSet optionSet)
         {
             this.optionSet = optionSet;
         }
 
-        private OptionSet optionSet;
+        private IOptionSet optionSet;
     }
 }

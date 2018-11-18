@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VisualTeensy</RootNamespace>
     <AssemblyName>VisualTeensy</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -20,6 +20,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -34,7 +35,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +45,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -117,26 +118,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Model\Boards\Board.cs" />
-    <Compile Include="Model\Boards\BuildEntry.cs" />
-    <Compile Include="Model\Boards\Entry.cs" />
-    <Compile Include="Model\Boards\FileContent.cs" />
-    <Compile Include="Model\FileHelpers.cs" />
-    <Compile Include="Model\Libraries\LibManager.cs" />
-    <Compile Include="Model\Libraries\Library.cs" />
-    <Compile Include="Model\Libraries\LibRepository.cs" />
-    <Compile Include="Model\Boards\Menu.cs" />
-    <Compile Include="Model\Project.cs" />
-    <Compile Include="Model\Boards\Option.cs" />
-    <Compile Include="Model\Boards\OptionSet.cs" />
-    <Compile Include="Model\Configuration.cs" />
-    <Compile Include="Model\PropertiesJson.cs" />
-    <Compile Include="Model\SetupData.cs" />
-    <Compile Include="Model\Strings.cs" />
-    <Compile Include="Model\tasksJson.cs" />
-    <Compile Include="Model\vtTransferData.cs" />
     <Compile Include="ViewModel\LibrariesTab\LibrariesTabVM.cs" />
-    <Compile Include="Model\Libraries\LibraryReader.cs" />
     <Compile Include="ViewModel\LibrariesTab\RepositoryVM.cs" />
     <Compile Include="ViewModel\LibrariesTab\LibraryVM.cs" />
     <Compile Include="ViewModel\MainWin\MainVM.cs" />
@@ -266,6 +248,13 @@
   <ItemGroup>
     <Resource Include="img\rubbish-bin.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\vtCore\vtCore.csproj">
+      <Project>{53f36c09-0e4d-4c85-bf72-09adfb259acd}</Project>
+      <Name>vtCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*.dll', '$(TargetDir)*.exe', '$(TargetDir)*.config' -DestinationPath '$(TargetDir)\VisualTeensy.zip' -Force)</PostBuildEvent>

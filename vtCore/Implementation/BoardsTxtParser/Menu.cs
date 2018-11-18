@@ -1,9 +1,9 @@
 ﻿using System;
-using ViewModel;
 
-namespace VisualTeensy.Model
+
+namespace vtCore
 {
-    public class Menu : BaseViewModel
+    class Menu : npc
     {
         public String OptionSetID { get; private set; }
         public String MenuName { get; private set; }

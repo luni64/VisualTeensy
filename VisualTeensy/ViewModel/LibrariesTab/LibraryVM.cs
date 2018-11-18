@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VisualTeensy.Model;
+using vtCore;
 using System.Linq;
 
 namespace ViewModel

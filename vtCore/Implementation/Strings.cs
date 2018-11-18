@@ -1,6 +1,6 @@
-﻿namespace VisualTeensy.Model
+﻿namespace vtCore
 {
-    static class Strings
+    public static class Strings
     {
         public static string mainCpp { get; } =
             "#include \"Arduino.h\"\n\n" +

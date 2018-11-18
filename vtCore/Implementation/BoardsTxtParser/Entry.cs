@@ -1,6 +1,6 @@
-﻿namespace VisualTeensy.Model
+﻿namespace vtCore
 {
-    public class Entry
+    class Entry
     {
         public Entry(string line)
         {

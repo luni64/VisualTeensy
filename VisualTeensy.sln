@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualTeensy", "VisualTeensy\VisualTeensy.csproj", "{ED408FC4-7F0D-4C4A-8272-D4C45B8ABA51}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vtCore", "vtCore\vtCore.csproj", "{53F36C09-0E4D-4C85-BF72-09ADFB259ACD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCore Tester", "ConsoleApp1\DotNetCore Tester.csproj", "{14234DB5-3414-49C3-ADB2-739222776EC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{ED408FC4-7F0D-4C4A-8272-D4C45B8ABA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED408FC4-7F0D-4C4A-8272-D4C45B8ABA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED408FC4-7F0D-4C4A-8272-D4C45B8ABA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F36C09-0E4D-4C85-BF72-09ADFB259ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F36C09-0E4D-4C85-BF72-09ADFB259ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F36C09-0E4D-4C85-BF72-09ADFB259ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F36C09-0E4D-4C85-BF72-09ADFB259ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14234DB5-3414-49C3-ADB2-739222776EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14234DB5-3414-49C3-ADB2-739222776EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14234DB5-3414-49C3-ADB2-739222776EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14234DB5-3414-49C3-ADB2-739222776EC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

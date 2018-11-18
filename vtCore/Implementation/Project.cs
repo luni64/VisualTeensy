@@ -1,23 +1,25 @@
-﻿using log4net;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
     public class Project
     {
         public SetupData setup { get; private set; }
         public LibManager libManager { get; private set; }
-        public List<Configuration> configurations { get; }
+        private List<Configuration> _configurations { get; }
         public Configuration selectedConfiguration { get; private set; }
 
+        public IEnumerable<IConfiguration> configurations => _configurations;
+      
+
+
         // files ------------------------------------
-       // public string makefile { get; set; }
+        // public string makefile { get; set; }
         public string tasks_json { get; set; }
         public string props_json { get; set; }
         public string vsSetup_json { get; set; }
@@ -39,7 +41,7 @@ namespace VisualTeensy.Model
 
         public void newProject()
         {
-            log.Info("new project");
+            //log.Info("new project");
 
             // Project Path -------------------------------------
             int i = 1;
@@ -47,30 +49,35 @@ namespace VisualTeensy.Model
             while (Directory.Exists(path)) { path = Path.Combine(setup.projectBaseDefault, $"newProject({i++})"); }
 
             // Add a default configuration ----------------------
-            configurations.Clear();
-            selectedConfiguration = Configuration.getDefault(setup);
-            configurations.Add(selectedConfiguration);
+            _configurations.Clear();
+            var sc = Configuration.getDefault(setup);
+
+            selectedConfiguration = sc;// Configuration.getDefault(setup);
+            _configurations.Add(sc);
+            //_configs.Add(selectedConfiguration);
 
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
-            configurations.Add(dummyConfig);
-            
+            _configurations.Add(dummyConfig);
+            //_configs.Add(dummyConfig);
+
             generateFiles();
         }
         public void openProject(string projectPath)
         {
-            log.Info($"open project {projectPath}");
+            //log.Info($"open project {projectPath}");
 
             path = projectPath;
 
-            configurations.Clear();
-
+            _configurations.Clear();
+          
             var vsTeensyJson = Path.Combine(projectPath, ".vsteensy", "vsteensy.json");
             if (!File.Exists(vsTeensyJson))
             {
-                log.Warn($"config file {vsTeensyJson} does not exist");
-                selectedConfiguration = Configuration.getDefault(setup);
-                configurations.Add(selectedConfiguration);
+                //log.Warn($"config file {vsTeensyJson} does not exist");
+                var sc = Configuration.getDefault(setup);
+                selectedConfiguration = sc; // Configuration.getDefault(setup);
+                _configurations.Add(sc);// selectedConfiguration);             
                 generateFiles();
                 return;
             }
@@ -78,7 +85,7 @@ namespace VisualTeensy.Model
             try
             {
                 string jsonString = File.ReadAllText(vsTeensyJson);
-                log.Debug("vsTeensy.json content:\n" + jsonString);
+                //log.Debug("vsTeensy.json content:\n" + jsonString);
 
                 var fileContent = JsonConvert.DeserializeObject<projectTransferData>(jsonString);
 
@@ -96,7 +103,7 @@ namespace VisualTeensy.Model
                             boardTxtPath = cfg.boardTxtPath,//.StartsWith("\\") ? Path.Combine(projectPath, cfg.boardTxtPath.Substring(1)) : cfg.boardTxtPath,
                             coreBase = cfg.coreBase,//.StartsWith("\\") ? Path.Combine(projectPath, cfg.coreBase.Substring(1)) : cfg.coreBase,                                                 
                         };
-                        
+
                         if (cfg.sharedLibraries != null)
                         {
                             var sharedLibraries = libManager.sharedRepository.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
@@ -113,7 +120,7 @@ namespace VisualTeensy.Model
                         if (cfg.localLibraries != null)
                         {
                             var localLibraries = LibraryReader.parseLibraryLocal(Path.Combine(projectPath, "lib")).Select(version => version.FirstOrDefault());
-                            foreach(var cfgLocalLib in cfg.localLibraries)
+                            foreach (var cfgLocalLib in cfg.localLibraries)
                             {
                                 var library = localLibraries.FirstOrDefault(lib => lib.path == cfgLocalLib);
                                 if (library != null)
@@ -121,7 +128,7 @@ namespace VisualTeensy.Model
                                     configuration.localLibs.Add(library);
                                 }
                             }
-                        }                       
+                        }
 
                         configuration.parseBoardsTxt(configuration.setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : null);
 
@@ -137,24 +144,29 @@ namespace VisualTeensy.Model
                                 }
                             }
                         }
-                        configurations.Add(configuration);
+                        _configurations.Add(configuration);
+                       // _configs.Add(configuration);
                     }
-                    selectedConfiguration = configurations.FirstOrDefault();
-                    log.Info($"{vsTeensyJson} read sucessfully");
+                    selectedConfiguration = _configurations.FirstOrDefault();
+                    //log.Info($"{vsTeensyJson} read sucessfully");
                 }
                 else
                 {
-                    selectedConfiguration = Configuration.getDefault(setup);
-                    configurations.Add(selectedConfiguration);
-                    log.Info($"{vsTeensyJson} parse error, using default configuration");
+                    var sc = Configuration.getDefault(setup);
+                    selectedConfiguration = sc;// Configuration.getDefault(setup);
+                    _configurations.Add(sc);//selectedConfiguration);
+                    //_configs.Add(selectedConfiguration);
+                    //log.Info($"{vsTeensyJson} parse error, using default configuration");
                 }
                 generateFiles();
             }
             catch (Exception ex)
             {
-                log.Warn($"config file {vsTeensyJson} does not exist");
-                selectedConfiguration = Configuration.getDefault(setup);
-                configurations.Add(selectedConfiguration);
+                //log.Warn($"config file {vsTeensyJson} does not exist");
+                var sc = Configuration.getDefault(setup);
+                selectedConfiguration = sc;// Configuration.getDefault(setup);
+                _configurations.Add(sc);//electedConfiguration);
+                //_configs.Add(selectedConfiguration);
                 generateFiles();
                 return;
             }
@@ -164,7 +176,8 @@ namespace VisualTeensy.Model
         {
             this.setup = setup;
             this.libManager = libManager;
-            this.configurations = new List<Configuration>();
+            this._configurations = new List<Configuration>();
+            //this._configs = new List<IConfiguration>();
 
             // openProject(Settings.Default.lastProject);           
 
@@ -175,32 +188,32 @@ namespace VisualTeensy.Model
 
         public void generateFiles()
         {
-            log.Info("enter");
+            //log.Info("enter");
             tasks_json = props_json = null;
-            configurations.ForEach(c => c.makefile = null);
+            _configurations.ForEach(c => c.makefile = null);
 
             bool ok = selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
-            if (configurations.Any(t=> t.setupType == SetupTypes.quick))
+            if (_configurations.Any(t => t.setupType == SetupTypes.quick))
             {
                 ok = ok && setup.arduinoBaseError == null;
             }
             else
             {
-                ok = ok && selectedConfiguration.corePathError == null && selectedConfiguration.compilerPathError == null;  // extend to all configurations
+                //TMPCommentar ok = ok && selectedConfiguration.corePathError == null && selectedConfiguration.compilerPathError == null;  // extend to all configurations
             }
 
             if (ok)
             {
-                log.Debug("OK (makefile, props_json, vsSetup_json)");
-                configurations.ForEach(c => c.makefile = generateMakefile(c));
+                //log.Debug("OK (makefile, props_json, vsSetup_json)");
+                _configurations.ForEach(c => c.makefile = generateMakefile(c));
 
                 props_json = generatePropertiesFile(selectedConfiguration.selectedBoard.getAllOptions());
                 vsSetup_json = generateVisualTeensySetup();
             }
             else
             {
-                log.Debug("NOK (makefile, props_json, vsSetup_json)");
-                selectedConfiguration.logProject();
+                //log.Debug("NOK (makefile, props_json, vsSetup_json)");
+                //selectedConfiguration.logProject();
             }
 
             tasks_json = generateTasksFile();
@@ -208,12 +221,12 @@ namespace VisualTeensy.Model
 
         private string generateVisualTeensySetup()
         {
-            log.Debug("enter");
+            // log.Debug("enter");
             return JsonConvert.SerializeObject(new projectTransferData(this), Formatting.Indented);
         }
         private string generateTasksFile()
         {
-            log.Debug("enter");
+            //log.Debug("enter");
             if (setup.makeExePathError != null)
             {
                 return null;
@@ -275,11 +288,11 @@ namespace VisualTeensy.Model
         }
         private string generatePropertiesFile(Dictionary<string, string> options)
         {
-            log.Debug("enter");
-            if (selectedConfiguration.compilerPathError != null)
-            {
-                return null;
-            }
+            //log.Debug("enter");
+            //if (selectedConfiguration.compilerPathError != null)
+            //{
+            //    return null;
+            //}
 
             var props = new PropertiesJson()
             {
@@ -321,18 +334,21 @@ namespace VisualTeensy.Model
             return JsonConvert.SerializeObject(props, Formatting.Indented);
 
         }
-        public string generateMakefile(Configuration cfg)
+        public string generateMakefile(IConfiguration cfg)
         {
             var options = cfg.selectedBoard.getAllOptions();
 
-            log.Debug("enter");
+            //log.Debug("enter");
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");
             mf.Append("# Generated by VisualTeensy (https://github.com/luni64/VisualTeensy)\n");
             mf.Append("#\n");
             mf.Append($"# {"Board",-18} {cfg.selectedBoard.name}\n");
-            cfg.selectedBoard.optionSets.ForEach(o => mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n"));
+            foreach (var o in cfg.selectedBoard.optionSets)
+            {
+                mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n");
+            }
             mf.Append("#\n");
             mf.Append($"# {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}\n");
             mf.Append("#******************************************************************************\n");
@@ -437,7 +453,7 @@ namespace VisualTeensy.Model
             }
         }
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 

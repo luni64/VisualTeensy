@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using VisualTeensy.Model;
+using vtCore;
 
 namespace ViewModel
 {
@@ -20,33 +20,33 @@ namespace ViewModel
 
                 switch (columnName)
                 {
-                    case "projectPath":
-                        error = project.pathError;
-                        break;
+                    //case "projectPath":
+                    //    error = project.pathError;
+                    //    break;
 
-                    case "arduinoBase":
-                        error = project.setup.arduinoBaseError;
-                        break;
+                    //case "arduinoBase":
+                    //    error = project.setup.arduinoBaseError;
+                    //    break;
 
-                    case "boardTxtPath":
-                        error = project.selectedConfiguration.boardTxtPathError;
-                        break;
+                    //case "boardTxtPath":
+                    //    error = project.selectedConfiguration.boardTxtPathError;
+                    //    break;
 
-                    case "corePath":
-                        error = project.selectedConfiguration.setupType == SetupTypes.expert ? project.selectedConfiguration.corePathError : null;
-                        break;
+                    //case "corePath":
+                    //    error = project.selectedConfiguration.setupType == SetupTypes.expert ? project.selectedConfiguration.corePathError : null;
+                    //    break;
 
-                    case "compilerPath":
-                        error = project.selectedConfiguration.compilerPathError;
-                        break;
+                    //case "compilerPath":
+                    //    error = project.selectedConfiguration.compilerPathError;
+                    //    break;
 
-                    case "makePath":
-                        error = project.setup.makeExePathError;
-                        break;
+                    //case "makePath":
+                    //    error = project.setup.makeExePathError;
+                    //    break;
 
-                    case "boardVMs":
-                        error = null;
-                        break;
+                    //case "boardVMs":
+                    //    error = null;
+                    //    break;
 
                     default:
                         error = null;
@@ -114,7 +114,7 @@ namespace ViewModel
             {
                 if(value != project.selectedConfiguration.makefileExtension)
                 {
-                    project.selectedConfiguration.makefileExtension = value;
+                   project.selectedConfiguration.makefileExtension = value;
                     OnPropertyChanged();
                     updateFiles();
                 }

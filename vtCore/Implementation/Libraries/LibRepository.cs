@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using ViewModel;
+//using ViewModel;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
     class libTransfer
     {

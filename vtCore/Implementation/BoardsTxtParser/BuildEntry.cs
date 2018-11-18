@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace VisualTeensy.Model
+namespace vtCore
 {
-    public class BuildEntry
+    class BuildEntry
     {
         public BuildEntry(Entry e)
         {

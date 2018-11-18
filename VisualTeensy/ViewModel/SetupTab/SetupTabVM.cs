@@ -1,6 +1,6 @@
-﻿using VisualTeensy.Model;
-using System;
+﻿using System;
 using System.ComponentModel;
+using vtCore;
 using Task = System.Threading.Tasks.Task;
 
 namespace ViewModel

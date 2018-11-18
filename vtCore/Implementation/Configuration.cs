@@ -1,14 +1,14 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace VisualTeensy.Model
+
+namespace vtCore
 {
-    public class Configuration
+    public class Configuration : IConfiguration
     {
         public SetupTypes setupType { get; set; }
 
@@ -67,13 +67,13 @@ namespace VisualTeensy.Model
         public List<Library> localLibs { get; set; }
         
         // boards
-        public List<Board> boards { get; private set; }
-        public Board selectedBoard { get; set; }
+        public List<IBoard> boards { get; private set; }
+        public IBoard selectedBoard { get; set; }
 
         public Configuration(SetupData settings = null)
         {
           //  this.setup = settings;
-            boards = new List<Board>();
+            boards = new List<IBoard>();
             sharedLibs = new List<Library>();
             localLibs = new List<Library>();
         }
@@ -87,12 +87,12 @@ namespace VisualTeensy.Model
             sb.Append($"compilerBase:\t{compilerBase}\n");
             sb.Append($"coreBase:\t{coreBase}\n");
             sb.Append($"selectedBoard:\t{selectedBoard?.name}");
-            log.Debug(sb.ToString());
+            //log.Debug(sb.ToString());
         }
 
         public static Configuration getDefault(SetupData setupData)
         {
-            log.Info("enter");
+            //log.Info("enter");
             var pd = new Configuration(setupData);
 
             pd.setupType = SetupTypes.quick;
@@ -102,7 +102,7 @@ namespace VisualTeensy.Model
             pd.coreBase = setupData.arduinoCore;
             pd.compilerBase = setupData.arduinoCompiler;
 
-            pd.boards = new List<Board>();
+            pd.boards = new List<IBoard>();
             pd.parseBoardsTxt(setupData.arduinoBoardsTxt);
 
             pd.logProject();
@@ -112,19 +112,14 @@ namespace VisualTeensy.Model
 
         public void parseBoardsTxt(string bt)
         {
-            log.Info("enter");
+            //log.Info("enter");
 
-            projectTransferData.vtBoard tmp = new projectTransferData.vtBoard(selectedBoard);
-
-           // string boardsTxt = setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : boardTxtPath;
-            boards = FileContent.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3").ToList();
-
+            projectTransferData.vtBoard tmp = new projectTransferData.vtBoard(selectedBoard);          
+            boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3").ToList();
             setBoardOptions(tmp);
         }
 
-      
-
-        void setBoardOptions(projectTransferData.vtBoard boardInfo)
+        private void setBoardOptions(projectTransferData.vtBoard boardInfo)
         {
             selectedBoard = boards?.FirstOrDefault(b => b.name == boardInfo.name) ?? boards?.FirstOrDefault();
             if (selectedBoard != null)
@@ -140,16 +135,11 @@ namespace VisualTeensy.Model
                         }
                     }
                 }
-            }
-            else
-            {
-
-            };
+            }            
         }
-                
-        
+                     
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        //private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 
