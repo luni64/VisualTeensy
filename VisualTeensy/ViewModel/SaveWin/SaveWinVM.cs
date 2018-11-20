@@ -66,6 +66,11 @@ namespace ViewModel
                 {
                     Directory.Delete(binLibFolder, true);
                 }
+
+                if (!project.isMakefileBuild && !Directory.Exists(project.buildPath))
+                {
+                    Directory.CreateDirectory(project.buildPath);
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -217,7 +222,7 @@ namespace ViewModel
                 await Task.Delay(1);
             }
         }
-        
+
         async Task writeFile(DisplayText filename, string file)
         {
             using (TextWriter writer = new StreamWriter(filename.text))
@@ -227,7 +232,7 @@ namespace ViewModel
             await Delay(50);
             filename.status = true;
         }
-        
+
         void writeMainCpp()
         {
             string mainCppPath = Path.Combine(project.path, "src", "main.cpp");

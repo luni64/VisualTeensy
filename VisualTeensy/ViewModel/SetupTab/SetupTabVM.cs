@@ -176,6 +176,19 @@ namespace ViewModel
             }
         }
 
+        public bool isMakefileBuild
+        {
+            get => project.isMakefileBuild;
+            set
+            {
+                if(value != project.isMakefileBuild)
+                {
+                    project.isMakefileBuild = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         public SetupTabVM(Project project)
         {

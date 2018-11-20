@@ -8,8 +8,22 @@ namespace vtCore
     {
         #region IBoard
         public String name { get; private set; }
+        public string fqbn
+        {
+            get
+            {
+                string r = $"teensy:avr:{id}:{_optionSets[0].optionSetID}={_optionSets[0]._selectedOption.id}";
+                foreach(var os in _optionSets.Skip(1))
+                {
+                    r += $",{os.optionSetID}={os._selectedOption.id}";
+                }
+                return r;
+            }
+        }
         public IEnumerable<IOptionSet> optionSets => _optionSets;
         public string core { get; private set; }
+        public string id { get; }
+
         public Dictionary<String, String> getAllOptions()
         {
             Dictionary<string, string> allOptions = fixedOptions.ToDictionary(o => o.name, o => o.value);
@@ -48,6 +62,8 @@ namespace vtCore
 
             return allOptions;
         }
+
+      
         #endregion
 
 
@@ -55,7 +71,10 @@ namespace vtCore
         {
             try
             {
-                name = entries.FirstOrDefault(e => e.key[1] == "name").value;
+                var nameEntry = entries.FirstOrDefault(e => e.key[1] == "name");
+                name = nameEntry.value;
+                id = nameEntry.key[0];
+                
                 _optionSets = menus.Select(m => new OptionSet(m.MenuName, m.OptionSetID)).ToList();
 
                 parse(entries);
@@ -94,5 +113,7 @@ namespace vtCore
 
         private List<OptionSet> _optionSets = new List<OptionSet>();
         private List<BuildEntry> fixedOptions;
+      
+
     }
 }

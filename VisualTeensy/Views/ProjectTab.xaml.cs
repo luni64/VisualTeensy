@@ -16,14 +16,15 @@ namespace VisualTeensy
         {
             InitializeComponent();
 
-            Loaded += (s, e) =>
-            {
-                var dc = DataContext as ProjectTabVM;
-                if (dc != null)
-                {
-                    dc.OnPropertyChanged("");
-                }
-            };
+            //Loaded += (s, e) =>
+            //{
+            //    var dc = DataContext as ProjectTabVM;
+            //    if (dc != null)
+            //    {
+            //       // dc.update();
+            //        //dc.OnPropertyChanged("");
+            //    }
+            //};
         }
 
         private void openOutputClick(object sender, RoutedEventArgs e)

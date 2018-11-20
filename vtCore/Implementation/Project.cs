@@ -14,8 +14,12 @@ namespace vtCore
         private List<Configuration> _configurations { get; }
         public Configuration selectedConfiguration { get; private set; }
 
+        public bool isMakefileBuild = true;
+
+        public string buildPath { get; } = Path.Combine(Path.GetTempPath(), "vsTeensy", Guid.NewGuid().ToString());
+
         public IEnumerable<IConfiguration> configurations => _configurations;
-      
+
 
 
         // files ------------------------------------
@@ -70,7 +74,7 @@ namespace vtCore
             path = projectPath;
 
             _configurations.Clear();
-          
+
             var vsTeensyJson = Path.Combine(projectPath, ".vsteensy", "vsteensy.json");
             if (!File.Exists(vsTeensyJson))
             {
@@ -145,7 +149,7 @@ namespace vtCore
                             }
                         }
                         _configurations.Add(configuration);
-                       // _configs.Add(configuration);
+                        // _configs.Add(configuration);
                     }
                     selectedConfiguration = _configurations.FirstOrDefault();
                     //log.Info($"{vsTeensyJson} read sucessfully");
@@ -237,53 +241,97 @@ namespace vtCore
             var tasks = new tasksJson()
             {
                 presentation = new Presentation(),
-                tasks = new List<Task>()
-                {
-                    new Task()
-                    {
-                        label = "Build",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"all","-j","-Otarget"},
-                    },
-                    new Task()
-                    {
-                        label = "Rebuild User Code",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"rebuild" ,"-j","-Otarget"},
-                    },
-                    new Task()
-                    {
-                        label = "Clean",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"clean"},
-                    },
-                    new Task()
-                    {
-                        label = "Upload (Teensy Uploader)",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"upload" ,"-j","-Otarget"},
-                    },
-                    new Task()
-                    {
-                        label = "Upload (TyCommander)",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"uploadTy" ,"-j","-Otarget"},
-                    },
-                    new Task()
-                    {
-                        label = "Upload (CLI)",
-                        group = new Group(),
-                        command = makePath.Replace('\\','/'),
-                        args = new List<string>{"uploadCLI" ,"-j","-Otarget"},
-                    }
-                }
             };
 
+            var tasklist = new List<Task>();
+
+            if (isMakefileBuild)
+            {
+                tasklist.Add(new Task()
+                {
+                    label = "Build",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "all", "-j", "-Otarget" },
+                });
+
+                tasklist.Add(new Task()
+                {
+                    label = "Rebuild User Code",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "rebuild", "-j", "-Otarget" },
+                });
+
+                tasklist.Add(new Task()
+                {
+                    label = "Clean",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "clean" },
+                });
+
+                tasklist.Add(new Task()
+                {
+                    label = "Upload (Teensy Uploader)",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "upload", "-j", "-Otarget" },
+                });
+
+                tasklist.Add(new Task()
+                {
+                    label = "Upload (TyCommander)",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "uploadTy", "-j", "-Otarget" },
+                });
+
+                tasklist.Add(new Task()
+                {
+                    label = "Upload (CLI)",
+                    group = new Group(),
+                    command = makePath.Replace('\\', '/'),
+                    args = new List<string> { "uploadCLI", "-j", "-Otarget" },
+                });
+            }
+            else
+            {
+                tasklist.Add(new Task()
+                {
+                    label = "Arduino Builder",
+                    group = new Group(),
+                    command = Path.Combine(setup.arduinoBase, "arduino-builder").Replace('\\', '/'),
+                    args = new List<string>
+                    {
+                        "-verbose=1",
+                        "-logger=human",
+                        $"-hardware= {setup.arduinoBase}\\hardware",
+                        $"-build-path={buildPath}",
+                        $"-tools={setup.arduinoBase}\\tools-builder",
+                        $"-tools={setup.arduinoBase}\\hardware\\tools\\avr",
+                        $"-fqbn={selectedConfiguration.selectedBoard.fqbn}",
+
+                        "src\\main.cpp"
+                    }
+                });
+                tasklist.Add(new Task()
+                {
+                    label = "Upload",
+                    group = new Group(),
+                    command = $"{setup.arduinoTools}\\teensy_post_compile.exe",                    
+                    args = new List<string>
+                    {
+                        $"-test",
+                        $"-reboot",
+                        $"-path={buildPath}",
+                        $"-board={selectedConfiguration.selectedBoard.id}",
+                        $"-tools={setup.arduinoTools}",
+                        $"-file='main.cpp'",
+                    },
+                });
+            }
+            tasks.tasks = tasklist;
             return JsonConvert.SerializeObject(tasks, Formatting.Indented);
         }
         private string generatePropertiesFile(Dictionary<string, string> options)

@@ -91,7 +91,21 @@ namespace ViewModel
                 }
             }
         }
-        
+
+
+        public bool isMakefileBuild
+        {
+            get => project.isMakefileBuild;
+            set
+            {
+                if (value != project.isMakefileBuild)
+                {
+                    project.isMakefileBuild = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool quickSetup
         {
             get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
@@ -244,7 +258,7 @@ namespace ViewModel
             updateBoards();
             updateFiles();
         }
-        private void updateFiles()
+        public void updateFiles()
         {
             project.generateFiles();
             OnPropertyChanged("makefile");

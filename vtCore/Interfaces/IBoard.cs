@@ -5,10 +5,12 @@ namespace vtCore
 {
     public interface IBoard
     {
-        String name { get; }
+        string name { get; }
+        string id { get; }
+        string fqbn { get; }
 
-        IEnumerable<IOptionSet> optionSets { get; }
-        
+
+        IEnumerable<IOptionSet> optionSets { get; }        
 
         string core { get; }
         Dictionary<String, String> getAllOptions();        
