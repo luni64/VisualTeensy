@@ -19,8 +19,15 @@
         d:DataContext="{d:DesignInstance vm:MainVM, IsDesignTimeCreatable=False}"
         Height="auto" Width="1000" Closing="Window_Closing">
 
-    <DockPanel>
-        <Menu Grid.Row="0" DockPanel.Dock="Top" IsMainMenu="True">            
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" DockPanel.Dock="Top" IsMainMenu="True" HorizontalAlignment="Left">
             <MenuItem Header="File">
                 <MenuItem Header="New Project" Command="{Binding cmdFileNew}">
                     <MenuItem.Icon>
@@ -32,7 +39,7 @@
                         <md:PackIcon Kind="FolderOpen" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save..." Click="openOutputClick">                
+                <MenuItem Header="Save..." Click="openOutputClick">
                     <MenuItem.Icon>
                         <md:PackIcon Kind="ContentSave" />
                     </MenuItem.Icon>
@@ -53,32 +60,32 @@
                 <MenuItem Header="TBD"/>
             </MenuItem>
         </Menu>
-        <Grid DockPanel.Dock="Top">
-            <StackPanel VerticalAlignment="Center" Grid.Row="1"  Margin="20,16,0,16" Orientation="Horizontal"  HorizontalAlignment="Left" >
-                <TextBlock Text="Project: " Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                <TextBlock   FontWeight="SemiBold" FontSize="20" Foreground="{DynamicResource PrimaryHueMidBrush}" Text="{Binding projectName, Mode=OneWay}" />
-                <!--<TextBlock  FontSize="10">
+        
+        <StackPanel VerticalAlignment="Center" Grid.Row="1"  Margin="20,5,0,10" Orientation="Horizontal"  HorizontalAlignment="Left" >
+            <TextBlock Text="Project: " Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            <TextBlock   FontWeight="SemiBold" FontSize="20" Foreground="{DynamicResource PrimaryHueMidBrush}" Text="{Binding projectName, Mode=OneWay}" />
+            <!--<TextBlock  FontSize="10">
                 <Hyperlink NavigateUri="{Binding projectPath}" RequestNavigate="Hyperlink_RequestNavigate" >
                     <TextBlock Text="{Binding projectPath, Mode=OneWay}"/>
                 </Hyperlink>
             </TextBlock>-->
-            </StackPanel>
-            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1" Margin="0,0,22,0">
-                <Image  Grid.Row="1" HorizontalAlignment="Right" Source="/VisualTeensy;component/app.ico" Height="56" Margin="0,10,0,0"/>
-                <TextBlock Text="VisualTeensy" FontSize="11" VerticalAlignment="Bottom" Foreground="DarkGray"  >
-                    <TextBlock.LayoutTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform Angle="90"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </TextBlock.LayoutTransform>
-                </TextBlock>
-            </StackPanel>
-        </Grid>
+        </StackPanel>
+        <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,22,0">
+            <Image   HorizontalAlignment="Right" Source="/VisualTeensy;component/app.ico" Height="56" Margin="0,0,0,0"/>
+            <TextBlock Text="VisualTeensy" FontSize="11" VerticalAlignment="Center" Foreground="DarkGray"  >
+                <TextBlock.LayoutTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="90"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+        </StackPanel>
 
-        <StatusBar DockPanel.Dock="Bottom">
+
+        <StatusBar Grid.Row="3">
             <StatusBarItem>
                 <TextBlock Text="Project path:"/>
             </StatusBarItem>
@@ -90,13 +97,12 @@
             </TextBlock>
             </StatusBarItem>
             <StatusBarItem>
-
             </StatusBarItem>
         </StatusBar>
 
-        
-        
-        <TabControl  Margin="20,0,20,20" Grid.RowSpan="2">
+
+
+        <TabControl Grid.Row="2" Margin="20,0,20,20" >
             <!--<TabControl.Effect>
                 <DropShadowEffect BlurRadius="15" Direction="314" Color="#FFDADADA"/>
             </TabControl.Effect>-->
@@ -115,5 +121,6 @@
         </TabControl>
 
 
-    </DockPanel>
+
+    </Grid>
 </Window>
