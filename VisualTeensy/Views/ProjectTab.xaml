@@ -125,8 +125,8 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
             <TextBlock Grid.Row="0" Grid.Column="0" FontSize="18" Text="Generated Files" Margin="0,0,0,0" HorizontalAlignment="Left"  Foreground="{DynamicResource PrimaryHueDarkBrush}" />
             <StackPanel ToggleButton.Checked="StackPanel_Checked" Orientation="Horizontal" Grid.Row="1" Margin="2,10,0,0" >
                 <StackPanel>
-                    <RadioButton Tag="makefile" Content="makefile" Margin="0,0,0,0" x:Name="rbMakefile" GroupName="files" IsEnabled="{Binding isMakefileBuild}" />
-                    <RadioButton Tag ="taskFile" Content="tasks.json" Margin="0,3,0,0" GroupName="files" IsChecked="True" />
+                    <RadioButton Tag="makefile" Content="makefile" Margin="0,0,0,0" x:Name="rbMakefile" GroupName="files" IsEnabled="{Binding isMakefileBuild}" IsChecked="True" />
+                    <RadioButton Tag ="taskFile" Content="tasks.json" Margin="0,3,0,0" GroupName="files"  />
                 </StackPanel>
                 <StackPanel Margin="20,0,0,0" >
                     <RadioButton Tag="propFile" Content="_c_cpp_properties.json"  Margin="0,0,0,0" GroupName="files"/>

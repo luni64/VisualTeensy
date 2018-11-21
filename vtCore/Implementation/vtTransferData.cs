@@ -48,34 +48,36 @@ namespace vtCore
             public string name { get; set; }
 
             [JsonProperty(Order = 2)]
+            public string guid { get; set; }
+
+            [JsonProperty(Order = 3)]
             [JsonConverter(typeof(StringEnumConverter))]
             public SetupTypes setupType { get; set; }
 
-            [JsonProperty(Order = 3)]
+            [JsonProperty(Order = 4)]
             public string boardTxtPath { get; set; }
 
-            [JsonProperty(Order = 4)]
+            [JsonProperty(Order = 5)]
             public string coreBase { get; set; }
 
-            [JsonProperty(Order = 5)]
+            [JsonProperty(Order = 6)]
             public string compilerBase { get; set; }
 
-            [JsonProperty(Order = 6)]
+            [JsonProperty(Order = 7)]
             public string makefileExtension { get; set; }
 
-            [JsonProperty(Order = 7)]
+            [JsonProperty(Order = 8)]
             public bool copyBoardTxt { get; set; }
 
-            [JsonProperty(Order = 8)]
-            public bool copyCore { get; set; }
-
-
             [JsonProperty(Order = 9)]
+            public bool copyCore { get; set; }
+            
+            [JsonProperty(Order = 10)]
             public IEnumerable<string> sharedLibraries{get; set;}
 
-            [JsonProperty(Order = 10)]
-            public IEnumerable<string> localLibraries { get; set; }
             [JsonProperty(Order = 11)]
+            public IEnumerable<string> localLibraries { get; set; }
+            [JsonProperty(Order = 12)]
             public vtBoard board { get; set; }
 
 
@@ -84,6 +86,7 @@ namespace vtCore
                 if (configuration == null ) return;
                 setupType = configuration.setupType;
                 name = configuration.name;
+                guid = configuration.guid;
 
                 sharedLibraries = configuration.sharedLibs.Select(lib => lib.path);
                 localLibraries = configuration.localLibs.Select(lib => lib.sourceType == Library.SourceType.local ? lib.path : lib.unversionedLibFolder);

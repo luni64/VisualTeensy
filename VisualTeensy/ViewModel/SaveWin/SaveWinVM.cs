@@ -48,6 +48,7 @@ namespace ViewModel
                 string binCoreFolder = Path.Combine(project.path, "bin", "core");
                 string binUserFolder = Path.Combine(project.path, "bin", "src");
                 string binLibFolder = Path.Combine(project.path, "bin", "lib");
+                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", project.selectedConfiguration.guid);
 
                 Directory.CreateDirectory(vsCodeFolder);
                 Directory.CreateDirectory(vsTeensyFolder);
@@ -66,10 +67,9 @@ namespace ViewModel
                 {
                     Directory.Delete(binLibFolder, true);
                 }
-
-                if (!project.isMakefileBuild && !Directory.Exists(project.buildPath))
+                if (!project.isMakefileBuild && !Directory.Exists(buildPath))
                 {
-                    Directory.CreateDirectory(project.buildPath);
+                    Directory.CreateDirectory(buildPath);
                 }
             }
             catch (UnauthorizedAccessException)

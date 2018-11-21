@@ -11,6 +11,7 @@ namespace vtCore
     {
         SetupTypes setupType { get; set; }
         string name { get; set; }
+        string guid { get; }
         
         string coreBase { get; set; }
         bool copyCore { get; set; }

@@ -13,6 +13,7 @@ namespace vtCore
         public SetupTypes setupType { get; set; }
 
         public string name { get; set; }
+        public string guid { get; set; }
              
         // boards.txt --------------------------------
         public string boardTxtPath { get; set; }
@@ -76,6 +77,7 @@ namespace vtCore
             boards = new List<IBoard>();
             sharedLibs = new List<Library>();
             localLibs = new List<Library>();
+            guid = Guid.NewGuid().ToString();
         }
    
         public void logProject()

@@ -16,8 +16,7 @@ namespace vtCore
 
         public bool isMakefileBuild = true;
 
-        public string buildPath { get; } = Path.Combine(Path.GetTempPath(), "vsTeensy", Guid.NewGuid().ToString());
-
+        
         public IEnumerable<IConfiguration> configurations => _configurations;
 
 
@@ -101,6 +100,7 @@ namespace vtCore
                         {
                             setupType = cfg.setupType,  // remove from config
                             name = cfg.name,
+                            guid = cfg.guid != null ? cfg.guid : Guid.NewGuid().ToString(),
 
                             compilerBase = cfg.compilerBase,
                             makefileExtension = cfg.makefileExtension,
@@ -297,6 +297,8 @@ namespace vtCore
             }
             else
             {
+                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", selectedConfiguration.guid);
+
                 tasklist.Add(new Task()
                 {
                     label = "Arduino Builder",
