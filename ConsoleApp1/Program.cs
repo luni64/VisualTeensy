@@ -17,7 +17,9 @@ namespace VisualTeensyCLI
         {
             SetupData setup = SetupData.getDefault();
             LibManager libManager = new LibManager(setup);
-            var project = new Project(setup, libManager);
+
+            
+            var project = Factory.makeProject(setup, libManager);
 
             project.newProject();
 

@@ -51,13 +51,14 @@ namespace ViewModel
             }
         }
 
-        public MainVM(vtCore.Project project = null)
+        public MainVM(IProject project, LibManager libManager)
         {
             this.project = project;
+            this.libManager = libManager;
 
             projecTabVM = new ProjectTabVM(project);
             setupTabVM = new SetupTabVM(project);
-            librariesTabVM = new LibrariesTabVM(project);
+            librariesTabVM = new LibrariesTabVM(project, libManager);
 
             cmdFileOpen = new RelayCommand(doFileOpen);
             cmdFileNew = new RelayCommand(doFileNew);
@@ -70,6 +71,8 @@ namespace ViewModel
             };
         }
 
-        public Project project { get; }
+        LibManager libManager;
+
+        public IProject project { get; }
     }
 }

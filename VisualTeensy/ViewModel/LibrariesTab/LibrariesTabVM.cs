@@ -26,13 +26,13 @@ namespace ViewModel
 
         public ObservableCollection<Library> projectLibraries { get; }
 
-        public LibrariesTabVM(Project project)
+        public LibrariesTabVM(IProject project, LibManager libManager)
         {
             this.project = project;
 
             cmdDel = new RelayCommand(doDel);
 
-            repositories = project.libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
+            repositories = libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
             selectedRepository = repositories.FirstOrDefault();
 
 
@@ -108,6 +108,6 @@ namespace ViewModel
             }
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
-        Project project;
+        IProject project;
     }
 }

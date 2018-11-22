@@ -242,7 +242,7 @@ namespace ViewModel
             OnPropertyChanged("");
         }
 
-        public ProjectTabVM(Project project)
+        public ProjectTabVM(IProject project)
         {
             this.project = project;
 
@@ -295,7 +295,7 @@ namespace ViewModel
         {
             MessageHandler?.Invoke(this, message);
         }
-        public Project project;
+        public IProject project;
     }
 }
 

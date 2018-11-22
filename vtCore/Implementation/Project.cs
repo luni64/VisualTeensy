@@ -7,14 +7,31 @@ using System.Text;
 
 namespace vtCore
 {
-    public class Project
+    public static class Factory
     {
+        public static IProject makeProject(SetupData setup, LibManager libManager)
+        {
+            return new Project(setup, libManager);
+        }
+        public static LibManager makeLibManager(SetupData setup)
+        {
+            return new LibManager(setup);
+        }
+    }
+
+
+    internal class Project : IProject
+    {
+        public IConfiguration selectedConfiguration => _selectedConfiguration;
+
+
         public SetupData setup { get; private set; }
         public LibManager libManager { get; private set; }
-        private List<Configuration> _configurations { get; }
-        public Configuration selectedConfiguration { get; private set; }
 
-        public bool isMakefileBuild = true;
+        private List<Configuration> _configurations { get; }
+        private Configuration _selectedConfiguration { get;  set; }
+
+        public bool isMakefileBuild { get; set; } = true;
 
         
         public IEnumerable<IConfiguration> configurations => _configurations;
@@ -55,7 +72,7 @@ namespace vtCore
             _configurations.Clear();
             var sc = Configuration.getDefault(setup);
 
-            selectedConfiguration = sc;// Configuration.getDefault(setup);
+            _selectedConfiguration = sc;// Configuration.getDefault(setup);
             _configurations.Add(sc);
             //_configs.Add(selectedConfiguration);
 
@@ -79,7 +96,7 @@ namespace vtCore
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);
-                selectedConfiguration = sc; // Configuration.getDefault(setup);
+                _selectedConfiguration = sc; // Configuration.getDefault(setup);
                 _configurations.Add(sc);// selectedConfiguration);             
                 generateFiles();
                 return;
@@ -151,13 +168,13 @@ namespace vtCore
                         _configurations.Add(configuration);
                         // _configs.Add(configuration);
                     }
-                    selectedConfiguration = _configurations.FirstOrDefault();
+                    _selectedConfiguration = _configurations.FirstOrDefault();
                     //log.Info($"{vsTeensyJson} read sucessfully");
                 }
                 else
                 {
                     var sc = Configuration.getDefault(setup);
-                    selectedConfiguration = sc;// Configuration.getDefault(setup);
+                    _selectedConfiguration = sc;// Configuration.getDefault(setup);
                     _configurations.Add(sc);//selectedConfiguration);
                     //_configs.Add(selectedConfiguration);
                     //log.Info($"{vsTeensyJson} parse error, using default configuration");
@@ -168,7 +185,7 @@ namespace vtCore
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);
-                selectedConfiguration = sc;// Configuration.getDefault(setup);
+                _selectedConfiguration = sc;// Configuration.getDefault(setup);
                 _configurations.Add(sc);//electedConfiguration);
                 //_configs.Add(selectedConfiguration);
                 generateFiles();
@@ -180,11 +197,7 @@ namespace vtCore
         {
             this.setup = setup;
             this.libManager = libManager;
-            this._configurations = new List<Configuration>();
-            //this._configs = new List<IConfiguration>();
-
-            // openProject(Settings.Default.lastProject);           
-
+            this._configurations = new List<Configuration>();           
         }
 
         public RepositoryIndexJson sharedLibraries { get; }
@@ -196,7 +209,7 @@ namespace vtCore
             tasks_json = props_json = null;
             _configurations.ForEach(c => c.makefile = null);
 
-            bool ok = selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
+            bool ok = _selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
             if (_configurations.Any(t => t.setupType == SetupTypes.quick))
             {
                 ok = ok && setup.arduinoBaseError == null;
@@ -211,7 +224,7 @@ namespace vtCore
                 //log.Debug("OK (makefile, props_json, vsSetup_json)");
                 _configurations.ForEach(c => c.makefile = generateMakefile(c));
 
-                props_json = generatePropertiesFile(selectedConfiguration.selectedBoard.getAllOptions());
+                props_json = generatePropertiesFile(_selectedConfiguration.selectedBoard.getAllOptions());
                 vsSetup_json = generateVisualTeensySetup();
             }
             else
@@ -297,7 +310,7 @@ namespace vtCore
             }
             else
             {
-                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", selectedConfiguration.guid);
+                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", _selectedConfiguration.guid);
 
                 tasklist.Add(new Task()
                 {
@@ -312,7 +325,7 @@ namespace vtCore
                         $"-build-path={buildPath}",
                         $"-tools={setup.arduinoBase}\\tools-builder",
                         $"-tools={setup.arduinoBase}\\hardware\\tools\\avr",
-                        $"-fqbn={selectedConfiguration.selectedBoard.fqbn}",
+                        $"-fqbn={_selectedConfiguration.selectedBoard.fqbn}",
 
                         "src\\main.cpp"
                     }
@@ -327,7 +340,7 @@ namespace vtCore
                         $"-test",
                         $"-reboot",
                         $"-path={buildPath}",
-                        $"-board={selectedConfiguration.selectedBoard.id}",
+                        $"-board={_selectedConfiguration.selectedBoard.id}",
                         $"-tools={setup.arduinoTools}",
                         $"-file='main.cpp'",
                     },
@@ -351,13 +364,13 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(selectedConfiguration.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(_selectedConfiguration.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>()
                         {
                             "src/**",
                             "lib/**",
-                            selectedConfiguration.coreBase?.Replace('\\','/') + "/**",
+                            _selectedConfiguration.coreBase?.Replace('\\','/') + "/**",
                             libManager.sharedRepositoryPath.Replace('\\','/') + "/**"
                         },
                         defines = new List<string>()

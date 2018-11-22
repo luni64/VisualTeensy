@@ -1,6 +1,6 @@
 ﻿using log4net;
 using log4net.Appender;
-using log4net.Config;
+//using log4net.Config;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using System;
@@ -66,34 +66,29 @@ namespace VisualTeensy
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            XmlConfigurator.Configure();
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
+            log4net.Config.XmlConfigurator.Configure();
             var repository = (Hierarchy)LogManager.GetRepository();
             repository.Threshold = Level.All;
-
             var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
-
             fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
             fa.ActivateOptions();
-
-
+            
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             log.Info($"------------------------------------------");
             log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
 
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
             base.OnStartup(e);
-            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-
+            
             try
             {
-                var setupData = loadSetup();
-                //var project = Configuration.open(Settings.Default.lastProject, setupData) ?? Configuration.getDefault(setupData);
-
+                var setupData = loadSetup();               
                 setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
-                var libManager = new LibManager(setupData);
+               
 
-                var project = new vtCore.Project(setupData, libManager);
+                var  libManager = Factory.makeLibManager(setupData);
+                var project =  Factory.makeProject(setupData, libManager);
 
                 if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
                 {
@@ -104,7 +99,7 @@ namespace VisualTeensy
                     project.newProject();
                 }
 
-                var mainVM = new MainVM(project);
+                var mainVM = new MainVM(project, libManager);
 
                 var mainWin = new MainWindow()
                 {

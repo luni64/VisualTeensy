@@ -117,7 +117,7 @@ namespace vtCore
         [JsonProperty(Order = 3)]
         public List<vtConfiguration> configurations;
 
-        public projectTransferData(Project project)
+        internal projectTransferData(Project project)
         {
             this.model = project;
             version = "1";

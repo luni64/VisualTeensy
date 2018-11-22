@@ -247,7 +247,7 @@ namespace ViewModel
             }
         }
 
-        public SaveWinVM(Project project)
+        public SaveWinVM(IProject project)
         {
             cmdSave = new AsyncCommand(doSave);
 
@@ -300,6 +300,6 @@ namespace ViewModel
         // private SetupData data;
         private IConfiguration configuration;
         private SetupData setup;
-        private Project project;
+        private IProject project;
     }
 }

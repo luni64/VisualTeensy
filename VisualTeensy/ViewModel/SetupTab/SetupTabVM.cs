@@ -190,7 +190,7 @@ namespace ViewModel
         }
 
 
-        public SetupTabVM(Project project)
+        public SetupTabVM(IProject project)
         {
             this.project = project;          
            // this.setup = project.setup;
@@ -201,7 +201,7 @@ namespace ViewModel
         
         //SetupData setup;
 
-        Project project;
+        IProject project;
 
         
     }
