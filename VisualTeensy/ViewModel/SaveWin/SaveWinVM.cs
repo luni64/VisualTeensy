@@ -36,6 +36,10 @@ namespace ViewModel
         public AsyncCommand cmdSave { get; private set; }
         async Task doSave()
         {
+            vsCodeProjectGenerator.generate(project);
+
+            return;
+
             projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
                 coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
 

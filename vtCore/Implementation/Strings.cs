@@ -16,6 +16,18 @@
             "  delay(500);\n" +
             "}\n";
 
+        public static string sketchIno { get; } =
+            "void setup()\n" +
+            "{\n" +
+            "  pinMode(LED_BUILTIN,OUTPUT);\n" +
+            "}\n\n" +
+
+            "void loop()\n" +
+            "{\n" +
+            "  digitalWriteFast(LED_BUILTIN,!digitalReadFast(LED_BUILTIN));\n" +
+            "  delay(500);\n" +
+            "}\n";
+
 
         //public static string makeFileEnd { get; } =        
         //    "\n" +

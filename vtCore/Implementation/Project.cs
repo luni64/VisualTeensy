@@ -309,9 +309,7 @@ namespace vtCore
                 });
             }
             else
-            {
-                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", _selectedConfiguration.guid);
-
+            {                
                 tasklist.Add(new Task()
                 {
                     label = "Arduino Builder",
@@ -321,28 +319,27 @@ namespace vtCore
                     {
                         "-verbose=1",
                         "-logger=human",
-                        $"-hardware= {setup.arduinoBase}\\hardware",
-                        $"-build-path={buildPath}",
-                        $"-tools={setup.arduinoBase}\\tools-builder",
-                        $"-tools={setup.arduinoBase}\\hardware\\tools\\avr",
+                        $"-hardware={setup.arduinoBase}\\hardware".Replace('\\', '/'),
+                        $"'-build-path=.vsTeensy/build'",
+                        $"-tools={setup.arduinoBase}\\tools-builder".Replace('\\', '/'),
+                        $"-tools={setup.arduinoBase}\\hardware\\tools\\avr".Replace('\\', '/'),
                         $"-fqbn={_selectedConfiguration.selectedBoard.fqbn}",
-
-                        "src\\main.cpp"
+                        $"{name}.ino"
                     }
                 });
                 tasklist.Add(new Task()
                 {
                     label = "Upload",
                     group = new Group(),
-                    command = $"{setup.arduinoTools}\\teensy_post_compile.exe",                    
+                    command = $"{setup.arduinoTools}/teensy_post_compile.exe".Replace('\\', '/'),                    
                     args = new List<string>
                     {
                         $"-test",
                         $"-reboot",
-                        $"-path={buildPath}",
+                        "'-path=${workspaceFolder}/.vsTeensy/build'",
                         $"-board={_selectedConfiguration.selectedBoard.id}",
-                        $"-tools={setup.arduinoTools}",
-                        $"-file='main.cpp'",
+                        $"-tools={setup.arduinoTools}".Replace('\\', '/'),
+                        $"-file='{name}.ino'",
                     },
                 });
             }
