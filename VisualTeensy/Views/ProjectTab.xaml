@@ -53,12 +53,12 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 
             <TextBlock Grid.Row="0" Grid.Column="0"  FontSize="18" Text="Configuration" Margin="0,0,0,0" HorizontalAlignment="Left" Foreground="{DynamicResource PrimaryHueDarkBrush}" />
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,28" >
-                <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" >
+                <RadioButton x:Name="radioButton"  Content="Quick Setup" IsChecked="{Binding quickSetup}" Visibility="{Binding isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" >
                     <RadioButton.ToolTip>
                         Quick Setup uses your Arduino installation to generate the project.
                     </RadioButton.ToolTip>
                 </RadioButton>
-                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="10,0,0,0" >
+                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="10,0,0,0" Visibility="{Binding isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" >
                     <RadioButton.ToolTip>
                         Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
                     </RadioButton.ToolTip>
@@ -134,7 +134,7 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                 </StackPanel>
             </StackPanel>
 
-         
+
 
             <Border BorderBrush="DarkGray" BorderThickness="1" Grid.Row="2" Margin="0,10,0,0" >
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Padding="5">

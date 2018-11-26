@@ -6,7 +6,7 @@ using Task = System.Threading.Tasks.Task;
 namespace ViewModel
 {
     using System;
-    using System.Diagnostics;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using static System.Threading.Tasks.Task;
 
@@ -24,6 +24,12 @@ namespace ViewModel
         bool _status;
     }
 
+    public class TaskText
+    {
+        public string task { get; set; }
+        public string status { get; set; }
+    }
+
     public class SaveWinVM : BaseViewModel
     {
         public string error
@@ -33,113 +39,69 @@ namespace ViewModel
         }
         string _error;
 
+        public ObservableCollection<TaskText> tasklist { get; } = new ObservableCollection<TaskText>();
+        public int selectedTask { get; set; }
+
         public AsyncCommand cmdSave { get; private set; }
         async Task doSave()
         {
-            vsCodeProjectGenerator.generate(project);
+            TaskText current = new TaskText();
 
-            return;
-
-            projectFolder.status = makefilePath.status = buildTaskPath.status = intellisensePath.status = boardDefintionPath.status =
-                coreBase.status = mainCppPath.status = compilerBase.status = makeExePath.status = false;
-
-            try
+            var progressHandler = new Progress<string>(value =>
             {
-                string vsCodeFolder = Path.Combine(project.path, ".vscode");
-                string vsTeensyFolder = Path.Combine(project.path, ".vsteensy");
-                string srcFolder = Path.Combine(project.path, "src");
-                string libFolder = Path.Combine(project.path, "lib");
-                string binCoreFolder = Path.Combine(project.path, "bin", "core");
-                string binUserFolder = Path.Combine(project.path, "bin", "src");
-                string binLibFolder = Path.Combine(project.path, "bin", "lib");
-                string buildPath = Path.Combine(Path.GetTempPath(), "vtBuild", project.selectedConfiguration.guid);
-
-                Directory.CreateDirectory(vsCodeFolder);
-                Directory.CreateDirectory(vsTeensyFolder);
-                Directory.CreateDirectory(srcFolder);
-                Directory.CreateDirectory(libFolder);
-
-                if (Directory.Exists(binCoreFolder))
+                if (current.task == null)
                 {
-                    Directory.Delete(binCoreFolder, true);
+                    current.task = value;
+                    current.status = "...";
+                    tasklist.Add(current);
+                    selectedTask = tasklist.Count - 1;
                 }
-                if (Directory.Exists(binUserFolder))
+                else
                 {
-                    Directory.Delete(binUserFolder, true);
+                    var lt = tasklist.Last();
+
+                    tasklist.Remove(lt);
+                    current.task = lt.task;
+                    current.status = value;
+                    tasklist.Add(current);
+                    selectedTask = tasklist.Count - 1;
+
+                    current = new TaskText();
                 }
-                if (Directory.Exists(binLibFolder))
-                {
-                    Directory.Delete(binLibFolder, true);
-                }
-                if (!project.isMakefileBuild && !Directory.Exists(buildPath))
-                {
-                    Directory.CreateDirectory(buildPath);
-                }
-            }
-            catch (UnauthorizedAccessException)
+
+                OnPropertyChanged("selectedTask");
+            });
+
+            switch (project.target)
             {
-                error = "Access violation! Please make sure that you have enough space and sufficient access rights.";
+                case Target.vsCode:
+                    await vsCodeGenerator.generate(project, libManager, setup, progressHandler);
+                    break;
+                case Target.atom:
+                    await AtomGenerator.generate(project, libManager, setup, progressHandler);
+                    break;
             }
-            catch (Exception e)
-            {
-                error = $"Error while setting up the project folder ({project.path}). {e.GetBaseException().Message}";
-                return;
-            }
-
-            await Delay(50);
-            projectFolder.status = true;
-
-            await writeProjectFiles();
-            await writeLibraries();
-
-
-
-            if (configuration.setupType == SetupTypes.expert && configuration.copyCore)
-            {
-                await copyCoreFiles();
-            }
-            else
-            {
-                await Delay(50);
-            }
-
-            coreBase.status = true;
-
-            writeMainCpp();
-            await Delay(50);
-            mainCppPath.status = true;
-
-            if (configuration.setupType == SetupTypes.expert && configuration.copyBoardTxt)
-            {
-                copyBoardFile();
-            }
-            await Delay(50);
-            boardDefintionPath.status = true;
-
-            await Delay(50);
-            compilerBase.status = true;
-
-            await Delay(50);
-            makeExePath.status = true;
-
-            startVSCode(projectFolder.text);
-
-            await Task.Delay(2000);
+            
+            await System.Threading.Tasks.Task.Delay(3000);
             System.Windows.Application.Current.Shutdown();
 
+            return;
+
+            
+
         }
 
-        public void startVSCode(string folder)
-        {
-            var vsCode = new Process();
-            vsCode.StartInfo.FileName = "cmd";
-            vsCode.StartInfo.Arguments = $"/c code \"{folder}\" src/main.cpp";
-            vsCode.StartInfo.WorkingDirectory = folder;
-            vsCode.StartInfo.UseShellExecute = false;
-            vsCode.StartInfo.CreateNoWindow = true;
-            vsCode.Start();
-            return;
-        }
+        //public void startVSCode(string folder)
+        //{
+        //    var vsCode = new Process();
+        //    vsCode.StartInfo.FileName = "cmd";
+        //    vsCode.StartInfo.Arguments = $"/c code \"{folder}\" src/main.cpp";
+        //    vsCode.StartInfo.WorkingDirectory = folder;
+        //    vsCode.StartInfo.UseShellExecute = false;
+        //    vsCode.StartInfo.CreateNoWindow = true;
+        //    vsCode.Start();
+        //    return;
+        //}
 
         public DisplayText projectFolder { get; }
         public DisplayText makefilePath { get; }
@@ -203,9 +165,9 @@ namespace ViewModel
         private async Task writeProjectFiles()
         {
             await writeFile(makefilePath, project.selectedConfiguration.makefile);
-            await writeFile(buildTaskPath, project.tasks_json);
-            await writeFile(intellisensePath, project.props_json);
-            await writeFile(setupFilePath, project.vsSetup_json);
+            //   await writeFile(buildTaskPath, project.tasks_json);
+            //   await writeFile(intellisensePath, project.props_json);
+            //  await writeFile(setupFilePath, project.vsSetup_json);
         }
         private async Task writeLibraries()
         {
@@ -251,13 +213,14 @@ namespace ViewModel
             }
         }
 
-        public SaveWinVM(IProject project)
+        public SaveWinVM(IProject project, LibManager libManager, SetupData setup)
         {
             cmdSave = new AsyncCommand(doSave);
 
             this.project = project;
             this.configuration = project.selectedConfiguration;
-            this.setup = project.setup;
+            this.setup = setup;
+            this.libManager = libManager;
 
             projectFolder = new DisplayText()
             {
@@ -305,5 +268,6 @@ namespace ViewModel
         private IConfiguration configuration;
         private SetupData setup;
         private IProject project;
+        private LibManager libManager;
     }
 }

@@ -75,8 +75,7 @@ namespace ViewModel
 
                 default:
                     break;
-            }
-            project.generateFiles();
+            }           
         }
 
         public void DragOver(IDropInfo dropInfo)

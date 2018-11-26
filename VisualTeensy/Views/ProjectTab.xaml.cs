@@ -27,13 +27,13 @@ namespace VisualTeensy
             //};
         }
 
-        private void openOutputClick(object sender, RoutedEventArgs e)
-        {
-            var vm = DataContext as ProjectTabVM;
-            var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
+        //private void openOutputClick(object sender, RoutedEventArgs e)
+        //{
+        //    var vm = DataContext as ProjectTabVM;
+        //    var dlg = new SaveProjectWin(new SaveWinVM(vm.project, vm.lib));
 
-            dlg.ShowDialog();
-        }
+        //    dlg.ShowDialog();
+        //}
 
         private void StackPanel_Checked(object sender, RoutedEventArgs e)
         {

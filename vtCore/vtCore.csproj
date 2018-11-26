@@ -10,11 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <Compile Remove="Implementation\Project Generators\TaskFiles\TaskFile_atom_builder.cs" />
+    <Compile Remove="Implementation\Project Generators\TaskFiles\TaskFile_vsCode_builder.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Implementation\Project Generators\" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
 </Project>

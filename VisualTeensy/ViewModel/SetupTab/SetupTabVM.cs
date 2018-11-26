@@ -80,19 +80,19 @@ namespace ViewModel
                         break;
 
                     case "makePath":
-                        error = project.setup.makeExePathError;
+                        error = setup.makeExePathError;
                         break;
 
                     case "uploadTyPath":
-                        error = project.setup.uplTyBaseError;
+                        error = setup.uplTyBaseError;
                         break;
 
                     case "uploadPjrcPath":
-                        error = project.setup.uplPjrcBaseError;
+                        error = setup.uplPjrcBaseError;
                         break;
 
                     case "uploadCLIPath":
-                        error = project.setup.uplCLIBaseError;
+                        error = setup.uplCLIBaseError;
                         break;
 
                     default:
@@ -105,105 +105,130 @@ namespace ViewModel
 
         public String arduinoBase
         {
-            get => project.setup.arduinoBase;
+            get => setup.arduinoBase;
             set
             {
-                if (value != project.setup.arduinoBase)
+                if (value != setup.arduinoBase)
                 {
-                    project.setup.arduinoBase = value;
+                    setup.arduinoBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String makePath
         {
-            get => project.setup.makeExePath;
+            get => setup.makeExePath;
             set
             {
-                if (value != project.setup.makeExePath)
+                if (value != setup.makeExePath)
                 {
-                    project.setup.makeExePath = value.Trim();
+                    setup.makeExePath = value.Trim();
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadTyPath
         {
-            get => project.setup.uplTyBase;
+            get => setup.uplTyBase;
             set
             {
-                if (value != project.setup.uplTyBase)
+                if (value != setup.uplTyBase)
                 {
-                    project.setup.uplTyBase = value;
+                    setup.uplTyBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadPjrcPath
         {
-            get => project.setup.uplPjrcBase;
+            get => setup.uplPjrcBase;
             set
             {
-                if (value != project.setup.uplPjrcBase)
+                if (value != setup.uplPjrcBase)
                 {
-                    project.setup.uplPjrcBase = value;
+                    setup.uplPjrcBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadCLIPath
         {
-            get => project.setup.uplCLIBase;
+            get => setup.uplCLIBase;
             set
             {
-                if (value != project.setup.uplCLIBase)
+                if (value != setup.uplCLIBase)
                 {
-                    project.setup.uplCLIBase = value;
+                    setup.uplCLIBase = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String projectBaseDefault
         {
-            get => project.setup.projectBaseDefault;
+            get => setup.projectBaseDefault;
             set
             {
-                if (value != project.setup.projectBaseDefault)
+                if (value != setup.projectBaseDefault)
                 {
-                    project.setup.projectBaseDefault = value;
+                    setup.projectBaseDefault = value;
                     OnPropertyChanged();
                 }
+            }
+        }
+
+        public bool isTargetvsCode
+        {
+            get => project.target == Target.vsCode;
+            set
+            {
+                if (value == true) project.target = Target.vsCode;
+                OnPropertyChanged();
+            }
+        }
+        public bool isTargetATOM
+        {
+            get => project.target == Target.atom;
+            set
+            {
+                if (value == true) project.target = Target.atom;
+                OnPropertyChanged();
             }
         }
 
         public bool isMakefileBuild
         {
-            get => project.isMakefileBuild;
+            get => project.buildSystem == BuildSystem.makefile;
             set
             {
-                if(value != project.isMakefileBuild)
-                {
-                    project.isMakefileBuild = value;
-                    OnPropertyChanged();
-                }
+                if (value == true) project.buildSystem = BuildSystem.makefile;
+                OnPropertyChanged();
+            }
+        }
+        public bool isArduinoBuild
+        {
+            get => project.buildSystem == BuildSystem.arduino;
+            set
+            {
+                if (value == true) project.buildSystem = BuildSystem.arduino;
+                OnPropertyChanged();
             }
         }
 
 
-        public SetupTabVM(IProject project)
+        public SetupTabVM(IProject project, SetupData setup)
         {
-            this.project = project;          
-           // this.setup = project.setup;
+            this.project = project;
+            this.setup = setup;
 
             cmdDownloadMake = new AsyncCommand(doDownload);
         }
 
-        
-        //SetupData setup;
+
+        SetupData setup;
 
         IProject project;
 
-        
+
     }
 }
 

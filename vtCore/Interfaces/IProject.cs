@@ -2,14 +2,26 @@
 
 namespace vtCore
 {
+    public enum Target
+    {
+        vsCode,
+        sublimeText,
+        atom,
+        vsFolder
+    }
+
+    public enum BuildSystem
+    {
+        makefile,
+        arduino
+    }
+
     public interface IProject
     {
         string name { get; }
 
         IEnumerable<IConfiguration> configurations { get; }
-        IConfiguration selectedConfiguration { get; }
-        SetupData setup { get; }
-       // LibManager libManager { get; }
+        IConfiguration selectedConfiguration { get;  }
 
         void openProject(string path);
         void newProject();
@@ -17,16 +29,7 @@ namespace vtCore
         string path { get; set; }
         string pathError { get; }
 
-        bool isMakefileBuild { get; set; }
-
-
-        // files ------------------------------------
-        // public string makefile { get; set; }
-        string tasks_json { get; }
-        string props_json { get; }
-        string vsSetup_json { get; }
-
-        void generateFiles();
-
+        Target target{ get; set; }
+        BuildSystem buildSystem { get; set; }
     }
 }

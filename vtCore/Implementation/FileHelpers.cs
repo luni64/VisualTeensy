@@ -187,7 +187,7 @@ namespace vtCore
             ZipArchive libArchive = null;
             try
             {
-                client = new WebClient();
+                client = new WebClient();                
                 zippedStream = new MemoryStream(client.DownloadData(lib.url));
                 libArchive = new ZipArchive(zippedStream);
                 ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
@@ -195,7 +195,7 @@ namespace vtCore
                 Directory.Move(versionedLibFolder, unversionedLibFolder);
                 return true;
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 return false;
             }

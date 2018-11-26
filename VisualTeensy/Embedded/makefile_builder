@@ -1,0 +1,39 @@
+TARGET_HEX       := $(BUILD_PATH)/$(SKETCH_NAME).hex
+
+#******************************************************************************
+# BINARIES
+#******************************************************************************
+BUILDER     := $(BUILDER_BASE)/arduino-builder
+UPL_PJRC    := "$(UPL_PJRC_B)/teensy_post_compile" -test -file=$(SKETCH_NAME) -path=$(BUILD_PATH) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
+UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
+UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX) 
+
+.PHONY:  all upload uploadTy uploadCLI clean 
+
+all:  
+	$(BUILDER) $(FLAGS) -build-path=$(BUILD_PATH) -fqbn=$(FQBN) $(HARDWARE) $(TOOLS) $(LIBRARIES) $(SKETCH_NAME)
+
+upload: all
+	$(UPL_PJRC)
+
+uploadTy: all
+	@$(UPL_TYCMD)
+
+uploadCLI: all
+	@$(UPL_CLICMD)
+
+clean: 
+	@echo Cleaning user binaries...
+	@if exist $(BUILD_PATH)/core rd /s/q "$(BUILD_PATH)/core"
+	@if exist $(BUILD_PATH)/libraries rd /s/q "$(BUILD_PATH)/libraries"
+	@if exist $(BUILD_PATH)/pch rd /s/q "$(BUILD_PATH)/pch"
+	@if exist $(BUILD_PATH)/preproc rd /s/q "$(BUILD_PATH)/preproc"
+	@if exist $(BUILD_PATH)/sketch rd /s/q "$(BUILD_PATH)/sketch"
+
+	@if exist "$(BUILD_PATH)/*.eep" del  $(subst /,\,$(BUILD_PATH)/*.eep)
+	@if exist "$(BUILD_PATH)/*.elf" del  $(subst /,\,$(BUILD_PATH)/*.elf)
+	@if exist "$(BUILD_PATH)/*.lst" del  $(subst /,\,$(BUILD_PATH)/*.lst)
+	@if exist "$(BUILD_PATH)/*.sym" del  $(subst /,\,$(BUILD_PATH)/*.sym)
+	@if exist "$(BUILD_PATH)/*.json" del  $(subst /,\,$(BUILD_PATH)/*.json)	
+	@if exist "$(BUILD_PATH)/*.cache" del  $(subst /,\,$(BUILD_PATH)/*.cache)
+	@echo done

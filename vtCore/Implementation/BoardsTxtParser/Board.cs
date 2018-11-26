@@ -46,19 +46,9 @@ namespace vtCore
                     }
                 }
             }
-
-            
-            //var buildFlagsLd = allOptions.FirstOrDefault(o => o.Key == "build.flags.ld");
-            //if (buildFlagsLd.Value != null)
-            //{
-            //    allOptions.Remove(buildFlagsLd.Key);
-            //    var newFlags = buildFlagsLd.Value.Replace("{extra.time.local}", "$(shell powershell [int](Get-Date -UFormat +%s))");
-            //    allOptions.Add(buildFlagsLd.Key, newFlags);
-            //}
-            
-
+                      
             allOptions.Remove("build.flags.ld");
-            allOptions.Add("build.flags.ld", "-Wl,--gc-sections,--relax,--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s))");
+            allOptions.Add("build.flags.ld", "-Wl,--gc-sections,--relax,--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s)[0])");
 
             return allOptions;
         }

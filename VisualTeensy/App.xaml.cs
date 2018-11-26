@@ -44,9 +44,13 @@ namespace VisualTeensy
             setupData.makeExePath = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Path.Combine(Directory.GetCurrentDirectory(), "make.exe") : Settings.Default.makeExePath;
             setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
 
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile")))
+            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
                 setupData.makefile_fixed = reader.ReadToEnd();
+            }
+            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
+            {
+                setupData.makefile_builder = reader.ReadToEnd();
             }
             Helpers.arduinoPath = setupData.arduinoBase;
 
@@ -83,12 +87,12 @@ namespace VisualTeensy
             
             try
             {
-                var setupData = loadSetup();               
-                setupData.libBase = Path.Combine(Path.GetDirectoryName(setupData.arduinoBoardsTxt), "libraries");
+                var setup = loadSetup();               
+                setup.libBase = Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries");
                
 
-                var  libManager = Factory.makeLibManager(setupData);
-                var project =  Factory.makeProject(setupData, libManager);
+                var  libManager = Factory.makeLibManager(setup);
+                var project =  Factory.makeProject(setup, libManager);
 
                 if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
                 {
@@ -99,7 +103,7 @@ namespace VisualTeensy
                     project.newProject();
                 }
 
-                var mainVM = new MainVM(project, libManager);
+                var mainVM = new MainVM(project, libManager, setup);
 
                 var mainWin = new MainWindow()
                 {
@@ -112,7 +116,7 @@ namespace VisualTeensy
 
                 mainWin.ShowDialog();
 
-                saveSetup(setupData);
+                saveSetup(setup);
 
                 Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
                 Settings.Default.lastProject = project.path;

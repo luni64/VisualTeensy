@@ -22,11 +22,14 @@ namespace vtCore
 
     internal class Project : IProject
     {
+        public IEnumerable<IConfiguration> configurations => _configurations;
         public IConfiguration selectedConfiguration => _selectedConfiguration;
 
-
-        public SetupData setup { get; private set; }
+        private SetupData setup;
         public LibManager libManager { get; private set; }
+
+        public Target target { get; set; } = Target.vsCode;
+        public BuildSystem buildSystem { get; set; }
 
         private List<Configuration> _configurations { get; }
         private Configuration _selectedConfiguration { get;  set; }
@@ -34,14 +37,12 @@ namespace vtCore
         public bool isMakefileBuild { get; set; } = true;
 
         
-        public IEnumerable<IConfiguration> configurations => _configurations;
 
 
 
         // files ------------------------------------
         // public string makefile { get; set; }
-        public string tasks_json { get; set; }
-        public string props_json { get; set; }
+        
         public string vsSetup_json { get; set; }
 
         public string path { get; set; }
@@ -61,12 +62,13 @@ namespace vtCore
 
         public void newProject()
         {
-            //log.Info("new project");
-
             // Project Path -------------------------------------
             int i = 1;
             path = Path.Combine(setup.projectBaseDefault, $"newProject");
             while (Directory.Exists(path)) { path = Path.Combine(setup.projectBaseDefault, $"newProject({i++})"); }
+
+            buildSystem = BuildSystem.makefile;
+            target = Target.vsCode;
 
             // Add a default configuration ----------------------
             _configurations.Clear();
@@ -78,15 +80,11 @@ namespace vtCore
 
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
-            _configurations.Add(dummyConfig);
-            //_configs.Add(dummyConfig);
-
-            generateFiles();
+            _configurations.Add(dummyConfig);          
         }
         public void openProject(string projectPath)
         {
-            //log.Info($"open project {projectPath}");
-
+            
             path = projectPath;
 
             _configurations.Clear();
@@ -94,11 +92,12 @@ namespace vtCore
             var vsTeensyJson = Path.Combine(projectPath, ".vsteensy", "vsteensy.json");
             if (!File.Exists(vsTeensyJson))
             {
-                //log.Warn($"config file {vsTeensyJson} does not exist");
+                buildSystem = BuildSystem.makefile;
+                target = Target.vsCode;
+
                 var sc = Configuration.getDefault(setup);
                 _selectedConfiguration = sc; // Configuration.getDefault(setup);
-                _configurations.Add(sc);// selectedConfiguration);             
-                generateFiles();
+                _configurations.Add(sc);// selectedConfiguration);                          
                 return;
             }
 
@@ -111,11 +110,15 @@ namespace vtCore
 
                 if (fileContent?.version == "1" && fileContent.configurations.Count > 0)
                 {
+                    buildSystem = fileContent.buildSystem;
+                    target = fileContent.target;
+
                     foreach (var cfg in fileContent.configurations)
                     {
                         var configuration = new Configuration()
                         {
                             setupType = cfg.setupType,  // remove from config
+
                             name = cfg.name,
                             guid = cfg.guid != null ? cfg.guid : Guid.NewGuid().ToString(),
 
@@ -179,16 +182,16 @@ namespace vtCore
                     //_configs.Add(selectedConfiguration);
                     //log.Info($"{vsTeensyJson} parse error, using default configuration");
                 }
-                generateFiles();
+              //  generateFiles();
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);
                 _selectedConfiguration = sc;// Configuration.getDefault(setup);
                 _configurations.Add(sc);//electedConfiguration);
                 //_configs.Add(selectedConfiguration);
-                generateFiles();
+             //   generateFiles();
                 return;
             }
         }
@@ -201,319 +204,49 @@ namespace vtCore
         }
 
         public RepositoryIndexJson sharedLibraries { get; }
+        
 
+        //public void generateFiles()
+        //{
+        //    //log.Info("enter");
+         
+           
+        //    bool ok = _selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
+        //    if (_configurations.Any(t => t.setupType == SetupTypes.quick))
+        //    {
+        //        ok = ok && setup.arduinoBaseError == null;
+        //    }
+        //    else
+        //    {
+        //        //TMPCommentar ok = ok && selectedConfiguration.corePathError == null && selectedConfiguration.compilerPathError == null;  // extend to all configurations
+        //    }
 
-        public void generateFiles()
-        {
-            //log.Info("enter");
-            tasks_json = props_json = null;
-            _configurations.ForEach(c => c.makefile = null);
+        //    if (ok)
+        //    {
+        //        //log.Debug("OK (makefile, props_json, vsSetup_json)");
+        //     //   _configurations.ForEach(c => c.makefile = generateMakefile(c));
 
-            bool ok = _selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
-            if (_configurations.Any(t => t.setupType == SetupTypes.quick))
-            {
-                ok = ok && setup.arduinoBaseError == null;
-            }
-            else
-            {
-                //TMPCommentar ok = ok && selectedConfiguration.corePathError == null && selectedConfiguration.compilerPathError == null;  // extend to all configurations
-            }
+        //      //  props_json = generatePropertiesFile(_selectedConfiguration.selectedBoard.getAllOptions());
+        //        vsSetup_json = generateVisualTeensySetup();
+        //    }
+        //    else
+        //    {
+        //        //log.Debug("NOK (makefile, props_json, vsSetup_json)");
+        //        //selectedConfiguration.logProject();
+        //    }
 
-            if (ok)
-            {
-                //log.Debug("OK (makefile, props_json, vsSetup_json)");
-                _configurations.ForEach(c => c.makefile = generateMakefile(c));
+        // //   tasks_json = generateTasksFile();
+        //}
 
-                props_json = generatePropertiesFile(_selectedConfiguration.selectedBoard.getAllOptions());
-                vsSetup_json = generateVisualTeensySetup();
-            }
-            else
-            {
-                //log.Debug("NOK (makefile, props_json, vsSetup_json)");
-                //selectedConfiguration.logProject();
-            }
+        //private string generateVisualTeensySetup()
+        //{
+        //    // log.Debug("enter");
+        //    return JsonConvert.SerializeObject(new projectTransferData(this), Formatting.Indented);
+        //}
+   
 
-            tasks_json = generateTasksFile();
-        }
-
-        private string generateVisualTeensySetup()
-        {
-            // log.Debug("enter");
-            return JsonConvert.SerializeObject(new projectTransferData(this), Formatting.Indented);
-        }
-        private string generateTasksFile()
-        {
-            //log.Debug("enter");
-            if (setup.makeExePathError != null)
-            {
-                return null;
-            }
-
-            string makePath = setup.makeExePath;
-
-            var tasks = new tasksJson()
-            {
-                presentation = new Presentation(),
-            };
-
-            var tasklist = new List<Task>();
-
-            if (isMakefileBuild)
-            {
-                tasklist.Add(new Task()
-                {
-                    label = "Build",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "all", "-j", "-Otarget" },
-                });
-
-                tasklist.Add(new Task()
-                {
-                    label = "Rebuild User Code",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "rebuild", "-j", "-Otarget" },
-                });
-
-                tasklist.Add(new Task()
-                {
-                    label = "Clean",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "clean" },
-                });
-
-                tasklist.Add(new Task()
-                {
-                    label = "Upload (Teensy Uploader)",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "upload", "-j", "-Otarget" },
-                });
-
-                tasklist.Add(new Task()
-                {
-                    label = "Upload (TyCommander)",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "uploadTy", "-j", "-Otarget" },
-                });
-
-                tasklist.Add(new Task()
-                {
-                    label = "Upload (CLI)",
-                    group = new Group(),
-                    command = makePath.Replace('\\', '/'),
-                    args = new List<string> { "uploadCLI", "-j", "-Otarget" },
-                });
-            }
-            else
-            {                
-                tasklist.Add(new Task()
-                {
-                    label = "Arduino Builder",
-                    group = new Group(),
-                    command = Path.Combine(setup.arduinoBase, "arduino-builder").Replace('\\', '/'),
-                    args = new List<string>
-                    {
-                        "-verbose=1",
-                        "-logger=human",
-                        $"-hardware={setup.arduinoBase}\\hardware".Replace('\\', '/'),
-                        $"'-build-path=.vsTeensy/build'",
-                        $"-tools={setup.arduinoBase}\\tools-builder".Replace('\\', '/'),
-                        $"-tools={setup.arduinoBase}\\hardware\\tools\\avr".Replace('\\', '/'),
-                        $"-fqbn={_selectedConfiguration.selectedBoard.fqbn}",
-                        $"{name}.ino"
-                    }
-                });
-                tasklist.Add(new Task()
-                {
-                    label = "Upload",
-                    group = new Group(),
-                    command = $"{setup.arduinoTools}/teensy_post_compile.exe".Replace('\\', '/'),                    
-                    args = new List<string>
-                    {
-                        $"-test",
-                        $"-reboot",
-                        "'-path=${workspaceFolder}/.vsTeensy/build'",
-                        $"-board={_selectedConfiguration.selectedBoard.id}",
-                        $"-tools={setup.arduinoTools}".Replace('\\', '/'),
-                        $"-file='{name}.ino'",
-                    },
-                });
-            }
-            tasks.tasks = tasklist;
-            return JsonConvert.SerializeObject(tasks, Formatting.Indented);
-        }
-        private string generatePropertiesFile(Dictionary<string, string> options)
-        {
-            //log.Debug("enter");
-            //if (selectedConfiguration.compilerPathError != null)
-            //{
-            //    return null;
-            //}
-
-            var props = new PropertiesJson()
-            {
-                configurations = new List<ConfigurationJson>()
-                {
-                    new ConfigurationJson()
-                    {
-                        name = "VisualTeensy",
-                        compilerPath =  Path.Combine(_selectedConfiguration.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
-                        intelliSenseMode = "gcc-x64",
-                        includePath = new List<string>()
-                        {
-                            "src/**",
-                            "lib/**",
-                            _selectedConfiguration.coreBase?.Replace('\\','/') + "/**",
-                            libManager.sharedRepositoryPath.Replace('\\','/') + "/**"
-                        },
-                        defines = new List<string>()
-                    }
-                }
-            };
-
-            if (options.ContainsKey("build.flags.defs"))
-            {
-                foreach (var define in options["build.flags.defs"].Split(new string[] { "-D" }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    props.configurations[0].defines.Add(define.Trim());
-                }
-            }
-            addConfigOption(options, props, "F_CPU=", "build.fcpu");
-            addConfigOption(options, props, "", "build.usbtype");
-            addConfigOption(options, props, "LAYOUT_", "build.keylayout");
-            props.configurations[0].defines.Add("ARDUINO");
-
-            //props.configurations[0].defines.Add("F_CPU=" + options["build.fcpu"]);
-            //props.configurations[0].defines.Add(options["build.usbtype"]);
-            //props.configurations[0].defines.Add("LAYOUT_" + options["build.keylayout"]);
-
-            return JsonConvert.SerializeObject(props, Formatting.Indented);
-
-        }
-        public string generateMakefile(IConfiguration cfg)
-        {
-            var options = cfg.selectedBoard.getAllOptions();
-
-            //log.Debug("enter");
-            StringBuilder mf = new StringBuilder();
-
-            mf.Append("#******************************************************************************\n");
-            mf.Append("# Generated by VisualTeensy (https://github.com/luni64/VisualTeensy)\n");
-            mf.Append("#\n");
-            mf.Append($"# {"Board",-18} {cfg.selectedBoard.name}\n");
-            foreach (var o in cfg.selectedBoard.optionSets)
-            {
-                mf.Append($"# {o.name,-18} {o.selectedOption?.name}\n");
-            }
-            mf.Append("#\n");
-            mf.Append($"# {DateTime.Now.ToShortDateString()} {DateTime.Now.ToShortTimeString()}\n");
-            mf.Append("#******************************************************************************\n");
-
-            mf.Append($"SHELL            := cmd.exe\nexport SHELL\n\n");
-
-            mf.Append($"TARGET_NAME      := {name?.Replace(" ", "_")}\n");
-
-            mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
-
-            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepositoryPath)}\n");
-            mf.Append($"LIBS_SHARED      := ");
-            foreach (var lib in cfg.sharedLibs)
-            {
-                mf.Append($"{lib.path ?? "ERROR"} "); //hack, improve library to distinguish between libraries to download and loacal libs
-            }
-            mf.Append("\n\n");
-
-            mf.Append($"LIBS_LOCAL_BASE  := lib\n");
-            mf.Append($"LIBS_LOCAL       := ");
-            foreach (var lib in cfg.localLibs)
-            {
-                mf.Append($"{lib.path ?? lib.name} "); //hack, improve library to distinguish between libraries to download and loacal libs
-            }
-            mf.Append("\n\n");
-
-            if (cfg.setupType == SetupTypes.quick)
-            {
-                mf.Append($"CORE_BASE        := {Helpers.getShortPath(setup.arduinoCore)}\n");
-                mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
-            }
-            else
-            {
-                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == path)) ? "core" : Helpers.getShortPath(cfg.coreBase))}\n");
-                mf.Append($"GCC_BASE         := {Helpers.getShortPath(cfg.compilerBase)}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
-            }
-            mf.Append($"UPL_TYCMD_B      := {Helpers.getShortPath(setup.uplTyBase)}\n");
-            mf.Append($"UPL_CLICMD_B     := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
-
-            mf.Append(makeEntry("MCU   := ", "build.mcu", options) + "\n\n");
-
-            mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
-            mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
-            mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
-            mf.Append(makeEntry("FLAGS_LSP   := ", "build.flags.ldspecs", options) + "\n");
-
-            mf.Append("\n");
-            mf.Append(makeEntry("FLAGS_CPP   := ", "build.flags.cpp", options) + "\n");
-            mf.Append(makeEntry("FLAGS_C     := ", "build.flags.c", options) + "\n");
-            mf.Append(makeEntry("FLAGS_S     := ", "build.flags.S", options) + "\n");
-            mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options) + "\n");
-
-            mf.Append("\n");
-            mf.Append(makeEntry("LIBS        := ", "build.flags.libs", options) + "\n");
-            mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
-
-            mf.Append("\n");
-            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + " -DARDUINO=10807\n");
-            mf.Append("DEFINES     += ");
-            mf.Append(makeEntry("-DF_CPU=", "build.fcpu", options) + " " + makeEntry("-D", "build.usbtype", options) + " " + makeEntry("-DLAYOUT_", "build.keylayout", options) + "\n");
-
-            mf.Append($"\n");
-            mf.Append("CPP_FLAGS   := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_CPP)\n");
-            mf.Append("C_FLAGS     := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_C)\n");
-            mf.Append("S_FLAGS     := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_S)\n");
-            mf.Append("LD_FLAGS    := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_LSP) $(FLAGS_LD)\n");
-            mf.Append("AR_FLAGS    := rcs\n");
-
-            if (cfg.setupType == SetupTypes.expert && !String.IsNullOrWhiteSpace(cfg.makefileExtension))
-            {
-                mf.Append("\n");
-                mf.Append(cfg.makefileExtension);
-                mf.Append("\n");
-            }
-
-            mf.Append(setup.makefile_fixed);
-
-            return mf.ToString();
-        }
-
-        private void addConfigOption(Dictionary<string, string> options, PropertiesJson props, string prefix, string key)
-        {
-            var option = options.FirstOrDefault(o => o.Key == key).Value;
-
-            if (option != null)
-            {
-                props.configurations[0].defines.Add(prefix + option);
-            }
-        }
-
-        private string makeEntry(String txt, String key, Dictionary<String, String> options)
-        {
-            if (options.ContainsKey(key))
-            {
-                return $"{txt}{options[key]}";
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        //private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+       
+        
     }
 }
 

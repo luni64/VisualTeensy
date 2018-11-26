@@ -6,6 +6,7 @@ namespace vtCore
     {
         public string name { get; set; }
         public List<string> includePath { get; set; } = new List<string>();
+        public List<string> forcedInclude { get; set; } = new List<string>();
         public List<string> defines { get; set; } = new List<string>();
         public string compilerPath { get; set; }
         public string intelliSenseMode { get; set; }

@@ -3,27 +3,27 @@ USR_SRC     := src
 LIB_SRC     := lib
 CORE_SRC    := $(CORE_BASE)
 
-BIN         := bin
+BIN         := .vsteensy/build
 USR_BIN     := $(BIN)/src
 CORE_BIN    := $(BIN)/core
 LIB_BIN     := $(BIN)/lib
-CORE_LIB    := $(BIN)\core.a
-TARGET_HEX  := $(BIN)\$(TARGET_NAME).hex
-TARGET_ELF  := $(BIN)\$(TARGET_NAME).elf
-TARGET_LST  := $(BIN)\$(TARGET_NAME).lst 
+CORE_LIB    := $(BIN)/core.a
+TARGET_HEX  := $(BIN)/$(TARGET_NAME).hex
+TARGET_ELF  := $(BIN)/$(TARGET_NAME).elf
+TARGET_LST  := $(BIN)/$(TARGET_NAME).lst 
 
 #******************************************************************************
 # BINARIES
 #******************************************************************************
-CC          := $(GCC_BASE)\bin\arm-none-eabi-gcc
-CXX         := $(GCC_BASE)\bin\arm-none-eabi-g++
-AR          := $(GCC_BASE)\bin\arm-none-eabi-gcc-ar
-OBJCOPY     := $(GCC_BASE)\bin\arm-none-eabi-objcopy
-SIZE        := $(GCC_BASE)\bin\arm-none-eabi-size
-OBJDUMP     := $(GCC_BASE)\bin\arm-none-eabi-objdump
-UPL_PJRC    := "$(UPL_PJRC_B)\teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
-UPL_TYCMD   := $(UPL_TYCMD_B)\tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
-UPL_CLICMD  := $(UPL_CLICMD_B)\teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
+CC          := $(GCC_BASE)/bin/arm-none-eabi-gcc
+CXX         := $(GCC_BASE)/bin/arm-none-eabi-g++
+AR          := $(GCC_BASE)/bin/arm-none-eabi-gcc-ar
+OBJCOPY     := $(GCC_BASE)/bin/arm-none-eabi-objcopy
+SIZE        := $(GCC_BASE)/bin/arm-none-eabi-size
+OBJDUMP     := $(GCC_BASE)/bin/arm-none-eabi-objdump
+UPL_PJRC    := "$(UPL_PJRC_B)/teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
+UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
+UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
 
 #******************************************************************************
 # Source and Include Files
@@ -67,7 +67,7 @@ LIB_OBJ         += $(LIB_C_SHARED:$(LIBS_SHARED_BASE)/%.c=$(LIB_BIN)/%.o)  $(LIB
 LIB_OBJ         += $(LIB_S_SHARED:$(LIBS_SHARED_BASE)/%.S=$(LIB_BIN)/%.o)  $(LIB_S_LOCAL:$(LIBS_LOCAL_BASE)/%.S=$(LIB_BIN)/%.o) 
 
 # Includes -------------------------------------------------------------
-INCLUDE        := -I.\$(USR_SRC) -I$(CORE_SRC) 
+INCLUDE        := -I./$(USR_SRC) -I$(CORE_SRC) 
 INCLUDE        += $(foreach d, $(LIB_DIRS_SHARED), -I$d)
 INCLUDE        += $(foreach d, $(LIB_DIRS_LOCAL), -I$d)
 
@@ -77,10 +77,6 @@ generateDirs := $(foreach d, $(DIRECTORIES), $(shell if not exist "$d" mkdir "$d
 
 #$(info dirs: $(DIRECTORIES))
 
-#$(info dirs: $(LIB_DIRS_LOCAL))
-#$(info )
-#$(info cpp: $(LIB_CPP_SHARED))
-#$(info include: ${INCLUDE})
 
 #******************************************************************************
 # Rules:
@@ -94,6 +90,7 @@ all:  $(TARGET_LST) $(TARGET_HEX)
 rebuild: cleanUser all
 
 clean:   cleanUser cleanCore cleanLib
+	@echo cleaning done
 
 upload: all
 	@$(UPL_PJRC)
@@ -184,14 +181,14 @@ cleanUser:
 	@echo Cleaning user binaries...
 	@if exist $(USR_BIN) rd /s/q "$(USR_BIN)"
 
-	@if exist $(TARGET_HEX) del  $(TARGET_HEX)
-	@if exist $(TARGET_ELF) del  $(TARGET_ELF)
-	@if exist $(TARGET_LST) del  $(TARGET_LST)
+#	@if exist "$(TARGET_HEX)" del  $(subst /,\,$(TARGET_HEX))
+#	@if exist "$(TARGET_ELF)" del $(subst /,\,$(TARGET_ELF))
+	@if exist "$(TARGET_LST)" del $(subst /,\,$(TARGET_LST))
 
 cleanCore:
 	@echo Cleaning core binaries...
 	@if exist $(CORE_BIN) rd /s/q "$(CORE_BIN)"
-	@if exist $(CORE_LIB) del  "$(CORE_LIB)"
+	@if exist $(CORE_LIB) del  $(subst /,\,$(CORE_LIB))
 
 cleanLib:
 	@echo Cleaning user library binaries...

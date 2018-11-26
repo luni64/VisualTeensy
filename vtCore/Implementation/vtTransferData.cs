@@ -71,19 +71,24 @@ namespace vtCore
 
             [JsonProperty(Order = 9)]
             public bool copyCore { get; set; }
-            
+
             [JsonProperty(Order = 10)]
-            public IEnumerable<string> sharedLibraries{get; set;}
+            public IEnumerable<string> sharedLibraries { get; set; }
 
             [JsonProperty(Order = 11)]
             public IEnumerable<string> localLibraries { get; set; }
+
             [JsonProperty(Order = 12)]
             public vtBoard board { get; set; }
 
 
             public vtConfiguration(IConfiguration configuration)
             {
-                if (configuration == null ) return;
+                if (configuration == null)
+                {
+                    return;
+                }
+
                 setupType = configuration.setupType;
                 name = configuration.name;
                 guid = configuration.guid;
@@ -100,7 +105,6 @@ namespace vtCore
                 board = new vtBoard(configuration.selectedBoard);
             }
 
-
             public override string ToString()
             {
                 return name;
@@ -110,26 +114,26 @@ namespace vtCore
         [JsonProperty(Order = 1)]
         public string version { get; set; }
 
-        //[JsonProperty(Order = 2)]
-        //[JsonConverter(typeof(StringEnumConverter))]
-        //public SetupTypes setupType { get; set; }
+        [JsonProperty(Order = 2)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Target target { get; set; }
 
-        [JsonProperty(Order = 3)]
+        [JsonProperty(Order = 2)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public BuildSystem buildSystem { get; set; }
+
+        [JsonProperty(Order = 5)]
         public List<vtConfiguration> configurations;
 
-        internal projectTransferData(Project project)
+
+        internal projectTransferData(IProject project)
         {
             this.model = project;
             version = "1";
-           // setupType = project.selectedConfiguration.setupType;
+            target = project.target;
+            buildSystem = project.buildSystem;
 
-            configurations = project.configurations.Select(c=>new vtConfiguration(c)).ToList();
-            
-
-            //configurations = new List<vtConfiguration>()
-            //{
-            //    new vtConfiguration(project.selectedConfiguration){ name = "default" }
-            //};
+            configurations = project.configurations.Select(c => new vtConfiguration(c)).ToList();
         }
 
         public projectTransferData() { }
@@ -154,6 +158,6 @@ namespace vtCore
         //    }
         //}
 
-        private Project model;
+        private IProject model;
     }
 }

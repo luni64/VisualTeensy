@@ -9,7 +9,7 @@ namespace ViewModel
         public SetupTabVM setupTabVM { get; }
         public ProjectTabVM projecTabVM { get; }
         public LibrariesTabVM librariesTabVM { get; }
-
+       
         public RelayCommand cmdFileOpen { get; set; }
         void doFileOpen(object path)
         {
@@ -51,15 +51,16 @@ namespace ViewModel
             }
         }
 
-        public MainVM(IProject project, LibManager libManager)
+        public MainVM(IProject project, LibManager libManager, SetupData setup)
         {
             this.project = project;
             this.libManager = libManager;
+            this.setup = setup;
 
-            projecTabVM = new ProjectTabVM(project);
-            setupTabVM = new SetupTabVM(project);
+            projecTabVM = new ProjectTabVM(project,libManager,setup);
+            setupTabVM = new SetupTabVM(project,setup);
             librariesTabVM = new LibrariesTabVM(project, libManager);
-
+          
             cmdFileOpen = new RelayCommand(doFileOpen);
             cmdFileNew = new RelayCommand(doFileNew);
             cmdClose = new RelayCommand(doClose);
@@ -71,8 +72,8 @@ namespace ViewModel
             };
         }
 
-        LibManager libManager;
-
+        public LibManager libManager { get; }
+        public SetupData setup { get; }
         public IProject project { get; }
     }
 }

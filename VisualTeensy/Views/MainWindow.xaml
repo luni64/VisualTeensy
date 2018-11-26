@@ -111,7 +111,7 @@
                 <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Libraries" Selector.IsSelected="False">
+            <TabItem Header="Libraries" Selector.IsSelected="False" Visibility="{Binding setupTabVM.isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <local:LibrariesTab DataContext="{Binding librariesTabVM , Mode=OneWay}"/>
             </TabItem>
 

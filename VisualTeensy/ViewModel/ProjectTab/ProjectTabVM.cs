@@ -75,7 +75,7 @@ namespace ViewModel
             // model.saveSettings();
         }
         #endregion
-     
+
         #region Properties ----------------------------------------------------
         public ObservableCollection<BoardVM> boardVMs { get; } = new ObservableCollection<BoardVM>();
         public BoardVM selectedBoard
@@ -93,18 +93,16 @@ namespace ViewModel
         }
 
 
-        public bool isMakefileBuild
-        {
-            get => project.isMakefileBuild;
-            set
-            {
-                if (value != project.isMakefileBuild)
-                {
-                    project.isMakefileBuild = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public bool isMakefileBuild =>  project.buildSystem == BuildSystem.makefile;
+        //    set
+        //    {
+        //        if (value != project.isMakefileBuild)
+        //        {
+        //            project.isMakefileBuild = value;
+        //            OnPropertyChanged();
+        //        }
+        //    }
+        //}
 
         public bool quickSetup
         {
@@ -126,29 +124,56 @@ namespace ViewModel
             get => project.selectedConfiguration.makefileExtension;
             set
             {
-                if(value != project.selectedConfiguration.makefileExtension)
+                if (value != project.selectedConfiguration.makefileExtension)
                 {
-                   project.selectedConfiguration.makefileExtension = value;
+                    project.selectedConfiguration.makefileExtension = value;
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
 
-        public String makefile => project.selectedConfiguration.makefile;
-        public String propFile => project.props_json;
-        public String taskFile => project.tasks_json;
-        public String settFile => project.vsSetup_json;
-        
+        public String makefile
+        {
+            get => _makefile;
+            set => SetProperty(ref _makefile, value);
+        }
+        string _makefile;
+
+        public String taskFile
+        {
+            get => _taskFile;
+            set => SetProperty(ref _taskFile, value);
+        }
+        string _taskFile;
+
+        public String propFile
+        {
+            get => _propFile;
+            set => SetProperty(ref _propFile, value);
+        }
+        string _propFile;
+
+        public String settFile
+        {
+            get => _settFile;
+            set => SetProperty(ref _settFile, value);
+        }
+        string _settFile;
+
+        // public String propFile => project.props_json;
+        //public String taskFile => project.tasks_json;
+        // public String settFile => project.vsSetup_json;
+
         public String arduinoBase
         {
-            get => project.setup.arduinoBase;
+            get => setup.arduinoBase;
             set
             {
-                if (value != project.setup.arduinoBase)
+                if (value != setup.arduinoBase)
                 {
-                    project.setup.arduinoBase = value.Trim();
-                    Helpers.arduinoPath = project.setup.arduinoBase;
+                    setup.arduinoBase = value.Trim();
+                    Helpers.arduinoPath = setup.arduinoBase;
 
                     ///Hack
                     var board = selectedBoard?.board;
@@ -186,7 +211,7 @@ namespace ViewModel
                 }
             }
         }
-        
+
         public bool copyCore
         {
             get => project.selectedConfiguration.copyCore;
@@ -227,9 +252,9 @@ namespace ViewModel
                 }
             }
         }
-        
+
         #endregion
-        
+
         private void onOptionSetChanged(object sender, PropertyChangedEventArgs e)
         {
             updateFiles();
@@ -242,16 +267,22 @@ namespace ViewModel
             OnPropertyChanged("");
         }
 
-        public ProjectTabVM(IProject project)
+        public ProjectTabVM(IProject project, LibManager libManager, SetupData setup)
         {
             this.project = project;
+            this.libManager = libManager;
+            this.setup = setup;
 
-            cmdGenerate = new RelayCommand(doGenerate, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
+            makefile = Makefile.generate(project, libManager, setup);
+            taskFile = TaskFile.generate(project, libManager, setup);
+            propFile = IntellisenseFile.generate(project, libManager, setup);
+
+            cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
 
-            updateBoards();            
+            updateBoards();
         }
-              
+
         private void updateAll()
         {
             project.selectedConfiguration.parseBoardsTxt(null); //ERRORR!!!!! fix 
@@ -260,10 +291,16 @@ namespace ViewModel
         }
         public void updateFiles()
         {
-            project.generateFiles();
-            OnPropertyChanged("makefile");
-            OnPropertyChanged("propFile");
-            OnPropertyChanged("taskFile");
+           // project.generateFiles();
+
+            makefile = Makefile.generate(project, libManager, setup);
+            taskFile = TaskFile.generate(project, libManager, setup);
+            propFile = IntellisenseFile.generate(project, libManager, setup);
+            settFile = ProjectSettings.generate(project);
+
+            //OnPropertyChanged("makefile");
+            // OnPropertyChanged("propFile");
+            //  OnPropertyChanged("taskFile");
             OnPropertyChanged("settFile");
         }
         private void updateBoards()
@@ -286,7 +323,7 @@ namespace ViewModel
                 {
                     optionSetVM.PropertyChanged += onOptionSetChanged;  // can't use a simple lambda here since we have no chance to remove it :-(
                 }
-            } 
+            }
             selectedBoard = boardVMs?.FirstOrDefault(b => b.board == project.selectedConfiguration.selectedBoard) ?? boardVMs?.FirstOrDefault();
         }
 
@@ -296,6 +333,8 @@ namespace ViewModel
             MessageHandler?.Invoke(this, message);
         }
         public IProject project;
+        LibManager libManager;
+        SetupData setup;
     }
 }
 

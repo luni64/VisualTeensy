@@ -26,7 +26,7 @@ namespace VisualTeensy
         private void openOutputClick(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as MainVM;
-            var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
+            var dlg = new SaveProjectWin(new SaveWinVM(vm.project, vm.libManager, vm.setup));
 
             dlg.ShowDialog();
         }
@@ -48,8 +48,8 @@ namespace VisualTeensy
                 {
                     Directory.CreateDirectory(dialog.FileName);
                     vm.project.path = dialog.FileName;
-                    vm.project.generateFiles();
-                    var dlg = new SaveProjectWin(new SaveWinVM(vm.project));
+                  //  vm.project.generateFiles();
+                    var dlg = new SaveProjectWin(new SaveWinVM(vm.project, vm.libManager, vm.setup));
                     dlg.ShowDialog();
                 }
             }

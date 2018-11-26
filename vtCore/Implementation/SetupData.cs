@@ -146,6 +146,7 @@ namespace vtCore
 
         // misc
         public string makefile_fixed { get; set; }
+        public string makefile_builder { get; set; }
       
 
         public static SetupData getDefault()

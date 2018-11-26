@@ -19,7 +19,6 @@ namespace vtCore
         public static ILookup<string, Library> parseLibrary_Index_Json(string library_indexJson)
         {
             //log.Debug(library_indexJson);
-
             try
             {
                 string jsonString = File.ReadAllText(library_indexJson);
@@ -27,7 +26,7 @@ namespace vtCore
 
                 return transfered.libraries.ToLookup(k => k.name); // libraries structured by name (more than on version per name possible)
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //log.Warn($"Parsing of {library_indexJson} failed", ex);
                 return null;
@@ -113,7 +112,7 @@ namespace vtCore
                     libraries.Add(lib);
                 }
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //log.Warn($"Parsing of {repository} failed", ex);
                 return null;

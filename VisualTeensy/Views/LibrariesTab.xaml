@@ -109,7 +109,8 @@
 
         <ListBox x:Name="lb" Grid.Row="2" Grid.Column="2" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray"
                      ItemsSource="{Binding selectedRepository.libVMs}" dd:DragDrop.IsDragSource="True"  >
-            <ListBox.ItemTemplate>
+            
+            <ListBox.ItemTemplate>                
                 <DataTemplate>
                     <Grid Margin="10" >
                         <Grid.ColumnDefinitions>

@@ -243,7 +243,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embedded\makefile" />
+    <EmbeddedResource Include="Embedded\makefile_make" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\rubbish-bin.png" />
@@ -254,7 +254,9 @@
       <Name>vtCore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded\makefile_builder" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*.dll', '$(TargetDir)*.exe', '$(TargetDir)*.config' -DestinationPath '$(TargetDir)\VisualTeensy.zip' -Force)</PostBuildEvent>
