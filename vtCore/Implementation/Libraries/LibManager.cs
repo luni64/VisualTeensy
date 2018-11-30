@@ -21,7 +21,7 @@ namespace vtCore
             
             
             repositories = new List<IRepository>();
-            repositories.Add(new RepositoryIndexJson("Arduino Repository", Path.Combine(Helpers.arduinoPrefsPath, "library_index.json")));
+            repositories.Add(new RepositoryIndexJson("Arduino Repository", Path.Combine(Helpers.arduinoAppPath, "library_index.json")));
             repositories.Add(new RepositoryLocal("Installed Teensyduino Libraries", setup.libBase));
             
             repositories.Add(sharedRepository);
