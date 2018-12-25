@@ -10,8 +10,10 @@ namespace vtCore
         static public string generate(IProject project, LibManager libManager, SetupData setup)
         {
             var cfg = project.selectedConfiguration;
-            var options = cfg.selectedBoard.getAllOptions();
-                      
+            var options = cfg.selectedBoard?.getAllOptions();
+
+            if (options == null) return "";
+
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");

@@ -18,7 +18,7 @@ namespace ViewModel
 
         public RepositoryVM(IRepository repo)
         {
-            if (repo != null)
+            if (repo != null && repo.libraries != null)
             {
                 libVMs = new ObservableCollection<LibraryVM>(
                     repo
