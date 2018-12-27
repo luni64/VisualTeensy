@@ -32,7 +32,7 @@ namespace ViewModel
 
             cmdDel = new RelayCommand(doDel);
 
-            repositories = libManager.repositories.Select(r => new RepositoryVM(r)).ToList();
+            repositories = libManager.repositories?.Select(r => new RepositoryVM(r)).ToList();
             selectedRepository = repositories.FirstOrDefault();
 
 

@@ -10,6 +10,8 @@ namespace vtCore
     {
         public static string generate(IProject project, LibManager libManager)
         {
+            if (project.selectedConfiguration.compilerBase == null) return ""; // hack
+
             var props = new PropertiesJson()
             {
                 configurations = new List<ConfigurationJson>()
