@@ -206,11 +206,9 @@ namespace vtCore
             this.libManager = libManager;
             this._configurations = new List<Configuration>();
 
-            var userPackages = Directory.GetDirectories(Helpers.arduinoAppPath + "\\packages");
-            var builtInPackages = Directory.GetDirectories(Helpers.arduinoPath + "\\hardware");
-
-
-            var packages = userPackages.Select(p => new Package(p)).ToList();
+            //var userPackages = Directory.GetDirectories(Helpers.arduinoAppPath + "\\packages");
+            //var builtInPackages = Directory.GetDirectories(Helpers.arduinoPath + "\\hardware");
+            //var packages = userPackages.Select(p => new Package(p)).ToList();
         }
 
         public RepositoryIndexJson sharedLibraries { get; }
