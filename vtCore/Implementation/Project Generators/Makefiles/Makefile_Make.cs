@@ -51,14 +51,14 @@ namespace vtCore
             mf.Append("\n\n");
 
             if (cfg.setupType == SetupTypes.quick)
-            {
-                mf.Append($"CORE_BASE        := {Helpers.getShortPath(setup.arduinoCore)}\n");
+            {                
+                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCore, cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
-                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == project.path)) ? "core" : Helpers.getShortPath(cfg.coreBase))}\n");
+                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == project.path)) ? "core" : Helpers.getShortPath(Path.Combine(cfg.coreBase,cfg.selectedBoard.core)))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(cfg.compilerBase)}\n");
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
@@ -76,11 +76,12 @@ namespace vtCore
             mf.Append(makeEntry("FLAGS_CPP   := ", "build.flags.cpp", options) + "\n");
             mf.Append(makeEntry("FLAGS_C     := ", "build.flags.c", options) + "\n");
             mf.Append(makeEntry("FLAGS_S     := ", "build.flags.S", options) + "\n");
-            mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options) + "\n");
+
+            mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options).Replace("{build.core.path}", "$(CORE_BASE)") + "\n");
 
             mf.Append("\n");
             mf.Append(makeEntry("LIBS        := ", "build.flags.libs", options) + "\n");
-            mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
+            //mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
 
             mf.Append("\n");
             mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + " -DARDUINO=10807\n");

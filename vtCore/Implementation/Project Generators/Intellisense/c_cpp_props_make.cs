@@ -10,6 +10,8 @@ namespace vtCore
     {
         public static string generate(IProject project, LibManager libManager)
         {
+            var cfg = project.selectedConfiguration;
+            var brd = cfg.selectedBoard;
             if (project.selectedConfiguration.compilerBase == null) return ""; // hack
 
             var props = new PropertiesJson()
@@ -19,13 +21,13 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(project.selectedConfiguration.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(cfg.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>()
                         {
                             "src/**",
                             "lib/**",
-                            project.selectedConfiguration.coreBase?.Replace('\\','/') + "/**",
+                            (cfg.coreBase +"\\" + brd.core) .Replace('\\','/') + "/**",
                             libManager.sharedRepositoryPath.Replace('\\','/') + "/**"
                         },
                         defines = new List<string>()
