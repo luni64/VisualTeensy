@@ -34,7 +34,7 @@ namespace VisualTeensy
             var setupData = new SetupData();
 
 
-            setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder().Trim() : Settings.Default.arduinoBase;
+            setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder()?.Trim() : Settings.Default.arduinoBase;
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
@@ -88,7 +88,7 @@ namespace VisualTeensy
             try
             {
                 var setup = loadSetup();               
-                setup.libBase = Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries");
+                setup.libBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
                
 
                 var  libManager = Factory.makeLibManager(setup);

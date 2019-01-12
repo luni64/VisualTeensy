@@ -12,6 +12,7 @@ namespace vtCore
         {
             var cfg = project.selectedConfiguration;
             var brd = cfg.selectedBoard;
+            if (project.selectedConfiguration.compilerBase == null) return ""; // hack
 
             var props = new PropertiesJson()
             {
