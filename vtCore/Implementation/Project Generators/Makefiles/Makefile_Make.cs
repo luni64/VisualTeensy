@@ -11,6 +11,8 @@ namespace vtCore
         {
             var cfg = project.selectedConfiguration;
             var board = cfg.selectedBoard;
+            if (board == null) return "";
+
             var options = board.getAllOptions();
                       
             StringBuilder mf = new StringBuilder();

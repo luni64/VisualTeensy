@@ -33,7 +33,8 @@ namespace vtCore
                 }
             };
 
-            var options = project.selectedConfiguration.selectedBoard.getAllOptions();
+            var options = project.selectedConfiguration?.selectedBoard?.getAllOptions();
+            if (options == null) return "";
             var defines = options.FirstOrDefault(o => o.Key == "build.flags.defs");
             if (defines.Value != null)
             {
