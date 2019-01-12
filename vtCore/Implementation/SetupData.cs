@@ -90,7 +90,7 @@ namespace vtCore
 
                     if (arduinoBaseError == null)
                     {
-                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores", "teensy3");
+                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores");
                         arduinoCore = Directory.Exists(path) ? path : null;
 
                         path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");

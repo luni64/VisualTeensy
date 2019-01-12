@@ -46,8 +46,12 @@ namespace ViewModel
         {
             get
             {
-                var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                return $"VisualTeensy V{v.Major}.{v.Minor}.{v.Build} - lunOptics";
+               
+                   // var v = ApplicationDeployment.CurrentDeployment.CurrentVersion;
+                    var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                    return $"VisualTeensy V{v.Major}.{v.Minor}.{v.Build}.{v.Revision} - lunOptics";
+               
+                
             }
         }
 

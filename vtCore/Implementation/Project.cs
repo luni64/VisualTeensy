@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace vtCore
 {
@@ -32,17 +31,17 @@ namespace vtCore
         public BuildSystem buildSystem { get; set; }
 
         private List<Configuration> _configurations { get; }
-        private Configuration _selectedConfiguration { get;  set; }
+        private Configuration _selectedConfiguration { get; set; }
 
         public bool isMakefileBuild { get; set; } = true;
 
-        
+
 
 
 
         // files ------------------------------------
         // public string makefile { get; set; }
-        
+
         public string vsSetup_json { get; set; }
 
         public string path { get; set; }
@@ -80,11 +79,16 @@ namespace vtCore
 
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
-            _configurations.Add(dummyConfig);          
+            _configurations.Add(dummyConfig);
+
+
+           
+
+           
+
         }
         public void openProject(string projectPath)
         {
-            
             path = projectPath;
 
             _configurations.Clear();
@@ -182,7 +186,7 @@ namespace vtCore
                     //_configs.Add(selectedConfiguration);
                     //log.Info($"{vsTeensyJson} parse error, using default configuration");
                 }
-              //  generateFiles();
+                //  generateFiles();
             }
             catch //(Exception ex)
             {
@@ -190,8 +194,8 @@ namespace vtCore
                 var sc = Configuration.getDefault(setup);
                 _selectedConfiguration = sc;// Configuration.getDefault(setup);
                 _configurations.Add(sc);//electedConfiguration);
-                //_configs.Add(selectedConfiguration);
-             //   generateFiles();
+                                        //_configs.Add(selectedConfiguration);
+                                        //   generateFiles();
                 return;
             }
         }
@@ -200,17 +204,21 @@ namespace vtCore
         {
             this.setup = setup;
             this.libManager = libManager;
-            this._configurations = new List<Configuration>();           
+            this._configurations = new List<Configuration>();
+
+            //var userPackages = Directory.GetDirectories(Helpers.arduinoAppPath + "\\packages");
+            //var builtInPackages = Directory.GetDirectories(Helpers.arduinoPath + "\\hardware");
+            //var packages = userPackages.Select(p => new Package(p)).ToList();
         }
 
         public RepositoryIndexJson sharedLibraries { get; }
-        
+
 
         //public void generateFiles()
         //{
         //    //log.Info("enter");
-         
-           
+
+
         //    bool ok = _selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
         //    if (_configurations.Any(t => t.setupType == SetupTypes.quick))
         //    {
@@ -243,10 +251,10 @@ namespace vtCore
         //    // log.Debug("enter");
         //    return JsonConvert.SerializeObject(new projectTransferData(this), Formatting.Indented);
         //}
-   
 
-       
-        
+
+
+
     }
 }
 

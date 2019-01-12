@@ -13,9 +13,12 @@ namespace vtCore
             get
             {
                 string r = $"teensy:avr:{id}:{_optionSets[0].optionSetID}={_optionSets[0]._selectedOption.id}";
-                foreach(var os in _optionSets.Skip(1))
+                foreach (var os in _optionSets.Skip(1))
                 {
-                    r += $",{os.optionSetID}={os._selectedOption.id}";
+                    if (os._selectedOption != null)
+                    {
+                        r += $",{os.optionSetID}={os._selectedOption.id}";
+                    }
                 }
                 return r;
             }
@@ -46,14 +49,25 @@ namespace vtCore
                     }
                 }
             }
-                      
-            allOptions.Remove("build.flags.ld");
-            allOptions.Add("build.flags.ld", "-Wl,--gc-sections,--relax,--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s)[0])");
+
+
+            var ldFlagOpt= allOptions.FirstOrDefault(o => o.Key == "build.flags.ld");
+
+            if (ldFlagOpt.Key != null)
+            {
+                string oldVal = ldFlagOpt.Value.Replace("\"","");
+
+                int pos = oldVal.IndexOf("--relax") + 7;
+                var newVal = oldVal.Insert(pos,",--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s)[0])");
+
+                allOptions.Remove("build.flags.ld");
+                allOptions.Add("build.flags.ld", newVal);
+            }            
 
             return allOptions;
         }
 
-      
+
         #endregion
 
 
@@ -64,7 +78,7 @@ namespace vtCore
                 var nameEntry = entries.FirstOrDefault(e => e.key[1] == "name");
                 name = nameEntry.value;
                 id = nameEntry.key[0];
-                
+
                 _optionSets = menus.Select(m => new OptionSet(m.MenuName, m.OptionSetID)).ToList();
 
                 parse(entries);
@@ -103,7 +117,7 @@ namespace vtCore
 
         private List<OptionSet> _optionSets = new List<OptionSet>();
         private List<BuildEntry> fixedOptions;
-      
+
 
     }
 }

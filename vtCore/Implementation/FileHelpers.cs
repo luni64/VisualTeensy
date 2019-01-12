@@ -15,11 +15,11 @@ namespace vtCore
 
         //Folders ----------------------------------------
 
-        public static string arduinoPrefsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
+        public static string arduinoAppPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
 
         public static string getSketchbookFolder()
         {
-            var preferencesPath = Path.Combine(arduinoPrefsPath, "preferences.txt");
+            var preferencesPath = Path.Combine(arduinoAppPath, "preferences.txt");
 
             string sketchbookPath = "";
 
