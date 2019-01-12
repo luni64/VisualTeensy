@@ -162,7 +162,7 @@ $(USR_BIN)/%.o: $(USR_SRC)/%.cpp
 # Linking ---------------------------------------------------------------------
 $(TARGET_ELF): $(CORE_LIB) $(LIB_OBJ) $(USR_OBJ) 
 	@echo [LD]  $@
-	@$(CC) $(LD_FLAGS) -T$(CORE_SRC)/$(LD_SCRIPT) -o "$@" $(USR_OBJ) $(LIB_OBJ) $(CORE_LIB) $(LIBS)
+	@$(CC) $(LD_FLAGS) -o "$@" $(USR_OBJ) $(LIB_OBJ) $(CORE_LIB) $(LIBS)
 	@echo User code built and linked to libraries &&echo.
 
 %.lst: %.elf
