@@ -51,6 +51,7 @@ namespace vtCore
                 presentation = new
                 {
                     echo = true,
+                    clear = true,
                     reveal = "always",
                     focus = false,
                     panel = "shared",

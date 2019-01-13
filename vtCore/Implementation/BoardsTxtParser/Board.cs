@@ -51,18 +51,26 @@ namespace vtCore
             }
 
 
-            var ldFlagOpt= allOptions.FirstOrDefault(o => o.Key == "build.flags.ld");
+            var ldFlagOpt = allOptions.FirstOrDefault(o => o.Key == "build.flags.ld");
 
             if (ldFlagOpt.Key != null)
             {
-                string oldVal = ldFlagOpt.Value.Replace("\"","");
+                string oldVal = ldFlagOpt.Value.Replace("\"", "");
+                string newVal;
 
-                int pos = oldVal.IndexOf("--relax") + 7;
-                var newVal = oldVal.Insert(pos,",--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s)[0])");
-
+                if (oldVal.Contains("--defsym=__rtc_localtime"))
+                {
+                    newVal = oldVal.Replace("{extra.time.local}", "$(shell powershell [int](Get-Date -UFormat +%s)[0])");
+                }
+                else
+                {
+                    int pos = oldVal.IndexOf("--relax") + 7;
+                    newVal = oldVal.Insert(pos, ",--defsym=__rtc_localtime=$(shell powershell [int](Get-Date -UFormat +%s)[0])");
+                }
+                
                 allOptions.Remove("build.flags.ld");
                 allOptions.Add("build.flags.ld", newVal);
-            }            
+            }
 
             return allOptions;
         }

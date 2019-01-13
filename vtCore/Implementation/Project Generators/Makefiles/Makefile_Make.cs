@@ -50,8 +50,6 @@ namespace vtCore
 
             if (cfg.setupType == SetupTypes.quick)
             {
-                
-
                 //mf.Append($"CORE_BASE        := {Helpers.getShortPath(setup.arduinoCore)}\n");
                 mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCore, cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
