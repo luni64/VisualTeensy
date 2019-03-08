@@ -116,6 +116,8 @@ namespace vtCore
         {
             //log.Info("enter");
 
+            var vboards = BoardsTxt.parse(bt ?? boardTxtPath);
+
             projectTransferData.vtBoard tmp = new projectTransferData.vtBoard(selectedBoard);          
             boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
             setBoardOptions(tmp);
