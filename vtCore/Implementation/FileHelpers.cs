@@ -80,6 +80,26 @@ namespace vtCore
 
             return null;
         }
+
+        public static string findJLinkFolder()
+        {
+            string folder;
+
+            folder = checkFolder(@"C:\Program Files", f => isJLinkFolder(f));
+            if (folder != null)
+            {
+                return folder;
+            }
+
+            folder = checkFolder(@"C:\Program Files (x86)", f => isJLinkFolder(f));
+            if (folder != null)
+            {
+                return folder;
+            }
+
+            return null;
+        }
+
         public static string findCLIFolder()
         {
             string folder;
@@ -131,6 +151,16 @@ namespace vtCore
         {
             var cli = Path.Combine(folder, "teensy_loader_cli.exe");
             return (File.Exists(cli));
+        }
+        private static bool isJLinkFolder(string folder)
+        {
+            if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "SEGGER" || !Directory.Exists(folder))
+            {
+                return false;
+            }
+
+            var jlink = Path.Combine(folder, "JLink_V646j", "JLink.exe");
+            return (File.Exists(jlink));
         }
 
         private static string checkFolder(string baseFolder, Predicate<string> isValid)

@@ -63,10 +63,9 @@ namespace vtCore
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
             }
             mf.Append($"UPL_TYCMD_B      := {Helpers.getShortPath(setup.uplTyBase)}\n");
+            mf.Append($"UPL_JLINK_B      := {Helpers.getShortPath(setup.uplJLinkBase)}\n");
             mf.Append($"UPL_CLICMD_B     := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
-
-          
-
+                       
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");

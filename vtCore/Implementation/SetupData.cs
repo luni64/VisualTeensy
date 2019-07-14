@@ -78,6 +78,8 @@ namespace vtCore
             }
         }
 
+        public string uplJLinkBase { get; set; }
+
         // arduinoBase
         public string arduinoBase
         {
@@ -161,6 +163,7 @@ namespace vtCore
             sd.uplPjrcBase = sd.arduinoTools;
             sd.uplTyBase = Helpers.findTyToolsFolder();
             sd.uplCLIBase = Helpers.findCLIFolder();
+            sd.uplJLinkBase = Helpers.findJLinkFolder();
 
             sd.makeExePath = Path.Combine(Directory.GetCurrentDirectory(), "make.exe");
 

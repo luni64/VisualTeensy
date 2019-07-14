@@ -79,6 +79,14 @@ namespace vtCore
             progressHandler.Report("OK");
             await Task.Delay(1);
 
+            // Launch_json --------------------------------------------------------------------------
+            progressHandler.Report("Generate launch.json");
+            var launchJsonFile = Path.Combine(vsCodeFolder, "launch.json");
+            var launch_json = DebugFile.generate(project, libManager, setup);
+            File.WriteAllText(launchJsonFile, launch_json);
+            progressHandler.Report("OK");
+            await Task.Delay(1);
+
             // BuildSystem Makefile ---------------------------------------------------------------
             if (project.buildSystem == BuildSystem.makefile)
             {

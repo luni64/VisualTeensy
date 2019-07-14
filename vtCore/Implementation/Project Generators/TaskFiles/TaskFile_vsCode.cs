@@ -21,18 +21,24 @@ namespace vtCore
                     command = make,
                     args = new List<string> { "all", j, O },
                 },
-               new{
-                   label = "Upload (Teensy Uploader)",
-                   group = new Group(),
-                   command = make,
-                   args = new List<string> { "upload", j, O },
-               },
                 new {
                     label = "Upload (TyCommander)",
                     group = new Group(),
                     command = make,
                     args = new List<string> { "uploadTy", j, O },
                 },
+                new {
+                    label = "Upload (JLink)",
+                    group = new Group(),
+                    command = make,
+                    args = new List<string> { "uploadJLink", j, O },
+                },
+               new{
+                   label = "Upload (Teensy Uploader)",
+                   group = new Group(),
+                   command = make,
+                   args = new List<string> { "upload", j, O },
+               },
                 new {
                     label = "Upload (CLI)",
                     group = new Group(),
