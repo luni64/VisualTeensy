@@ -1,5 +1,6 @@
-##Currently under development
-Support for debugging with Cortex-Debug (use branch 'develop' for testing)
+### Currently under development:
+- Add support for debugging with [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) (use branch 'develop' for first testing)
+- Improve generation of new projects 
 
 # VisualTeensy
 [VisualCode](https://code.visualstudio.com/) is a modern, open source code editor which can easily be used to compile and upload sketches for the [PJRC Teensy Boards](https://www.pjrc.com/) using VisualTeensy. 
