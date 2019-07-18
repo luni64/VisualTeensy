@@ -104,6 +104,7 @@ namespace ViewModel
         //    }
         //}
 
+                    
         public bool quickSetup
         {
             get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
@@ -116,6 +117,17 @@ namespace ViewModel
                     updateAll();
                     OnPropertyChanged("");
                 }
+            }
+        }
+
+        public bool hasDebugSupport
+        {
+            get => project.debugSupport != DebugSupport.none;
+            set
+            {
+                project.debugSupport = value ? DebugSupport.cortex_debug : DebugSupport.none;
+                updateFiles();
+                OnPropertyChanged("");
             }
         }
 
@@ -146,6 +158,13 @@ namespace ViewModel
             set => SetProperty(ref _taskFile, value);
         }
         string _taskFile;
+
+        public String debugFile
+        {
+            get => _debugFile;
+            set => SetProperty(ref _debugFile, value);
+        }
+        string _debugFile;
 
         public String propFile
         {
@@ -276,6 +295,10 @@ namespace ViewModel
             makefile = Makefile.generate(project, libManager, setup);
             taskFile = TaskFile.generate(project, libManager, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
+            settFile = ProjectSettings.generate(project);
+            debugFile = DebugFile.generate(project, setup);
+
+
 
             cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
@@ -297,6 +320,7 @@ namespace ViewModel
             taskFile = TaskFile.generate(project, libManager, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
             settFile = ProjectSettings.generate(project);
+            debugFile = DebugFile.generate(project, setup);
 
             //OnPropertyChanged("makefile");
             // OnPropertyChanged("propFile");

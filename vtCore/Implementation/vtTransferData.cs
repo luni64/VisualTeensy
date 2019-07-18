@@ -118,13 +118,16 @@ namespace vtCore
         [JsonConverter(typeof(StringEnumConverter))]
         public Target target { get; set; }
 
-        [JsonProperty(Order = 2)]
+        [JsonProperty(Order = 3)]
         [JsonConverter(typeof(StringEnumConverter))]
         public BuildSystem buildSystem { get; set; }
 
+        [JsonProperty(Order = 4)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DebugSupport debugSupport { get; set; }
+
         [JsonProperty(Order = 5)]
         public List<vtConfiguration> configurations;
-
 
         internal projectTransferData(IProject project)
         {
@@ -132,6 +135,7 @@ namespace vtCore
             version = "1";
             target = project.target;
             buildSystem = project.buildSystem;
+            debugSupport = project.debugSupport;
 
             configurations = project.configurations.Select(c => new vtConfiguration(c)).ToList();
         }

@@ -33,7 +33,7 @@ namespace vtCore
 
     public class vsCodeGenerator
     {
-       static string mainFile;
+        static string mainFile;
 
         static public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
         {
@@ -59,14 +59,14 @@ namespace vtCore
             // Settings ---------------------------------------------------------------------------
             progressHandler.Report("Generate vsteensy.json");
             var settingsFile = Path.Combine(vsTeensyFolder, "vsteensy.json");
-            var projectSettingsJson = ProjectSettings.generate(project);              
+            var projectSettingsJson = ProjectSettings.generate(project);
             File.WriteAllText(settingsFile, projectSettingsJson);
             progressHandler.Report("OK");
             await Task.Delay(1);
 
             // Makefile ---------------------------------------------------------------------------
             progressHandler.Report("Generate makefile");
-            var  makefile = Path.Combine(project.path, "makefile");
+            var makefile = Path.Combine(project.path, "makefile");
             File.WriteAllText(makefile, Makefile.generate(project, libManager, setup));
             progressHandler.Report("OK");
             await Task.Delay(1);
@@ -79,22 +79,32 @@ namespace vtCore
             progressHandler.Report("OK");
             await Task.Delay(1);
 
-            // Launch_json --------------------------------------------------------------------------
-            progressHandler.Report("Generate launch.json");
-            var launchJsonFile = Path.Combine(vsCodeFolder, "launch.json");
-            var launch_json = DebugFile.generate(project, libManager, setup);
-            File.WriteAllText(launchJsonFile, launch_json);
-            progressHandler.Report("OK");
-            await Task.Delay(1);
+            // Debugging --------------------------------------------------------------------------
+            if (project.debugSupport != DebugSupport.none)
+            {
+                progressHandler.Report("Generate flash.jlink");
+                var flashJinkFile = Path.Combine(vsTeensyFolder, "flash.jlink");
+                var flash_jlink = JLinkUploadScript.generate(project, setup);
+                File.WriteAllText(flashJinkFile, flash_jlink);
+                progressHandler.Report("OK");
+                await Task.Delay(1);
+
+                progressHandler.Report("Generate launch.json");
+                var launchJsonFile = Path.Combine(vsCodeFolder, "launch.json");
+                var launch_json = DebugFile.generate(project, setup);
+                File.WriteAllText(launchJsonFile, launch_json);
+                progressHandler.Report("OK");
+                await Task.Delay(1);
+            }
 
             // BuildSystem Makefile ---------------------------------------------------------------
             if (project.buildSystem == BuildSystem.makefile)
             {
                 string srcFolder = Path.Combine(project.path, "src");
-                string libFolder = Path.Combine(project.path, "lib");               
+                string libFolder = Path.Combine(project.path, "lib");
                 Directory.CreateDirectory(srcFolder);
-                Directory.CreateDirectory(libFolder);                
-              
+                Directory.CreateDirectory(libFolder);
+
 
                 // copy local libraries -----------------------------------------------------------
                 foreach (Library library in project.selectedConfiguration.localLibs)
@@ -122,18 +132,18 @@ namespace vtCore
                         await Task.Delay(1);
                     }
                 }
-                                
+
                 mainFile = Path.Combine(srcFolder, "main.cpp");
                 if (!File.Exists(mainFile))
                 {
-                    progressHandler.Report($"{mainFile} generated");                   
+                    progressHandler.Report($"{mainFile} generated");
                     File.WriteAllText(mainFile, Strings.mainCpp);
                     progressHandler.Report($"OK");
                     await Task.Delay(1);
-                }              
+                }
             }
             else    // BuildSystem Arduino Builder-------------------------------------------------
-            {                
+            {
                 mainFile = Path.Combine(project.path, project.name + ".ino");
                 if (!File.Exists(mainFile))
                 {
@@ -153,15 +163,15 @@ namespace vtCore
         static public void ardGenerator(IProject project, LibManager libManager, SetupData setup)
         {
 
-          
+
         }
 
         static public void mkGenerator(IProject project, LibManager libManager, SetupData setup)
         {
-            
+
 
             // copy makefile ----------------------------------------------------------------------
-           
+
         }
     }
 }

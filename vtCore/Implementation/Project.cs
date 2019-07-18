@@ -29,6 +29,7 @@ namespace vtCore
 
         public Target target { get; set; } = Target.vsCode;
         public BuildSystem buildSystem { get; set; }
+        public DebugSupport debugSupport { get; set; } = DebugSupport.none;
 
         private List<Configuration> _configurations { get; }
         private Configuration _selectedConfiguration { get; set; }
@@ -58,6 +59,7 @@ namespace vtCore
             }
         }
         public string name => Path.GetFileName(path ?? "ERROR");
+        public string cleanName => name.Replace(" ", "_");
 
         public void newProject()
         {
@@ -68,6 +70,7 @@ namespace vtCore
 
             buildSystem = BuildSystem.makefile;
             target = Target.vsCode;
+            debugSupport = setup.debugSupportDefault == true ? DebugSupport.cortex_debug : DebugSupport.none;
 
             // Add a default configuration ----------------------
             _configurations.Clear();
@@ -80,9 +83,6 @@ namespace vtCore
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
             _configurations.Add(dummyConfig);
-
-
-           
 
            
 
@@ -98,6 +98,7 @@ namespace vtCore
             {
                 buildSystem = BuildSystem.makefile;
                 target = Target.vsCode;
+                debugSupport = setup.debugSupportDefault == true ? DebugSupport.cortex_debug : DebugSupport.none;
 
                 var sc = Configuration.getDefault(setup);
                 _selectedConfiguration = sc; // Configuration.getDefault(setup);
@@ -116,6 +117,7 @@ namespace vtCore
                 {
                     buildSystem = fileContent.buildSystem;
                     target = fileContent.target;
+                    debugSupport = fileContent.debugSupport;
 
                     foreach (var cfg in fileContent.configurations)
                     {
@@ -147,7 +149,7 @@ namespace vtCore
 
                         if (cfg.localLibraries != null)
                         {
-                            var localLibraries = LibraryReader.parseLibraryLocal(Path.Combine(projectPath, "lib")).Select(version => version.FirstOrDefault());
+                            var localLibraries = LibraryReader.parseLibraryLocal(Path.Combine(projectPath, "lib"))?.Select(version => version.FirstOrDefault());
                             foreach (var cfgLocalLib in cfg.localLibraries)
                             {
                                 var library = localLibraries.FirstOrDefault(lib => lib.path == cfgLocalLib);
@@ -188,7 +190,7 @@ namespace vtCore
                 }
                 //  generateFiles();
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);

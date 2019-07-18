@@ -261,7 +261,7 @@ namespace ViewModel
             boardDefintionTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "boards.txt") };
 
             compilerBase = new DisplayText() { text = configuration.compilerBase };
-            makeExePath = new DisplayText() { text = setup.makeExePath };
+            makeExePath = new DisplayText() { text = setup.makeExeBase.path };
         }
 
         // private SetupData data;

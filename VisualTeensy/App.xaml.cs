@@ -38,12 +38,13 @@ namespace VisualTeensy
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-            setupData.uplPjrcBase = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
-            setupData.uplTyBase = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
-            setupData.uplCLIBase = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
-            setupData.uplJLinkBase = Path.Combine(Helpers.findJLinkFolder(), "JLink_V646j");
-            setupData.makeExePath = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Path.Combine(Directory.GetCurrentDirectory(), "make.exe") : Settings.Default.makeExePath;
+            setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
+            setupData.uplTyBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
+            setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
+            setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
+            setupData.makeExeBase.path = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Directory.GetCurrentDirectory() : Settings.Default.makeExePath;
             setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
+            setupData.debugSupportDefault = Settings.Default.debugSupport;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
@@ -53,7 +54,7 @@ namespace VisualTeensy
             {
                 setupData.makefile_builder = reader.ReadToEnd();
             }
-            Helpers.arduinoPath = setupData.arduinoBase;
+          //  Helpers.arduinoPath = setupData.arduinoBase;
 
             return setupData;
         }
@@ -62,11 +63,13 @@ namespace VisualTeensy
         {
             Settings.Default.arduinoBase = setupData.arduinoBase;
             Settings.Default.projectBaseDefault = setupData.projectBaseDefault;
-            Settings.Default.uplPjrcBase = setupData.uplPjrcBase;
-            Settings.Default.uplTyBase = setupData.uplTyBase;
-            Settings.Default.uplCLIBase = setupData.uplCLIBase;
-            Settings.Default.makeExePath = setupData.makeExePath;
+            Settings.Default.uplPjrcBase = setupData.uplPjrcBase.path;
+            Settings.Default.uplTyBase = setupData.uplTyBase.path;
+            Settings.Default.uplCLIBase = setupData.uplCLIBase.path;
+            Settings.Default.uplJLinkBase = setupData.uplJLinkBase.path;
+            Settings.Default.makeExePath = setupData.makeExeBase.path;
             Settings.Default.libBase = setupData.libBase;
+            Settings.Default.debugSupport = setupData.debugSupportDefault;
         }
 
         protected override void OnStartup(StartupEventArgs e)

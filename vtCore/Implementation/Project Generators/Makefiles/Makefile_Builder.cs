@@ -47,8 +47,8 @@ namespace vtCore
             mf.Append($"LIBRARIES        += -libraries=\"{setup.arduinoBase}/libraries\"\n\n");
 
             mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
-            mf.Append($"UPL_TYCMD_B      := {Helpers.getShortPath(setup.uplTyBase)}\n");
-            mf.Append($"UPL_CLICMD_B     := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
+            mf.Append($"UPL_TYCMD_B      := {setup.uplTyBase.shortPath}\n");
+            mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n\n");
 
           
             mf.Append(setup.makefile_builder);

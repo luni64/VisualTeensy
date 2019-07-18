@@ -14,7 +14,7 @@ namespace vtCore
             if (board == null) return "";
 
             var options = board.getAllOptions();
-                      
+
             StringBuilder mf = new StringBuilder();
 
             mf.Append("#******************************************************************************\n");
@@ -30,7 +30,7 @@ namespace vtCore
             mf.Append("#******************************************************************************\n");
 
             mf.Append($"SHELL            := cmd.exe\nexport SHELL\n\n");
-            mf.Append($"TARGET_NAME      := {project.name?.Replace(" ", "_")}\n");
+            mf.Append($"TARGET_NAME      := {project.cleanName}\n");
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
             mf.Append(makeEntry("MCU              := ", "build.mcu", options) + "\n\n");
 
@@ -51,21 +51,22 @@ namespace vtCore
             mf.Append("\n\n");
 
             if (cfg.setupType == SetupTypes.quick)
-            {                
+            {
                 mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCore, cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
-                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == project.path)) ? "core" : Helpers.getShortPath(Path.Combine(cfg.coreBase,cfg.selectedBoard.core)))}\n");
+                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == project.path)) ? "core" : Helpers.getShortPath(Path.Combine(cfg.coreBase, cfg.selectedBoard.core)))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(cfg.compilerBase)}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.uplPjrcBase)}\n");
+                mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
             }
-            mf.Append($"UPL_TYCMD_B      := {Helpers.getShortPath(setup.uplTyBase)}\n");
-            mf.Append($"UPL_JLINK_B      := {Helpers.getShortPath(setup.uplJLinkBase)}\n");
-            mf.Append($"UPL_CLICMD_B     := {Helpers.getShortPath(setup.uplCLIBase)}\n\n");
-                       
+            if (!String.IsNullOrWhiteSpace(setup.uplTyBase.path)) mf.Append($"UPL_TYCMD_B      := {setup.uplTyBase.shortPath}\n");
+            if (!String.IsNullOrWhiteSpace(setup.uplJLinkBase.path)) mf.Append($"UPL_JLINK_B      := {setup.uplJLinkBase.shortPath}\n");
+            if (!String.IsNullOrWhiteSpace(setup.uplCLIBase.path)) mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n");
+
+            mf.Append("\n");
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
@@ -108,14 +109,16 @@ namespace vtCore
 
         private static string makeEntry(String txt, String key, Dictionary<String, String> options)
         {
-            if (options.ContainsKey(key))
-            {
-                return $"{txt}{options[key]}";
-            }
-            else
-            {
-                return "";
-            }
+            return options.ContainsKey(key) ? $"{txt}{options[key]}" : "";
+
+            //if (options.ContainsKey(key))
+            //{
+            //    return $"{txt}{options[key]}";
+            //}
+            //else
+            //{
+            //    return "";
+            //}
         }
     }
 }

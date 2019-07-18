@@ -88,13 +88,13 @@ namespace vtCore
             folder = checkFolder(@"C:\Program Files", f => isJLinkFolder(f));
             if (folder != null)
             {
-                return folder;
+                return Path.Combine(folder, "JLINK64");
             }
 
             folder = checkFolder(@"C:\Program Files (x86)", f => isJLinkFolder(f));
             if (folder != null)
             {
-                return folder;
+                return Path.Combine(folder, "JLINK64");
             }
 
             return null;

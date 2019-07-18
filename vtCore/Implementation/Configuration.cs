@@ -95,18 +95,19 @@ namespace vtCore
         public static Configuration getDefault(SetupData setupData)
         {
             //log.Info("enter");
-            var pd = new Configuration(setupData);
+            var pd = new Configuration(setupData)
+            {
+                setupType = SetupTypes.quick,
+                name = "default",
 
-            pd.setupType = SetupTypes.quick;
-            pd.name = "default";            
+                boardTxtPath = setupData.arduinoBoardsTxt,
+                coreBase = setupData.arduinoCore,
+                compilerBase = setupData.arduinoCompiler,
 
-            pd.boardTxtPath = setupData.arduinoBoardsTxt;
-            pd.coreBase = setupData.arduinoCore;
-            pd.compilerBase = setupData.arduinoCompiler;
+                boards = new List<IBoard>()
+            };
 
-            pd.boards = new List<IBoard>();
             pd.parseBoardsTxt(setupData.arduinoBoardsTxt);
-
             pd.logProject();
 
             return pd;
