@@ -28,7 +28,7 @@ namespace vtCore
         public LibManager libManager { get; private set; }
 
         public Target target { get; set; } = Target.vsCode;
-        public BuildSystem buildSystem { get; set; }
+        public BuildSystem buildSystem { get; set; } = BuildSystem.makefile;
         public DebugSupport debugSupport { get; set; } = DebugSupport.none;
 
         private List<Configuration> _configurations { get; }
@@ -84,121 +84,26 @@ namespace vtCore
             dummyConfig.name = "Testdummy";
             _configurations.Add(dummyConfig);
 
-           
+
 
         }
+
+
         public void openProject(string projectPath)
         {
-            path = projectPath;
-
             _configurations.Clear();
 
-            var vsTeensyJson = Path.Combine(projectPath, ".vsteensy", "vsteensy.json");
-            if (!File.Exists(vsTeensyJson))
-            {
-                buildSystem = BuildSystem.makefile;
-                target = Target.vsCode;
-                debugSupport = setup.debugSupportDefault == true ? DebugSupport.cortex_debug : DebugSupport.none;
+            this.path = projectPath;
+            string vsTeensyJsonPath = Path.Combine(projectPath, ".vsteensy", "vsteensy.json");
 
-                var sc = Configuration.getDefault(setup);
-                _selectedConfiguration = sc; // Configuration.getDefault(setup);
-                _configurations.Add(sc);// selectedConfiguration);                          
-                return;
+
+            if (!File.Exists(vsTeensyJsonPath))
+            {
+                openNewFolder();
             }
-
-            try
+            else
             {
-                string jsonString = File.ReadAllText(vsTeensyJson);
-                //log.Debug("vsTeensy.json content:\n" + jsonString);
-
-                var fileContent = JsonConvert.DeserializeObject<projectTransferData>(jsonString);
-
-                if (fileContent?.version == "1" && fileContent.configurations.Count > 0)
-                {
-                    buildSystem = fileContent.buildSystem;
-                    target = fileContent.target;
-                    debugSupport = fileContent.debugSupport;
-
-                    foreach (var cfg in fileContent.configurations)
-                    {
-                        var configuration = new Configuration()
-                        {
-                            setupType = cfg.setupType,  // remove from config
-
-                            name = cfg.name,
-                            guid = cfg.guid != null ? cfg.guid : Guid.NewGuid().ToString(),
-
-                            compilerBase = cfg.compilerBase,
-                            makefileExtension = cfg.makefileExtension,
-                            boardTxtPath = cfg.boardTxtPath,//.StartsWith("\\") ? Path.Combine(projectPath, cfg.boardTxtPath.Substring(1)) : cfg.boardTxtPath,
-                            coreBase = cfg.coreBase,//.StartsWith("\\") ? Path.Combine(projectPath, cfg.coreBase.Substring(1)) : cfg.coreBase,                                                 
-                        };
-
-                        if (cfg.sharedLibraries != null)
-                        {
-                            var sharedLibraries = libManager.sharedRepository.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
-                            foreach (var cfgSharedLib in cfg.sharedLibraries)
-                            {
-                                var library = sharedLibraries.FirstOrDefault(lib => lib.path == cfgSharedLib); // find the corresponding lib
-                                if (library != null)
-                                {
-                                    configuration.sharedLibs.Add(library);
-                                }
-                            }
-                        }
-
-                        if (cfg.localLibraries != null)
-                        {
-                            var localLibraries = LibraryReader.parseLibraryLocal(Path.Combine(projectPath, "lib"))?.Select(version => version.FirstOrDefault());
-                            foreach (var cfgLocalLib in cfg.localLibraries)
-                            {
-                                var library = localLibraries.FirstOrDefault(lib => lib.path == cfgLocalLib);
-                                if (library != null)
-                                {
-                                    configuration.localLibs.Add(library);
-                                }
-                            }
-                        }
-
-                        configuration.parseBoardsTxt(configuration.setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : null);
-
-                        configuration.selectedBoard = configuration.boards?.FirstOrDefault(b => b.name == cfg.board.name);
-                        if (configuration.selectedBoard != null)
-                        {
-                            foreach (var option in cfg.board.options)
-                            {
-                                var optionSet = configuration.selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
-                                if (optionSet != null)
-                                {
-                                    optionSet.selectedOption = optionSet.options.FirstOrDefault(x => x.name == option.Value);
-                                }
-                            }
-                        }
-                        _configurations.Add(configuration);
-                        // _configs.Add(configuration);
-                    }
-                    _selectedConfiguration = _configurations.FirstOrDefault();
-                    //log.Info($"{vsTeensyJson} read sucessfully");
-                }
-                else
-                {
-                    var sc = Configuration.getDefault(setup);
-                    _selectedConfiguration = sc;// Configuration.getDefault(setup);
-                    _configurations.Add(sc);//selectedConfiguration);
-                    //_configs.Add(selectedConfiguration);
-                    //log.Info($"{vsTeensyJson} parse error, using default configuration");
-                }
-                //  generateFiles();
-            }
-            catch (Exception ex)
-            {
-                //log.Warn($"config file {vsTeensyJson} does not exist");
-                var sc = Configuration.getDefault(setup);
-                _selectedConfiguration = sc;// Configuration.getDefault(setup);
-                _configurations.Add(sc);//electedConfiguration);
-                                        //_configs.Add(selectedConfiguration);
-                                        //   generateFiles();
-                return;
+                openExistingFolder(vsTeensyJsonPath);
             }
         }
 
@@ -216,45 +121,100 @@ namespace vtCore
         public RepositoryIndexJson sharedLibraries { get; }
 
 
-        //public void generateFiles()
-        //{
-        //    //log.Info("enter");
+
+        void openNewFolder()
+        {
+            buildSystem = BuildSystem.makefile;
+            target = Target.vsCode;
+            debugSupport = DebugSupport.none;
+
+            var sc = Configuration.getDefault(setup);
+            _configurations.Add(sc);
+            _selectedConfiguration = sc;
+        }
+
+        void openExistingFolder(string vsTeensyJsonPath)
+        {
+            try
+            {  // read vsTeensy.json
+                var fileContent = JsonConvert.DeserializeObject<ProjectTransferData>(File.ReadAllText(vsTeensyJsonPath));
+
+                if (fileContent == null || fileContent.version != "1" || fileContent.configurations.Count == 0)
+                {
+                    openNewFolder();
+                }
+                else
+                {
+                    buildSystem = fileContent.buildSystem;
+                    target = fileContent.target;
+                    debugSupport = fileContent.debugSupport;
 
 
-        //    bool ok = _selectedConfiguration.selectedBoard != null && setup.uplTyBaseError == null && pathError == null;
-        //    if (_configurations.Any(t => t.setupType == SetupTypes.quick))
-        //    {
-        //        ok = ok && setup.arduinoBaseError == null;
-        //    }
-        //    else
-        //    {
-        //        //TMPCommentar ok = ok && selectedConfiguration.corePathError == null && selectedConfiguration.compilerPathError == null;  // extend to all configurations
-        //    }
+                    foreach (var cfg in fileContent.configurations)
+                    {
+                        var configuration = (Configuration)cfg;
 
-        //    if (ok)
-        //    {
-        //        //log.Debug("OK (makefile, props_json, vsSetup_json)");
-        //     //   _configurations.ForEach(c => c.makefile = generateMakefile(c));
+                        // add shared libraries
+                        if (cfg.sharedLibraries != null)
+                        {
+                            var sharedLibraries = libManager.sharedRepository.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
+                            foreach (var cfgSharedLib in cfg.sharedLibraries)
+                            {
+                                var library = sharedLibraries.FirstOrDefault(lib => lib.path == cfgSharedLib); // find the corresponding lib
+                                if (library != null)
+                                {
+                                    configuration.sharedLibs.Add(library);
+                                }
+                            }
+                        }
 
-        //      //  props_json = generatePropertiesFile(_selectedConfiguration.selectedBoard.getAllOptions());
-        //        vsSetup_json = generateVisualTeensySetup();
-        //    }
-        //    else
-        //    {
-        //        //log.Debug("NOK (makefile, props_json, vsSetup_json)");
-        //        //selectedConfiguration.logProject();
-        //    }
+                        // add libraries installed in ./lib                                                
+                        string libPath = Path.Combine(path, "lib");
 
-        // //   tasks_json = generateTasksFile();
-        //}
+                        var localLibs = LibraryReader.parseLibraryLocal(libPath)?.Select(version => version.FirstOrDefault());
 
-        //private string generateVisualTeensySetup()
-        //{
-        //    // log.Debug("enter");
-        //    return JsonConvert.SerializeObject(new projectTransferData(this), Formatting.Indented);
-        //}
+                        if (localLibs != null)
+                        {
+                            foreach (var lib in localLibs)
+                            {
+                                lib.source = Path.Combine(libPath, lib.path);  // lib will be copied to local => set source to the local path
+                                configuration.localLibs.Add(lib);
+                            }
+                        }
 
+                        // initialize boards list and options
+                        configuration.parseBoardsTxt(configuration.setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : null);
+                        configuration.selectedBoard = configuration.boards?.FirstOrDefault(b => b.name == cfg.board.name);
+                        if (configuration.selectedBoard != null)
+                        {
+                            foreach (var option in cfg.board.options)
+                            {
+                                var optionSet = configuration.selectedBoard.optionSets.FirstOrDefault(x => x.name == option.Key);
+                                if (optionSet != null)
+                                {
+                                    optionSet.selectedOption = optionSet.options.FirstOrDefault(x => x.name == option.Value);
+                                }
+                            }
+                        }
 
+                        _configurations.Add(configuration);
+
+                    }
+                    _selectedConfiguration = _configurations.FirstOrDefault();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //log.Warn($"config file {vsTeensyJson} does not exist");
+                var sc = Configuration.getDefault(setup);
+                _selectedConfiguration = sc;// Configuration.getDefault(setup);
+                _configurations.Add(sc);//electedConfiguration);
+                                        //_configs.Add(selectedConfiguration);
+                                        //   generateFiles();
+                return;
+            }
+        }
 
 
     }

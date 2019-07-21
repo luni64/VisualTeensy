@@ -117,7 +117,7 @@ namespace ViewModel
         public DisplayText compilerBase { get; }
         public DisplayText makeExePath { get; }
 
-        public bool copyBoardTxt => configuration.copyBoardTxt && configuration.setupType == SetupTypes.expert;
+       // public bool copyBoardTxt => configuration.copyBoardTxt && configuration.setupType == SetupTypes.expert;
         public bool copyCore => configuration.copyCore && configuration.setupType == SetupTypes.expert;
 
         public double perc
@@ -136,14 +136,14 @@ namespace ViewModel
 
         private void copyBoardFile()
         {
-            string SourcePath = configuration.boardTxtPath;
+            string SourcePath = Path.Combine(configuration.coreBase.path, "boards.txt");
             string DestinationPath = Path.Combine(project.path, Path.GetFileName(SourcePath));
             File.Copy(SourcePath, DestinationPath, overwrite: true);
         }
         private async Task copyCoreFiles()
         {
             showProg = true;
-            string SourcePath = configuration.coreBase;
+            string SourcePath = configuration.coreBase.path;
             string DestinationPath = Path.Combine(project.path, "core");
 
             foreach (string dirPath in Directory.GetDirectories(SourcePath, "*.*", SearchOption.AllDirectories))
@@ -249,18 +249,18 @@ namespace ViewModel
             setupFilePath = new DisplayText() { text = Path.Combine(projectFolder.text, ".vsteensy", "vsteensy.json") };
             setupFilePath.action = File.Exists(setupFilePath.text) ? "overwrite" : "generate";
 
-            coreBase = new DisplayText() { text = configuration.coreBase };
+            coreBase = new DisplayText() { text = configuration.coreBase.path };
             coreBase.action = configuration.copyCore ? "copy from" : "link to";
             coreTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "core") };
 
             mainCppPath = new DisplayText() { text = Path.Combine(project.path, "src", "main.cpp") };
             mainCppPath.action = File.Exists(mainCppPath.text) ? "skip (exists)" : "generate";
 
-            boardDefintionPath = new DisplayText() { text = configuration.boardTxtPath };
-            boardDefintionPath.action = configuration.copyBoardTxt ? "copy from" : "link to";
-            boardDefintionTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "boards.txt") };
+            //boardDefintionPath = new DisplayText() { text = configuration.boardTxtPath };
+            //boardDefintionPath.action = configuration.copyBoardTxt ? "copy from" : "link to";
+            //boardDefintionTarget = new DisplayText() { text = Path.Combine(projectFolder.text, "boards.txt") };
 
-            compilerBase = new DisplayText() { text = configuration.compilerBase };
+            compilerBase = new DisplayText() { text = configuration.compilerBase.path };
             makeExePath = new DisplayText() { text = setup.makeExeBase.path };
         }
 

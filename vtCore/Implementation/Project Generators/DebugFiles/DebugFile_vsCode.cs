@@ -8,8 +8,9 @@ namespace vtCore
         static public string generate(IProject project, SetupData setup)
         {
             IConfiguration cfg = project.selectedConfiguration;
-            (string target, string svd) debugTarget = DebugFile.seggerDebugTargets.TryGetValue(cfg.selectedBoard.id, out (string, string) value) ? value : ("unknown", "unknown");
-            string compilerBase = Helpers.getShortPath(cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase).Replace('\\', '/'); ;
+            (string target, string svd) = DebugFile.seggerDebugTargets.TryGetValue(cfg.selectedBoard.id, out (string, string) value) ? value : ("unknown", "unknown");
+            string compilerBase =(cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase.shortPath).Replace('\\', '/'); 
+            //Helpers.getShortPath(cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase).Replace('\\', '/'); ;
 
             var launchJson = new
             {
@@ -24,8 +25,8 @@ namespace vtCore
                       request = "attach",
                       type = "cortex-debug",
                       servertype = "jlink",
-                      device = debugTarget.target,
-                      svdFile= debugTarget.svd,
+                      device = target,
+                      svdFile= svd,
                       armToolchainPath= compilerBase + "/bin",
                   },
                   new
@@ -36,8 +37,8 @@ namespace vtCore
                       request = "launch",
                       type = "cortex-debug",
                       servertype = "jlink",
-                      device = debugTarget.target,
-                      svdFile= debugTarget.svd,
+                      device = target,
+                      svdFile= svd,
                       armToolchainPath= compilerBase + "/bin",
                   },
                 }

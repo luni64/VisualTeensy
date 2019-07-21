@@ -17,18 +17,18 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(project.selectedConfiguration.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(project.selectedConfiguration.compilerBase.path ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>()
                         {
-                            project.selectedConfiguration.coreBase?.Replace('\\','/') + "/*",                         
+                            project.selectedConfiguration.coreBase.path?.Replace('\\','/') + "/*",                         
                             $"{Path.Combine(setup.arduinoBase, "hardware", "teensy", "avr", "libraries/**")}".Replace('\\','/'),
                             $"{Path.Combine(setup.arduinoBase ,"libraries/**")}".Replace('\\','/'),
                             $"{Path.Combine(Helpers.getSketchbookFolder() ,"libraries/**")}".Replace('\\','/'),
                         },
                         forcedInclude = new List<string>()
                         {
-                            Path.Combine(project.selectedConfiguration.coreBase,"arduino.h").Replace('\\','/'),
+                            Path.Combine(project.selectedConfiguration.coreBase.path,"arduino.h").Replace('\\','/'),
                         },
                         defines = new List<string>()
                     }

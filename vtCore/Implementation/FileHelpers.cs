@@ -210,7 +210,7 @@ namespace vtCore
         {
             string versionedLibFolder = Path.Combine(targetFolder, Path.GetFileNameWithoutExtension(lib.url));
             string unversionedLibFolder = versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
-            if (Directory.Exists(unversionedLibFolder)) return false;
+         //   if (Directory.Exists(unversionedLibFolder)) return false;
 
             WebClient client = null;
             MemoryStream zippedStream = null;

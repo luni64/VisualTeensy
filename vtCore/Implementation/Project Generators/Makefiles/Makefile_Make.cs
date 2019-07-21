@@ -52,14 +52,14 @@ namespace vtCore
 
             if (cfg.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCore, cfg.selectedBoard.core))}\n");
+                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase,"cores", cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
-            {
-                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase) == project.path)) ? "core" : Helpers.getShortPath(Path.Combine(cfg.coreBase, cfg.selectedBoard.core)))}\n");
-                mf.Append($"GCC_BASE         := {Helpers.getShortPath(cfg.compilerBase)}\n");
+            {                
+                mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase.path) == project.path)) ? "core" : Helpers.getShortPath(cfg.core))}\n");
+                mf.Append($"GCC_BASE         := {cfg.compilerBase.shortPath}\n");
                 mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
             }
             if (!String.IsNullOrWhiteSpace(setup.uplTyBase.path)) mf.Append($"UPL_TYCMD_B      := {setup.uplTyBase.shortPath}\n");
