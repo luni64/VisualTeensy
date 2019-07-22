@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace vtCore
 {
+    enum stati { TBD, done, ntbd};
+
     static class Starter
     {
         static public void start_vsCode(string folder, string file)
@@ -32,19 +35,113 @@ namespace vtCore
         }
     }
 
-    public class vsCodeGenerator
+    interface ITask
     {
+        string description { get; }
+        Func<string> action { get; }
+        Func<stati> status { get; }
+    }
+
+    class PrepareFolders : ITask
+    {
+        public string description => "Generate .vscode and .vsteensy folders";
+
+        public PrepareFolders(IProject project)
+        {
+            vsCodeFolder = new DirectoryInfo(Path.Combine(project.path, ".vscode"));
+            vsTeensyFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy"));
+        }
+        
+        public Func<string> action => () =>
+        {
+            if (!vsCodeFolder.Exists) vsCodeFolder.Create();
+            if (!vsTeensyFolder.Exists) vsTeensyFolder.Create();
+
+            return "OK";
+        };
+        public Func<stati> status => () =>
+        {
+            return stati.TBD;
+        };
+
+        DirectoryInfo vsCodeFolder, vsTeensyFolder;
+    }
+
+    class CleanBinaries : ITask
+    {
+        public CleanBinaries(IProject project)
+        {
+            buildFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy", "build"));            
+        }
+
+        public string description => "Clean binaries";
+
+        public Func<string> action => () =>
+        {
+            if (status() == stati.TBD)
+            {
+                buildFolder.Delete(true);
+                buildFolder.Create();
+            }
+
+            return "OK";
+        };
+        public Func<stati> status => () =>
+        {
+            if (buildFolder.Exists && buildFolder.EnumerateFileSystemInfos().Any())
+            {
+                return stati.TBD;
+            }
+            return stati.ntbd;
+
+        };
+        
+        DirectoryInfo buildFolder;
+    }
+
+
+    public class vsCodeGenerator : ICodeGenerator
+    {
+        public vsCodeGenerator(IProject project, LibManager libManager, SetupData setup)
+        {
+            this.project = project;
+            this.libManager = libManager;
+            this.setup = setup;
+
+            tasks = new List<ITask>
+            {
+                new PrepareFolders(project),
+                new CleanBinaries(project),
+            };
+        }
+
+        IProject project;
+        LibManager libManager;
+        SetupData setup;
+
+        List<ITask> tasks;
+
+
+
         static string mainFile;
 
-        static public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
+        public async Task generate(IProject p, LibManager l, SetupData s, IProgress<string> progressHandler)
         {
+
+            foreach(var task in tasks)
+            {
+                task.action();
+            }
+
+            return; 
+
             progressHandler.Report("Check or create folders");
             var vsCodeFolder = Path.Combine(project.path, ".vscode");
             var vsTeensyFolder = Path.Combine(project.path, ".vsteensy");
             var buildFolder = Path.Combine(project.path, vsTeensyFolder, "build");
             Directory.CreateDirectory(vsCodeFolder);
             Directory.CreateDirectory(vsTeensyFolder);
-            if (Directory.Exists(buildFolder)) Directory.Delete(buildFolder,true);
+            if (Directory.Exists(buildFolder)) Directory.Delete(buildFolder, true);
             Directory.CreateDirectory(buildFolder);
 
             await Task.Delay(1);
@@ -120,7 +217,7 @@ namespace vtCore
 
                 // copy core ----------------------------------------------------------------------                
                 DirectoryInfo coreFolder = new DirectoryInfo(Path.Combine(project.path, "core"));
-                if(coreFolder.Exists) coreFolder.Delete(true);
+                if (coreFolder.Exists) coreFolder.Delete(true);
 
                 if (project.selectedConfiguration.copyCore)
                 {
@@ -166,7 +263,7 @@ namespace vtCore
                     }
                 }
 
-              
+
             }
             else    // BuildSystem Arduino Builder-------------------------------------------------
             {

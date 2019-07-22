@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace vtCore
 {
-    static public class AtomGenerator
+    public class AtomGenerator : ICodeGenerator
     {
         static string mainFile;
         static string taskJsonFile;
         static string settingsFile;
 
-        static public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
+        public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
         {
             progressHandler.Report("Check or create folders");
             var tasksFolder = project.path;

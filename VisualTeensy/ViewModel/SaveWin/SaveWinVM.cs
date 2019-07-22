@@ -72,22 +72,26 @@ namespace ViewModel
                 OnPropertyChanged("selectedTask");
             });
 
+            ICodeGenerator generator = null;
+
             switch (project.target)
             {
                 case Target.vsCode:
-                    await vsCodeGenerator.generate(project, libManager, setup, progressHandler);
+                    generator = new vsCodeGenerator(project, libManager, setup);
                     break;
+
                 case Target.atom:
-                    await AtomGenerator.generate(project, libManager, setup, progressHandler);
-                    break;
+                    generator = new AtomGenerator();
+                    break;                
             }
-            
+            await generator.generate(project, libManager, setup, progressHandler);
+
             await System.Threading.Tasks.Task.Delay(3000);
             System.Windows.Application.Current.Shutdown();
 
             return;
 
-            
+
 
         }
 
@@ -117,7 +121,7 @@ namespace ViewModel
         public DisplayText compilerBase { get; }
         public DisplayText makeExePath { get; }
 
-       // public bool copyBoardTxt => configuration.copyBoardTxt && configuration.setupType == SetupTypes.expert;
+        // public bool copyBoardTxt => configuration.copyBoardTxt && configuration.setupType == SetupTypes.expert;
         public bool copyCore => configuration.copyCore && configuration.setupType == SetupTypes.expert;
 
         public double perc
