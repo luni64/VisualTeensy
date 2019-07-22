@@ -3,8 +3,6 @@ using System.IO;
 
 namespace vtCore
 {
-   
-    
     public class SetupData
     {
         // project path
@@ -12,73 +10,15 @@ namespace vtCore
         public string projectBaseDefaultError => (!String.IsNullOrWhiteSpace(projectBaseDefault) && (Directory.Exists(projectBaseDefault)) ? null : "Error");
 
         // gnu make
-        public string makeExePath { get; set; }
-        public string makeExePathError => makeExePath != null ? (File.Exists(makeExePath) ? null : "Error") : "Error";
+        public CheckedPath makeExeBase { get; } = new CheckedPath("make.exe");
+        //public string makeExePathError => makeExeBase != null ? (File.Exists(makeExeBase) ? null : "Error") : "Error";
 
-        // upload TyTools
-        public string uplTyBase { get; set; }
-        public string uplTyBaseError
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(uplTyBase))
-                {
-                    return null; // setting is optional
-                }
+        // uploaders
+        public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
+        public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
+        public CheckedPath uplJLinkBase { get; } = new CheckedPath("JLink.exe");             // upload JLink
+        public CheckedPath uplCLIBase { get; } = new CheckedPath("teensy_loader_cli.exe");   // upload PJRC      
 
-                if (Directory.Exists(uplTyBase))
-                {
-                    string uploader = Path.Combine(uplTyBase, "TyCommanderC.exe");
-                    string gui = Path.Combine(uplTyBase, "TyCommander.exe");
-                    if (File.Exists(uploader) && File.Exists(gui))
-                    {
-                        return null;
-                    }
-                    return "TyCommanderC.exe or TyCommander.exe not found in the specified folder";
-                }
-                return "Folder doesn't exist";
-            }
-        }
-       
-        // upload PJRC 
-        public string uplPjrcBase { get; set; }
-        public string uplPjrcBaseError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(uplPjrcBase) && (Directory.Exists(uplPjrcBase)))
-                {
-                    string uploader = Path.Combine(uplPjrcBase, "teensy.exe");
-                    if (File.Exists(uploader))
-                    {
-                        return null;
-                    }
-                    return "Teensy.exe not found in the specified directory";
-                }
-                return "Folder doesn't exist";
-            }
-        }
-
-        // upload PJRC 
-        public string uplCLIBase { get; set; }
-        public string uplCLIBaseError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(uplCLIBase) && (Directory.Exists(uplCLIBase)))
-                {
-                    string uploader = Path.Combine(uplCLIBase, "teensy_loader_cli.exe");
-                    if (File.Exists(uploader))
-                    {
-                        return null;
-                    }
-                    return "Teensy_loader_cli.exe not found in the specified directory";
-                }
-                return "Folder doesn't exist";
-            }
-        }
-
-        // arduinoBase
         public string arduinoBase
         {
             get => _arduinoBase;
@@ -90,8 +30,8 @@ namespace vtCore
 
                     if (arduinoBaseError == null)
                     {
-                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores");
-                        arduinoCore = Directory.Exists(path) ? path : null;
+                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr");
+                        arduinoCoreBase = Directory.Exists(path) ? path : null;
 
                         path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
                         arduinoBoardsTxt = File.Exists(path) ? path : null;
@@ -105,7 +45,7 @@ namespace vtCore
                 }
                 else
                 {
-                    arduinoCore = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                    arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
                 }
             }
         }
@@ -136,10 +76,10 @@ namespace vtCore
         }
 
         // libraries
-        public string libBase { get; set; }      
-        
+        public string libBase { get; set; }
+
         // settings for quick setup
-        public string arduinoCore { get; private set; }
+        public string arduinoCoreBase { get; private set; }
         public string arduinoBoardsTxt { get; private set; }
         public string arduinoTools { get; private set; }
         public string arduinoCompiler { get; private set; }
@@ -147,22 +87,25 @@ namespace vtCore
         // misc
         public string makefile_fixed { get; set; }
         public string makefile_builder { get; set; }
-      
+        public bool debugSupportDefault { get; set; }
+
 
         public static SetupData getDefault()
         {
             SetupData sd = new SetupData();
-
+            
             sd.arduinoBase = Helpers.findArduinoFolder().Trim();
             Helpers.arduinoPath = sd.arduinoBase;
 
             sd.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
-            
-            sd.uplPjrcBase = sd.arduinoTools;
-            sd.uplTyBase = Helpers.findTyToolsFolder();
-            sd.uplCLIBase = Helpers.findCLIFolder();
 
-            sd.makeExePath = Path.Combine(Directory.GetCurrentDirectory(), "make.exe");
+            sd.uplPjrcBase.path = sd.arduinoTools;
+            sd.uplTyBase.path = Helpers.findTyToolsFolder();
+            sd.uplCLIBase.path = Helpers.findCLIFolder();
+            sd.uplJLinkBase.path = Helpers.findJLinkFolder();
+            
+            sd.makeExeBase.path = Directory.GetCurrentDirectory();
+            sd.debugSupportDefault = false;
 
             return sd;
         }

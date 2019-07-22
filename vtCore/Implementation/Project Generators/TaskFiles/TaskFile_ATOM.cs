@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.IO;
 
 namespace vtCore
 {
@@ -6,7 +7,7 @@ namespace vtCore
     {
         static public string generate(IProject project, SetupData setup)
         {
-            string make = setup.makeExePath.Replace('\\', '/');
+            string make = Path.Combine(setup.makeExeBase.path, "make.exe").Replace('\\', '/');
             string parallelExecute = project.buildSystem == BuildSystem.makefile ? "-j -Otarget" : "";
 
             var tasklist = new

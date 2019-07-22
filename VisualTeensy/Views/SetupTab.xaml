@@ -16,7 +16,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" >
-   
+
 
     <Grid Margin="20" >
         <Grid.ColumnDefinitions>
@@ -29,23 +29,24 @@
 
             <TextBlock Text="Basic Settings:"  FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
-
             <Label   Content="Arduino folder:" FontSize="10" FontWeight="SemiBold"  Padding="0" Margin="0,10,0,0" />
             <local:PSelector SelectedPath="{Binding arduinoBase, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
 
-            <Label   Content="GNU make" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
-            <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}"  />
+            <Label   Content="GNU make (folder containing make.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <local:PSelector SelectedPath="{Binding  makePath, ValidatesOnDataErrors=True}"  isFolderDialog="True" Style="{DynamicResource ValidatingControl}"  />
 
             <TextBlock Text="Uploaders:"  Margin="0,20,0,0" FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
-
-            <Label   Content="PJRC Uploader (Folder containing Teensy.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <Label   Content="PJRC Uploader (folder containing Teensy.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
             <local:PSelector SelectedPath="{Binding  uploadPjrcPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
 
-            <Label   Content="TyCommander - optional (folder containing TyCommanderC.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <Label   Content="TyCommander (folder containing TyCommanderC.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,15,0,0" />
             <local:PSelector SelectedPath="{Binding  uploadTyPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
 
-            <Label   Content="CLI loader - optional (folder containing Teensy_loader_cli.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,10,0,0" />
+            <Label   Content="JLink loader (folder containing JLink.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,15,0,0" />
+            <local:PSelector SelectedPath="{Binding  uploadJLinkPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
+
+            <Label   Content="CLI loader (folder containing Teensy_loader_cli.exe)" FontSize="10" FontWeight="SemiBold" Padding="0" Margin="0,15,0,0" />
             <local:PSelector SelectedPath="{Binding  uploadCLIPath, ValidatesOnDataErrors=True}" isFolderDialog="True" Style="{DynamicResource ValidatingControl}" />
         </StackPanel>
 
@@ -69,12 +70,29 @@
                     <RadioButton GroupName="IDE" Content="Visual Studio Folder" IsEnabled="False" />
                 </StackPanel>
 
-                <TextBlock Text="Build System"  FontSize="14" Margin="0,20,0,0"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
+                <TextBlock Text="Build System"  FontSize="14" Margin="0,25,0,0"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0" >
                     <RadioButton Content="Makefile" IsChecked="{Binding isMakefileBuild}"  Width="100"/>
                     <RadioButton Content="Arduino-Builder" IsChecked="{Binding isArduinoBuild}" Margin="0,0,10,0" />
                 </StackPanel>
+
+
+                <!--<TextBlock Margin="0,25,0,0" FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}" VerticalAlignment="Center">
+                    <Span> Debug support (see </Span>
+                    <Span>
+                        <Hyperlink NavigateUri="https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug" RequestNavigate="Hyperlink_RequestNavigate_1" >
+                            cortex-debug
+                        </Hyperlink>
+                    </Span>
+                    <Span>)</Span>
+                </TextBlock>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" >
+                    <Label Content="Off" Padding="1" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <ToggleButton HorizontalAlignment="Left"   Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding isDebugEnabled}" />
+                    <Label Content="On"/>
+                </StackPanel>-->
+                
             </StackPanel>
         </Grid>
 

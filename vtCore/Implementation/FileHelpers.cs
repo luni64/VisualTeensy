@@ -80,6 +80,26 @@ namespace vtCore
 
             return null;
         }
+
+        public static string findJLinkFolder()
+        {
+            string folder;
+
+            folder = checkFolder(@"C:\Program Files", f => isJLinkFolder(f));
+            if (folder != null)
+            {
+                return Path.Combine(folder, "JLINK64");
+            }
+
+            folder = checkFolder(@"C:\Program Files (x86)", f => isJLinkFolder(f));
+            if (folder != null)
+            {
+                return Path.Combine(folder, "JLINK64");
+            }
+
+            return null;
+        }
+
         public static string findCLIFolder()
         {
             string folder;
@@ -132,6 +152,16 @@ namespace vtCore
             var cli = Path.Combine(folder, "teensy_loader_cli.exe");
             return (File.Exists(cli));
         }
+        private static bool isJLinkFolder(string folder)
+        {
+            if (String.IsNullOrWhiteSpace(folder) || Path.GetFileName(folder) != "SEGGER" || !Directory.Exists(folder))
+            {
+                return false;
+            }
+
+            var jlink = Path.Combine(folder, "JLink_V646j", "JLink.exe");
+            return (File.Exists(jlink));
+        }
 
         private static string checkFolder(string baseFolder, Predicate<string> isValid)
         {
@@ -180,7 +210,7 @@ namespace vtCore
         {
             string versionedLibFolder = Path.Combine(targetFolder, Path.GetFileNameWithoutExtension(lib.url));
             string unversionedLibFolder = versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
-            if (Directory.Exists(unversionedLibFolder)) return false;
+         //   if (Directory.Exists(unversionedLibFolder)) return false;
 
             WebClient client = null;
             MemoryStream zippedStream = null;

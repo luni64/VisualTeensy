@@ -6,7 +6,7 @@ namespace vtCore
     {
         static public string generate(IProject project)
         {
-            return JsonConvert.SerializeObject(new projectTransferData(project), Formatting.Indented);
+            return JsonConvert.SerializeObject(new ProjectTransferData(project), Formatting.Indented);
         }
     }
 

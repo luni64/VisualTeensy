@@ -16,9 +16,16 @@ namespace vtCore
         arduino
     }
 
+    public enum DebugSupport
+    {
+        none,
+        cortex_debug
+    }
+
     public interface IProject
     {
         string name { get; }
+        string cleanName { get; }
 
         IEnumerable<IConfiguration> configurations { get; }
         IConfiguration selectedConfiguration { get;  }
@@ -31,5 +38,6 @@ namespace vtCore
 
         Target target{ get; set; }
         BuildSystem buildSystem { get; set; }
+        DebugSupport debugSupport { get; set; }
     }
 }

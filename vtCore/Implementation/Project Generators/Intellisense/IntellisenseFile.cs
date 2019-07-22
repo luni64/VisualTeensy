@@ -13,7 +13,7 @@ namespace vtCore
                 case Target.vsCode:
                     if (project.buildSystem == BuildSystem.makefile)
                     {
-                        return C_CPP_Props_make.generate(project,libManager);
+                        return C_CPP_Props_make.generate(project, setup, libManager);
                     }
                     else
                     {

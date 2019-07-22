@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace vtCore
@@ -21,7 +23,7 @@ namespace vtCore
         }
     }
 
-    public class projectTransferData
+    public class ProjectTransferData
     {
         public class vtBoard
         {
@@ -54,8 +56,8 @@ namespace vtCore
             [JsonConverter(typeof(StringEnumConverter))]
             public SetupTypes setupType { get; set; }
 
-            [JsonProperty(Order = 4)]
-            public string boardTxtPath { get; set; }
+            //[JsonProperty(Order = 4)]
+            //public string boardTxtPath { get; set; }
 
             [JsonProperty(Order = 5)]
             public string coreBase { get; set; }
@@ -66,8 +68,8 @@ namespace vtCore
             [JsonProperty(Order = 7)]
             public string makefileExtension { get; set; }
 
-            [JsonProperty(Order = 8)]
-            public bool copyBoardTxt { get; set; }
+            //[JsonProperty(Order = 8)]
+            //public bool copyBoardTxt { get; set; }
 
             [JsonProperty(Order = 9)]
             public bool copyCore { get; set; }
@@ -76,12 +78,11 @@ namespace vtCore
             public IEnumerable<string> sharedLibraries { get; set; }
 
             [JsonProperty(Order = 11)]
-            public IEnumerable<string> localLibraries { get; set; }
+            public IEnumerable<string> projectLibraries { get; set; }
 
             [JsonProperty(Order = 12)]
             public vtBoard board { get; set; }
-
-
+            
             public vtConfiguration(IConfiguration configuration)
             {
                 if (configuration == null)
@@ -94,20 +95,34 @@ namespace vtCore
                 guid = configuration.guid;
 
                 sharedLibraries = configuration.sharedLibs.Select(lib => lib.path);
-                localLibraries = configuration.localLibs.Select(lib => lib.sourceType == Library.SourceType.local ? lib.path : lib.unversionedLibFolder);
+                projectLibraries = configuration.localLibs.Select(lib => lib.sourceType == Library.SourceType.local ? lib.path : lib.unversionedLibFolder);
 
                 makefileExtension = configuration.makefileExtension;
-                compilerBase = configuration.compilerBase;
-                coreBase = configuration.coreBase;
+                compilerBase = configuration.compilerBase.path;
+                coreBase = configuration.coreBase.path;
                 copyCore = configuration.copyCore;
-                boardTxtPath = configuration.boardTxtPath;
-                copyBoardTxt = configuration.copyBoardTxt;
+                //  boardTxtPath = configuration.boardTxtPath;
+                //  copyBoardTxt = configuration.copyBoardTxt;
                 board = new vtBoard(configuration.selectedBoard);
             }
 
             public override string ToString()
             {
                 return name;
+            }
+
+            public static explicit operator Configuration(vtConfiguration vtConf)
+            {
+                var conf = new Configuration();
+
+                conf.name = vtConf.name;
+                conf.setupType = vtConf.setupType;
+                conf.compilerBase.path = vtConf.compilerBase;
+                conf.coreBase.path = vtConf.coreBase;
+                conf.copyCore = vtConf.copyCore;
+                conf.makefileExtension = vtConf.makefileExtension;
+                conf.guid = vtConf.guid != null ? vtConf.guid : Guid.NewGuid().ToString();
+                return conf;
             }
         }
 
@@ -118,46 +133,34 @@ namespace vtCore
         [JsonConverter(typeof(StringEnumConverter))]
         public Target target { get; set; }
 
-        [JsonProperty(Order = 2)]
+        [JsonProperty(Order = 3)]
         [JsonConverter(typeof(StringEnumConverter))]
         public BuildSystem buildSystem { get; set; }
+
+        [JsonProperty(Order = 4)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DebugSupport debugSupport { get; set; }
 
         [JsonProperty(Order = 5)]
         public List<vtConfiguration> configurations;
 
-
-        internal projectTransferData(IProject project)
+        internal ProjectTransferData(IProject project)
         {
             this.model = project;
             version = "1";
             target = project.target;
             buildSystem = project.buildSystem;
+            debugSupport = project.debugSupport;
 
             configurations = project.configurations.Select(c => new vtConfiguration(c)).ToList();
         }
 
-        public projectTransferData() { }
+        public ProjectTransferData() { }
 
-        //private string makeRelative(string path, string basePath)
-        //{
-        //    if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(basePath))
-        //    {
-        //        return path;
-        //    }
-
-        //    if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(basePath)))
-        //    {
-        //        var p1 = new System.Uri(path);
-        //        var baseUri = new System.Uri(basePath);
-
-        //        return p1.MakeRelativeUri(baseUri).ToString();
-        //    }
-        //    else
-        //    {
-        //        return path;
-        //    }
-        //}
+       
 
         private IProject model;
     }
+
+
 }

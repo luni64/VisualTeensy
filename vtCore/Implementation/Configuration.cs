@@ -16,48 +16,19 @@ namespace vtCore
         public string guid { get; set; }
              
         // boards.txt --------------------------------
-        public string boardTxtPath { get; set; }
-        public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
-        public bool copyBoardTxt { get; set; }
+     //   public string boardTxtPath { get; set; }
+        //public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
+        //public bool copyBoardTxt { get; set; }
+
 
         // compilerBase ------------------------------
-        public string compilerBase { get; set; }
-        public string compilerPathError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(compilerBase) && (Directory.Exists(compilerBase)))
-                {
-                    string gcc = Path.Combine(compilerBase, @"bin\arm-none-eabi-gcc.exe");
-                    if (File.Exists(gcc))
-                    {
-                        return null;
-                    }
-                    return @".\bin\arm-none-eabi-gcc.exe not found in the specified directory. Please select a valid arm-none-eabi gcc folder";
-                }
-                return "Folder doesn't exist";
-            }
-        }
+        public CheckedPath compilerBase { get; } = new CheckedPath("bin\\arm-none-eabi-gcc.exe");
 
         // core --------------------------------------
-        public string coreBase { get; set; }
-        public string corePathError
-        {
-            get
-            {
-                if (!String.IsNullOrEmpty(coreBase) && (Directory.Exists(coreBase)))
-                {
-                    string uploader = Path.Combine(coreBase, "Arduino.h");
-                    if (File.Exists(uploader))
-                    {
-                        return null;
-                    }
-                    return "Arduino.h not found in the specified folder. Doesn't seem to be valid arduino core";
-                }
-                return "Folder doesn't exist";
-            }
-        }
+        public CheckedPath coreBase { get; } = new CheckedPath("Arduino.h");     
         public bool copyCore { get; set; }
+        public bool localCore { get; set; }
+        public string core => Path.Combine(coreBase.path, "cores", selectedBoard.core);
 
         // makefile  ------------------------
         public string makefile { get; set; }
@@ -85,7 +56,7 @@ namespace vtCore
             var sb = new StringBuilder();
             sb.Append("Data:\n");
             sb.Append($"setupType:\t{setupType}\n");           
-            sb.Append($"boardTxtPath:\t{boardTxtPath}\n");
+            //sb.Append($"boardTxtPath:\t{boardTxtPath}\n");
             sb.Append($"compilerBase:\t{compilerBase}\n");
             sb.Append($"coreBase:\t{coreBase}\n");
             sb.Append($"selectedBoard:\t{selectedBoard?.name}");
@@ -95,18 +66,16 @@ namespace vtCore
         public static Configuration getDefault(SetupData setupData)
         {
             //log.Info("enter");
-            var pd = new Configuration(setupData);
-
-            pd.setupType = SetupTypes.quick;
-            pd.name = "default";            
-
-            pd.boardTxtPath = setupData.arduinoBoardsTxt;
-            pd.coreBase = setupData.arduinoCore;
-            pd.compilerBase = setupData.arduinoCompiler;
+            var pd = new Configuration(setupData)
+            {
+                setupType = SetupTypes.quick,
+                name = "default",                      
+            };
 
             pd.boards = new List<IBoard>();
+            pd.coreBase.path = setupData.arduinoCoreBase;
+            pd.compilerBase.path = setupData.arduinoCompiler;
             pd.parseBoardsTxt(setupData.arduinoBoardsTxt);
-
             pd.logProject();
 
             return pd;
@@ -116,14 +85,18 @@ namespace vtCore
         {
             //log.Info("enter");
 
-            var vboards = BoardsTxt.parse(bt ?? boardTxtPath);
+            string btp = bt ?? Path.Combine(coreBase.path, "boards.txt");
+                       
+            //  var vboards = BoardsTxt.parse(bt ?? boardTxtPath);
+            var vboards = BoardsTxt.parse(btp);
 
-            projectTransferData.vtBoard tmp = new projectTransferData.vtBoard(selectedBoard);          
-            boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
+            ProjectTransferData.vtBoard tmp = new ProjectTransferData.vtBoard(selectedBoard);
+            //  boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
+            boards = BoardsTxt.parse(btp).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
             setBoardOptions(tmp);
         }
 
-        private void setBoardOptions(projectTransferData.vtBoard boardInfo)
+        private void setBoardOptions(ProjectTransferData.vtBoard boardInfo)
         {
             selectedBoard = boards?.FirstOrDefault(b => b.name == boardInfo.name) ?? boards?.FirstOrDefault();
             if (selectedBoard != null)

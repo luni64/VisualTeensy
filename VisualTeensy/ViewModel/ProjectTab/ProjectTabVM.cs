@@ -10,7 +10,7 @@ namespace ViewModel
     {
         #region IDataErrorInfo ------------------------------------------------
 
-        public string Error => throw new NotImplementedException();
+        public string Error => "ERR"; //throw new NotImplementedException();
 
         public string this[string columnName]
         {
@@ -104,6 +104,7 @@ namespace ViewModel
         //    }
         //}
 
+                    
         public bool quickSetup
         {
             get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
@@ -116,6 +117,17 @@ namespace ViewModel
                     updateAll();
                     OnPropertyChanged("");
                 }
+            }
+        }
+
+        public bool hasDebugSupport
+        {
+            get => project.debugSupport != DebugSupport.none;
+            set
+            {
+                project.debugSupport = value ? DebugSupport.cortex_debug : DebugSupport.none;
+                updateFiles();
+                OnPropertyChanged("");
             }
         }
 
@@ -146,6 +158,13 @@ namespace ViewModel
             set => SetProperty(ref _taskFile, value);
         }
         string _taskFile;
+
+        public String debugFile
+        {
+            get => _debugFile;
+            set => SetProperty(ref _debugFile, value);
+        }
+        string _debugFile;
 
         public String propFile
         {
@@ -185,32 +204,32 @@ namespace ViewModel
                 }
             }
         }
-        public String boardTxtPath
-        {
-            get => project.selectedConfiguration.boardTxtPath;
-            set
-            {
-                if (value != project.selectedConfiguration.boardTxtPath)
-                {
-                    project.selectedConfiguration.boardTxtPath = value.Trim();
-                    updateAll();
-                    OnPropertyChanged("");
-                }
-            }
-        }
-        public bool copyBoardTxt
-        {
-            get => project.selectedConfiguration.copyBoardTxt;
-            set
-            {
-                if (value != project.selectedConfiguration.copyBoardTxt)
-                {
-                    project.selectedConfiguration.copyBoardTxt = value;
-                    OnPropertyChanged();
-                    updateFiles();
-                }
-            }
-        }
+        //public String boardTxtPath
+        //{
+        //    get => project.selectedConfiguration.boardTxtPath;
+        //    set
+        //    {
+        //        if (value != project.selectedConfiguration.boardTxtPath)
+        //        {
+        //            project.selectedConfiguration.boardTxtPath = value.Trim();
+        //            updateAll();
+        //            OnPropertyChanged("");
+        //        }
+        //    }
+        //}
+        //public bool copyBoardTxt
+        //{
+        //    get => project.selectedConfiguration.copyBoardTxt;
+        //    set
+        //    {
+        //        if (value != project.selectedConfiguration.copyBoardTxt)
+        //        {
+        //            project.selectedConfiguration.copyBoardTxt = value;
+        //            OnPropertyChanged();
+        //            updateFiles();
+        //        }
+        //    }
+        //}
 
         public bool copyCore
         {
@@ -227,26 +246,25 @@ namespace ViewModel
         }
         public String corePath
         {
-            get => project.selectedConfiguration.coreBase;
+            get => project.selectedConfiguration.coreBase.path;
             set
             {
-                if (value != project.selectedConfiguration.coreBase)
+                if (value != project.selectedConfiguration.coreBase.path)
                 {
-                    project.selectedConfiguration.coreBase = value.Trim();
+                    project.selectedConfiguration.coreBase.path = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
-
         public String compilerPath
         {
-            get => project.selectedConfiguration.compilerBase;
+            get => project.selectedConfiguration.compilerBase.path;
             set
             {
-                if (value != project.selectedConfiguration.compilerBase)
+                if (value != project.selectedConfiguration.compilerBase.path)
                 {
-                    project.selectedConfiguration.compilerBase = value.Trim();
+                    project.selectedConfiguration.compilerBase.path = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
@@ -276,6 +294,10 @@ namespace ViewModel
             makefile = Makefile.generate(project, libManager, setup);
             taskFile = TaskFile.generate(project, libManager, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
+            settFile = ProjectSettings.generate(project);
+            debugFile = DebugFile.generate(project, setup);
+
+
 
             cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
@@ -297,6 +319,7 @@ namespace ViewModel
             taskFile = TaskFile.generate(project, libManager, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
             settFile = ProjectSettings.generate(project);
+            debugFile = DebugFile.generate(project, setup);
 
             //OnPropertyChanged("makefile");
             // OnPropertyChanged("propFile");

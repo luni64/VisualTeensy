@@ -80,19 +80,23 @@ namespace ViewModel
                         break;
 
                     case "makePath":
-                        error = setup.makeExePathError;
+                        error = setup.makeExeBase.error;
                         break;
 
                     case "uploadTyPath":
-                        error = setup.uplTyBaseError;
+                        error = setup.uplTyBase.error;
                         break;
 
                     case "uploadPjrcPath":
-                        error = setup.uplPjrcBaseError;
+                        error = setup.uplPjrcBase.error;
                         break;
 
                     case "uploadCLIPath":
-                        error = setup.uplCLIBaseError;
+                        error = setup.uplCLIBase.error;
+                        break;
+
+                    case "uploadJLinkPath":
+                        error = setup.uplJLinkBase.error;
                         break;
 
                     default:
@@ -117,48 +121,60 @@ namespace ViewModel
         }
         public String makePath
         {
-            get => setup.makeExePath;
+            get => setup.makeExeBase.path;
             set
             {
-                if (value != setup.makeExePath)
+                if (value != setup.makeExeBase.path)
                 {
-                    setup.makeExePath = value.Trim();
+                    setup.makeExeBase.path = value.Trim();
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadTyPath
         {
-            get => setup.uplTyBase;
+            get => setup.uplTyBase.path;
             set
             {
-                if (value != setup.uplTyBase)
+                if (value != setup.uplTyBase.path)
                 {
-                    setup.uplTyBase = value;
+                    setup.uplTyBase.path = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public String uploadJLinkPath
+        {
+            get => setup.uplJLinkBase.path;
+            set
+            {
+                if (value != setup.uplJLinkBase.path)
+                {
+                    setup.uplJLinkBase.path = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadPjrcPath
         {
-            get => setup.uplPjrcBase;
+            get => setup.uplPjrcBase.path;
             set
             {
-                if (value != setup.uplPjrcBase)
+                if (value != setup.uplPjrcBase.path)
                 {
-                    setup.uplPjrcBase = value;
+                    setup.uplPjrcBase.path = value;
                     OnPropertyChanged();
                 }
             }
         }
         public String uploadCLIPath
         {
-            get => setup.uplCLIBase;
+            get => setup.uplCLIBase.path;
             set
             {
-                if (value != setup.uplCLIBase)
+                if (value != setup.uplCLIBase.path)
                 {
-                    setup.uplCLIBase = value;
+                    setup.uplCLIBase.path = value;
                     OnPropertyChanged();
                 }
             }
@@ -171,6 +187,18 @@ namespace ViewModel
                 if (value != setup.projectBaseDefault)
                 {
                     setup.projectBaseDefault = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public bool hasDebugSupport
+        {
+            get => setup.debugSupportDefault;
+            set
+            {
+                if (setup.debugSupportDefault != value)
+                {
+                    setup.debugSupportDefault = value;
                     OnPropertyChanged();
                 }
             }
@@ -213,6 +241,15 @@ namespace ViewModel
                 OnPropertyChanged();
             }
         }
+        public bool isDebugEnabled
+        {
+            get => project.debugSupport == DebugSupport.cortex_debug;
+            set
+            {
+                project.debugSupport = value == true ? DebugSupport.cortex_debug : DebugSupport.none;
+                OnPropertyChanged();
+            }
+        }
 
 
         public SetupTabVM(IProject project, SetupData setup)
@@ -227,8 +264,6 @@ namespace ViewModel
         SetupData setup;
 
         IProject project;
-
-
     }
 }
 

@@ -24,6 +24,7 @@ OBJDUMP     := $(GCC_BASE)/bin/arm-none-eabi-objdump
 UPL_PJRC    := "$(UPL_PJRC_B)/teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
 UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
 UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
+UPL_JLINK   := $(UPL_JLINK_B)/jlink -commanderscript .vsteensy/flash.jlink
 
 #******************************************************************************
 # Source and Include Files
@@ -100,6 +101,9 @@ uploadTy: all
 
 uploadCLI: all
 	@$(UPL_CLICMD)
+
+uploadJLink: all
+	@$(UPL_JLINK)
 
 
 # Core library ----------------------------------------------------------------

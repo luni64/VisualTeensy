@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace vtCore
@@ -33,7 +34,7 @@ namespace vtCore
 
     public class vsCodeGenerator
     {
-       static string mainFile;
+        static string mainFile;
 
         static public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
         {
@@ -43,6 +44,7 @@ namespace vtCore
             var buildFolder = Path.Combine(project.path, vsTeensyFolder, "build");
             Directory.CreateDirectory(vsCodeFolder);
             Directory.CreateDirectory(vsTeensyFolder);
+            if (Directory.Exists(buildFolder)) Directory.Delete(buildFolder,true);
             Directory.CreateDirectory(buildFolder);
 
             await Task.Delay(1);
@@ -59,14 +61,14 @@ namespace vtCore
             // Settings ---------------------------------------------------------------------------
             progressHandler.Report("Generate vsteensy.json");
             var settingsFile = Path.Combine(vsTeensyFolder, "vsteensy.json");
-            var projectSettingsJson = ProjectSettings.generate(project);              
+            var projectSettingsJson = ProjectSettings.generate(project);
             File.WriteAllText(settingsFile, projectSettingsJson);
             progressHandler.Report("OK");
             await Task.Delay(1);
 
             // Makefile ---------------------------------------------------------------------------
             progressHandler.Report("Generate makefile");
-            var  makefile = Path.Combine(project.path, "makefile");
+            var makefile = Path.Combine(project.path, "makefile");
             File.WriteAllText(makefile, Makefile.generate(project, libManager, setup));
             progressHandler.Report("OK");
             await Task.Delay(1);
@@ -79,53 +81,95 @@ namespace vtCore
             progressHandler.Report("OK");
             await Task.Delay(1);
 
+            // Debugging --------------------------------------------------------------------------
+            if (project.debugSupport != DebugSupport.none)
+            {
+                progressHandler.Report("Generate flash.jlink");
+                var flashJinkFile = Path.Combine(vsTeensyFolder, "flash.jlink");
+                var flash_jlink = JLinkUploadScript.generate(project, setup);
+                File.WriteAllText(flashJinkFile, flash_jlink);
+                progressHandler.Report("OK");
+                await Task.Delay(1);
+
+                progressHandler.Report("Generate launch.json");
+                var launchJsonFile = Path.Combine(vsCodeFolder, "launch.json");
+                var launch_json = DebugFile.generate(project, setup);
+                File.WriteAllText(launchJsonFile, launch_json);
+                progressHandler.Report("OK");
+                await Task.Delay(1);
+            }
+
             // BuildSystem Makefile ---------------------------------------------------------------
             if (project.buildSystem == BuildSystem.makefile)
             {
-                string srcFolder = Path.Combine(project.path, "src");
-                string libFolder = Path.Combine(project.path, "lib");               
-                Directory.CreateDirectory(srcFolder);
-                Directory.CreateDirectory(libFolder);                
-              
+                DirectoryInfo source, target;
 
-                // copy local libraries -----------------------------------------------------------
-                foreach (Library library in project.selectedConfiguration.localLibs)
+                target = new DirectoryInfo(Path.Combine(project.path, "src"));
+                target.Create();
+
+                FileInfo mainFile = new FileInfo(Path.Combine(target.FullName, "main.cpp"));
+                //mainFile = Path.Combine(srcFolder, "main.cpp");
+                if (!mainFile.Exists)
+                //if (!File.Exists(mainFile))
                 {
-                    if (library.sourceType == Library.SourceType.local)
-                    {
-                        progressHandler.Report($"Copy library {library.name}");
-                        await Task.Delay(1);
-
-                        DirectoryInfo source = new DirectoryInfo(library.source);
-                        DirectoryInfo target = new DirectoryInfo(Path.Combine(libFolder, library.path));
-                        Helpers.copyFilesRecursively(source, target);
-
-                        progressHandler.Report($"OK");
-                        await Task.Delay(1);
-                    }
-                    else
-                    {
-                        progressHandler.Report($"Download library {library.name}");
-                        await Task.Delay(1);
-
-                        Helpers.downloadLibrary(library, libFolder);
-
-                        progressHandler.Report($"OK");
-                        await Task.Delay(1);
-                    }
-                }
-                                
-                mainFile = Path.Combine(srcFolder, "main.cpp");
-                if (!File.Exists(mainFile))
-                {
-                    progressHandler.Report($"{mainFile} generated");                   
-                    File.WriteAllText(mainFile, Strings.mainCpp);
+                    progressHandler.Report($"{mainFile.Name} generated");
+                    File.WriteAllText(mainFile.FullName, Strings.mainCpp);
                     progressHandler.Report($"OK");
                     await Task.Delay(1);
-                }              
+                }
+
+                // copy core ----------------------------------------------------------------------                
+                DirectoryInfo coreFolder = new DirectoryInfo(Path.Combine(project.path, "core"));
+                if(coreFolder.Exists) coreFolder.Delete(true);
+
+                if (project.selectedConfiguration.copyCore)
+                {
+                    source = new DirectoryInfo(project.selectedConfiguration.core);
+                    Helpers.copyFilesRecursively(source, coreFolder);
+                }
+
+                // copy local libraries -----------------------------------------------------------
+                if (project.selectedConfiguration.localLibs.Any())
+                {
+                    DirectoryInfo libFolder = new DirectoryInfo(Path.Combine(project.path, "lib"));
+                    libFolder.Create();
+
+                    foreach (Library library in project.selectedConfiguration.localLibs)
+                    {
+                        if (library.sourceType != Library.SourceType.net)
+                        {
+                            target = new DirectoryInfo(Path.Combine(libFolder.FullName, library.path));
+                            source = new DirectoryInfo(library.source);
+                            if (source.FullName != target.FullName)
+                            {
+                                if (target.Exists) target.Delete();
+
+                                progressHandler.Report($"Copy library {library.name}");
+                                await Task.Delay(1);
+
+                                Helpers.copyFilesRecursively(source, target);
+
+                                progressHandler.Report($"OK");
+                                await Task.Delay(1);
+                            }
+                        }
+                        else
+                        {
+                            progressHandler.Report($"Download library {library.name}");
+                            await Task.Delay(1);
+
+                            Helpers.downloadLibrary(library, libFolder.FullName);
+
+                            progressHandler.Report($"OK");
+                            await Task.Delay(1);
+                        }
+                    }
+                }
+
+              
             }
             else    // BuildSystem Arduino Builder-------------------------------------------------
-            {                
+            {
                 mainFile = Path.Combine(project.path, project.name + ".ino");
                 if (!File.Exists(mainFile))
                 {
@@ -145,15 +189,15 @@ namespace vtCore
         static public void ardGenerator(IProject project, LibManager libManager, SetupData setup)
         {
 
-          
+
         }
 
         static public void mkGenerator(IProject project, LibManager libManager, SetupData setup)
         {
-            
+
 
             // copy makefile ----------------------------------------------------------------------
-           
+
         }
     }
 }
