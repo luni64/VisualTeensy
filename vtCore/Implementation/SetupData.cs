@@ -3,57 +3,6 @@ using System.IO;
 
 namespace vtCore
 {
-
-    public class CheckedPath
-    {
-        public CheckedPath(string checkedFile, bool optional = true)
-        {
-            this.checkedFile = checkedFile;
-            this.optional = optional;
-            this._path = path;
-            error = null;
-        }
-        public string path
-        {
-            get => _path;
-            set
-            {
-                if (value != _path)
-                {
-                    _path = value;
-                    error = check();
-                }
-            }
-        }
-        public string shortPath => Helpers.getShortPath(path);
-        public bool isOk => error == null;
-        public string error { get; private set; }
-
-
-        string _path;
-        string checkedFile;
-        bool optional;
-
-        string check()
-        {
-            if (String.IsNullOrWhiteSpace(path))
-            {
-                return optional ? null : "Folder required";
-            }
-
-
-            if (Directory.Exists(path))
-            {
-                if (checkedFile == null || File.Exists(Path.Combine(path, checkedFile)))
-                {
-                    return null;
-                }
-                return $"{checkedFile} not found in the specified folder";
-            }
-            return "Folder doesn't exist";
-        }
-    }
-
     public class SetupData
     {
         // project path
@@ -81,8 +30,8 @@ namespace vtCore
 
                     if (arduinoBaseError == null)
                     {
-                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "cores");
-                        arduinoCore = Directory.Exists(path) ? path : null;
+                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr");
+                        arduinoCoreBase = Directory.Exists(path) ? path : null;
 
                         path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
                         arduinoBoardsTxt = File.Exists(path) ? path : null;
@@ -96,7 +45,7 @@ namespace vtCore
                 }
                 else
                 {
-                    arduinoCore = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                    arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
                 }
             }
         }
@@ -130,7 +79,7 @@ namespace vtCore
         public string libBase { get; set; }
 
         // settings for quick setup
-        public string arduinoCore { get; private set; }
+        public string arduinoCoreBase { get; private set; }
         public string arduinoBoardsTxt { get; private set; }
         public string arduinoTools { get; private set; }
         public string arduinoCompiler { get; private set; }
@@ -144,8 +93,7 @@ namespace vtCore
         public static SetupData getDefault()
         {
             SetupData sd = new SetupData();
-
-
+            
             sd.arduinoBase = Helpers.findArduinoFolder().Trim();
             Helpers.arduinoPath = sd.arduinoBase;
 

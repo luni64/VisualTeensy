@@ -25,7 +25,7 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 
     <Grid Margin="20" >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" MinWidth="250" />
+            <ColumnDefinition Width="3*" MinWidth="250" />
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="4*" MinWidth="250"/>
         </Grid.ColumnDefinitions>
@@ -93,18 +93,19 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 
             <!--Expert Setup ____________________________________-->
             <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Width="auto" Margin="0,1,0,0"   Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
-                <Label   Content="boards.txt " FontSize="12" FontWeight="SemiBold" Padding="0" />
+                <!--<Label   Content="boards.txt " FontSize="12" FontWeight="SemiBold" Padding="0" />
                 <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
-                <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>
+                <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>-->
 
-                <Label   Content="Teensy core library:" FontSize="12" FontWeight="SemiBold" Padding="0" Margin="0,15,0,0" />
-                <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True"  />
-                <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyCore}"/>
-
-                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,15,0,0" />
+                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,25,0,0" />
                 <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
 
-                <Label   Content="Additional entries to makefile:" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,15,0,0" />
+                <Label   Content="Hardware folder (containing ./boards.txt and ./cores/)" FontSize="12" FontWeight="SemiBold" Padding="0" Margin="0,20,0,0"  />
+                <local:PSelector SelectedPath="{Binding corePath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True"  />
+                <CheckBox Content="Embedd in project (recommended)" FontSize="10" IsChecked="{Binding copyCore}"/>
+
+
+                <Label   Content="Additional entries to makefile:" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,25,0,0" />
             </StackPanel>
             <TextBox Grid.Row="5" Grid.ColumnSpan="2" VerticalContentAlignment="Stretch" BorderThickness="1" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="13"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" Text="{Binding makefileExtension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100}"/>
         </Grid>

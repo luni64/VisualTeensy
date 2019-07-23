@@ -12,14 +12,17 @@ namespace vtCore
         SetupTypes setupType { get; set; }
         string name { get; set; }
         string guid { get; }
-        
-        string coreBase { get; set; }
+
+        CheckedPath coreBase { get; }
+        bool localCore { get; set; }
         bool copyCore { get; set; }
 
-        string boardTxtPath { get; set; }
-        bool copyBoardTxt { get; set; }
+        string core { get; }
+
+        //string boardTxtPath { get; set; }
+        //bool copyBoardTxt { get; set; }
         
-        string compilerBase { get; set; }
+        CheckedPath compilerBase { get; }
         string makefileExtension { get; set; }
 
         List<IBoard> boards { get; }
@@ -27,6 +30,7 @@ namespace vtCore
 
         List<Library> sharedLibs { get; }
         List<Library> localLibs { get; }
+        //List<Library> projectLibs { get; }
 
         void parseBoardsTxt(string bt);
 

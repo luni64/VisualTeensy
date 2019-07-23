@@ -10,7 +10,7 @@ namespace ViewModel
     {
         #region IDataErrorInfo ------------------------------------------------
 
-        public string Error => throw new NotImplementedException();
+        public string Error => "ERR"; //throw new NotImplementedException();
 
         public string this[string columnName]
         {
@@ -204,32 +204,32 @@ namespace ViewModel
                 }
             }
         }
-        public String boardTxtPath
-        {
-            get => project.selectedConfiguration.boardTxtPath;
-            set
-            {
-                if (value != project.selectedConfiguration.boardTxtPath)
-                {
-                    project.selectedConfiguration.boardTxtPath = value.Trim();
-                    updateAll();
-                    OnPropertyChanged("");
-                }
-            }
-        }
-        public bool copyBoardTxt
-        {
-            get => project.selectedConfiguration.copyBoardTxt;
-            set
-            {
-                if (value != project.selectedConfiguration.copyBoardTxt)
-                {
-                    project.selectedConfiguration.copyBoardTxt = value;
-                    OnPropertyChanged();
-                    updateFiles();
-                }
-            }
-        }
+        //public String boardTxtPath
+        //{
+        //    get => project.selectedConfiguration.boardTxtPath;
+        //    set
+        //    {
+        //        if (value != project.selectedConfiguration.boardTxtPath)
+        //        {
+        //            project.selectedConfiguration.boardTxtPath = value.Trim();
+        //            updateAll();
+        //            OnPropertyChanged("");
+        //        }
+        //    }
+        //}
+        //public bool copyBoardTxt
+        //{
+        //    get => project.selectedConfiguration.copyBoardTxt;
+        //    set
+        //    {
+        //        if (value != project.selectedConfiguration.copyBoardTxt)
+        //        {
+        //            project.selectedConfiguration.copyBoardTxt = value;
+        //            OnPropertyChanged();
+        //            updateFiles();
+        //        }
+        //    }
+        //}
 
         public bool copyCore
         {
@@ -246,26 +246,25 @@ namespace ViewModel
         }
         public String corePath
         {
-            get => project.selectedConfiguration.coreBase;
+            get => project.selectedConfiguration.coreBase.path;
             set
             {
-                if (value != project.selectedConfiguration.coreBase)
+                if (value != project.selectedConfiguration.coreBase.path)
                 {
-                    project.selectedConfiguration.coreBase = value.Trim();
+                    project.selectedConfiguration.coreBase.path = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }
             }
         }
-
         public String compilerPath
         {
-            get => project.selectedConfiguration.compilerBase;
+            get => project.selectedConfiguration.compilerBase.path;
             set
             {
-                if (value != project.selectedConfiguration.compilerBase)
+                if (value != project.selectedConfiguration.compilerBase.path)
                 {
-                    project.selectedConfiguration.compilerBase = value.Trim();
+                    project.selectedConfiguration.compilerBase.path = value.Trim();
                     OnPropertyChanged();
                     updateFiles();
                 }

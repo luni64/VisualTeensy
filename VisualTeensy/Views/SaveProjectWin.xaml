@@ -34,14 +34,48 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Generate Project" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
-        <ListView Grid.Row="1" ItemsSource="{Binding tasklist}" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" SelectedIndex="{Binding selectedTask}" SelectionChanged="ListView_SelectionChanged" Margin="0,0,0,20" ScrollViewer.CanContentScroll="True" >
+
+        <ListBox  Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray"
+                ItemsSource="{Binding projectLibraries}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="25" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Grid.Column="0" FontSize ="13" FontWeight="SemiBold" Style="{DynamicResource autoLink}" HorizontalAlignment="Left" >
+                                    <Run Text="{Binding name, Mode=OneWay}"/> V<Run Text="{Binding version, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock  HorizontalAlignment="Stretch" Text="{Binding sentence}" Foreground="#FF252526"  TextWrapping="WrapWithOverflow" />
+                            <!--<Button Content="Info" HorizontalAlignment="Left" Style="{DynamicResource autoHide}" Click="Button_Click"  />-->
+                        </StackPanel>
+                        <Button Grid.Column="1" Grid.RowSpan="1" Background="Transparent" BorderThickness="0" VerticalAlignment="Center"   >
+                            <Image Source="/VisualTeensy;component/img/rubbish-bin.png" Height="20" />
+                        </Button>
+
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+
+        <!--<ListView Grid.Row="1" ItemsSource="{Binding tasklist}" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Visible" SelectedIndex="{Binding selectedTask}" SelectionChanged="ListView_SelectionChanged" Margin="0,0,0,20" ScrollViewer.CanContentScroll="True" >
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Task" DisplayMemberBinding="{Binding task}" Width="350" />
                     <GridViewColumn Header="Status" DisplayMemberBinding="{Binding status}" />
                 </GridView>
             </ListView.View>
-        </ListView>
+        </ListView>-->
         <!--<StackPanel Grid.Row="1" VerticalAlignment="Stretch" Background="AliceBlue">
 
             --><!--<StackPanel Orientation="Horizontal" >

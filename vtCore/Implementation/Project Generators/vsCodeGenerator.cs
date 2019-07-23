@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace vtCore
 {
+    enum stati { TBD, done, ntbd};
+
     static class Starter
     {
         static public void start_vsCode(string folder, string file)
@@ -31,18 +35,113 @@ namespace vtCore
         }
     }
 
-    public class vsCodeGenerator
+    interface ITask
     {
+        string description { get; }
+        Func<string> action { get; }
+        Func<stati> status { get; }
+    }
+
+    class PrepareFolders : ITask
+    {
+        public string description => "Generate .vscode and .vsteensy folders";
+
+        public PrepareFolders(IProject project)
+        {
+            vsCodeFolder = new DirectoryInfo(Path.Combine(project.path, ".vscode"));
+            vsTeensyFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy"));
+        }
+        
+        public Func<string> action => () =>
+        {
+            if (!vsCodeFolder.Exists) vsCodeFolder.Create();
+            if (!vsTeensyFolder.Exists) vsTeensyFolder.Create();
+
+            return "OK";
+        };
+        public Func<stati> status => () =>
+        {
+            return stati.TBD;
+        };
+
+        DirectoryInfo vsCodeFolder, vsTeensyFolder;
+    }
+
+    class CleanBinaries : ITask
+    {
+        public CleanBinaries(IProject project)
+        {
+            buildFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy", "build"));            
+        }
+
+        public string description => "Clean binaries";
+
+        public Func<string> action => () =>
+        {
+            if (status() == stati.TBD)
+            {
+                buildFolder.Delete(true);
+                buildFolder.Create();
+            }
+
+            return "OK";
+        };
+        public Func<stati> status => () =>
+        {
+            if (buildFolder.Exists && buildFolder.EnumerateFileSystemInfos().Any())
+            {
+                return stati.TBD;
+            }
+            return stati.ntbd;
+
+        };
+        
+        DirectoryInfo buildFolder;
+    }
+
+
+    public class vsCodeGenerator : ICodeGenerator
+    {
+        public vsCodeGenerator(IProject project, LibManager libManager, SetupData setup)
+        {
+            this.project = project;
+            this.libManager = libManager;
+            this.setup = setup;
+
+            tasks = new List<ITask>
+            {
+                new PrepareFolders(project),
+                new CleanBinaries(project),
+            };
+        }
+
+        IProject project;
+        LibManager libManager;
+        SetupData setup;
+
+        List<ITask> tasks;
+
+
+
         static string mainFile;
 
-        static public async Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
+        public async Task generate(IProject p, LibManager l, SetupData s, IProgress<string> progressHandler)
         {
+
+            foreach(var task in tasks)
+            {
+                task.action();
+            }
+
+            return; 
+
             progressHandler.Report("Check or create folders");
             var vsCodeFolder = Path.Combine(project.path, ".vscode");
             var vsTeensyFolder = Path.Combine(project.path, ".vsteensy");
             var buildFolder = Path.Combine(project.path, vsTeensyFolder, "build");
             Directory.CreateDirectory(vsCodeFolder);
             Directory.CreateDirectory(vsTeensyFolder);
+            if (Directory.Exists(buildFolder)) Directory.Delete(buildFolder, true);
             Directory.CreateDirectory(buildFolder);
 
             await Task.Delay(1);
@@ -100,47 +199,71 @@ namespace vtCore
             // BuildSystem Makefile ---------------------------------------------------------------
             if (project.buildSystem == BuildSystem.makefile)
             {
-                string srcFolder = Path.Combine(project.path, "src");
-                string libFolder = Path.Combine(project.path, "lib");
-                Directory.CreateDirectory(srcFolder);
-                Directory.CreateDirectory(libFolder);
+                DirectoryInfo source, target;
 
+                target = new DirectoryInfo(Path.Combine(project.path, "src"));
+                target.Create();
 
-                // copy local libraries -----------------------------------------------------------
-                foreach (Library library in project.selectedConfiguration.localLibs)
+                FileInfo mainFile = new FileInfo(Path.Combine(target.FullName, "main.cpp"));
+                //mainFile = Path.Combine(srcFolder, "main.cpp");
+                if (!mainFile.Exists)
+                //if (!File.Exists(mainFile))
                 {
-                    if (library.sourceType == Library.SourceType.local)
-                    {
-                        progressHandler.Report($"Copy library {library.name}");
-                        await Task.Delay(1);
-
-                        DirectoryInfo source = new DirectoryInfo(library.source);
-                        DirectoryInfo target = new DirectoryInfo(Path.Combine(libFolder, library.path));
-                        Helpers.copyFilesRecursively(source, target);
-
-                        progressHandler.Report($"OK");
-                        await Task.Delay(1);
-                    }
-                    else
-                    {
-                        progressHandler.Report($"Download library {library.name}");
-                        await Task.Delay(1);
-
-                        Helpers.downloadLibrary(library, libFolder);
-
-                        progressHandler.Report($"OK");
-                        await Task.Delay(1);
-                    }
-                }
-
-                mainFile = Path.Combine(srcFolder, "main.cpp");
-                if (!File.Exists(mainFile))
-                {
-                    progressHandler.Report($"{mainFile} generated");
-                    File.WriteAllText(mainFile, Strings.mainCpp);
+                    progressHandler.Report($"{mainFile.Name} generated");
+                    File.WriteAllText(mainFile.FullName, Strings.mainCpp);
                     progressHandler.Report($"OK");
                     await Task.Delay(1);
                 }
+
+                // copy core ----------------------------------------------------------------------                
+                DirectoryInfo coreFolder = new DirectoryInfo(Path.Combine(project.path, "core"));
+                if (coreFolder.Exists) coreFolder.Delete(true);
+
+                if (project.selectedConfiguration.copyCore)
+                {
+                    source = new DirectoryInfo(project.selectedConfiguration.core);
+                    Helpers.copyFilesRecursively(source, coreFolder);
+                }
+
+                // copy local libraries -----------------------------------------------------------
+                if (project.selectedConfiguration.localLibs.Any())
+                {
+                    DirectoryInfo libFolder = new DirectoryInfo(Path.Combine(project.path, "lib"));
+                    libFolder.Create();
+
+                    foreach (Library library in project.selectedConfiguration.localLibs)
+                    {
+                        if (library.sourceType != Library.SourceType.net)
+                        {
+                            target = new DirectoryInfo(Path.Combine(libFolder.FullName, library.path));
+                            source = new DirectoryInfo(library.source);
+                            if (source.FullName != target.FullName)
+                            {
+                                if (target.Exists) target.Delete();
+
+                                progressHandler.Report($"Copy library {library.name}");
+                                await Task.Delay(1);
+
+                                Helpers.copyFilesRecursively(source, target);
+
+                                progressHandler.Report($"OK");
+                                await Task.Delay(1);
+                            }
+                        }
+                        else
+                        {
+                            progressHandler.Report($"Download library {library.name}");
+                            await Task.Delay(1);
+
+                            Helpers.downloadLibrary(library, libFolder.FullName);
+
+                            progressHandler.Report($"OK");
+                            await Task.Delay(1);
+                        }
+                    }
+                }
+
+
             }
             else    // BuildSystem Arduino Builder-------------------------------------------------
             {

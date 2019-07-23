@@ -8,11 +8,11 @@ namespace vtCore
 {
     static class C_CPP_Props_make
     {
-        public static string generate(IProject project, LibManager libManager)
+        public static string generate(IProject project, SetupData setup, LibManager libManager)
         {
             var cfg = project.selectedConfiguration;
             var brd = cfg.selectedBoard;
-            if (project.selectedConfiguration.compilerBase == null) return ""; // hack
+            if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
 
             var props = new PropertiesJson()
             {
@@ -21,19 +21,38 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(cfg.compilerBase ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(cfg.setupType == SetupTypes.expert ? cfg.compilerBase.path : setup.arduinoCompiler ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
-                        includePath = new List<string>()
-                        {
-                            "src/**",
-                            "lib/**",
-                            (cfg.coreBase +"\\" + brd.core) .Replace('\\','/') + "/**",
-                            libManager.sharedRepositoryPath.Replace('\\','/') + "/**"
-                        },
+                        includePath = new List<string>(),                        
                         defines = new List<string>()
                     }
                 }
             };
+
+
+            var cfgp = props.configurations[0];
+
+            // include path -------------------------------------------------------------
+            cfgp.includePath.Add("src/**");
+            if(cfg.setupType == SetupTypes.quick)
+            {
+                cfgp.includePath.Add(Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**");
+            }
+            else
+            {
+                cfgp.includePath.Add((cfg.copyCore ? "core" : cfg.core).Replace('\\', '/') + "/**");
+            }
+            foreach (var lib in cfg.sharedLibs)
+            {
+                cfgp.includePath.Add(Path.Combine(lib.source, "**").Replace('\\', '/'));
+            }
+
+            foreach (var lib in cfg.localLibs)
+            {
+                cfgp.includePath.Add(Path.Combine("lib",lib.name, "**").Replace('\\', '/'));
+            }
+
+            // Compiler switches ----------------------------------------------------------
 
             var options = project.selectedConfiguration?.selectedBoard?.getAllOptions();
             if (options == null) return "";

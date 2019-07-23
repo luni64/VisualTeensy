@@ -11,6 +11,7 @@ namespace vtCore
     public interface IRepository
     {
         string name { get; }
+        string path { get; }
         ILookup<string, Library> libraries { get; }
     }
 
