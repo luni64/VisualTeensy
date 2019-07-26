@@ -6,6 +6,7 @@ using Task = System.Threading.Tasks.Task;
 namespace ViewModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using static System.Threading.Tasks.Task;
@@ -32,6 +33,8 @@ namespace ViewModel
 
     public class SaveWinVM : BaseViewModel
     {
+        public List<TaskVM> tasks { get; }
+
         public string error
         {
             get => _error;
@@ -45,6 +48,15 @@ namespace ViewModel
         public AsyncCommand cmdSave { get; private set; }
         async Task doSave()
         {
+            foreach (var tsk in tasks)
+            {
+                tsk.action();
+                OnPropertyChanged("tasks");
+            }
+
+            return; 
+
+
             TaskText current = new TaskText();
 
             var progressHandler = new Progress<string>(value =>
@@ -217,6 +229,8 @@ namespace ViewModel
             }
         }
 
+        ICodeGenerator generator = null;
+
         public SaveWinVM(IProject project, LibManager libManager, SetupData setup)
         {
             cmdSave = new AsyncCommand(doSave);
@@ -225,6 +239,22 @@ namespace ViewModel
             this.configuration = project.selectedConfiguration;
             this.setup = setup;
             this.libManager = libManager;
+
+
+
+            switch (project.target)
+            {
+                case Target.vsCode:
+                    generator = new vsCodeGenerator(project, libManager, setup);
+                    break;
+
+                case Target.atom:
+                    generator = new AtomGenerator();
+                    break;
+            }
+
+            tasks = generator.tasks.Select(t => new TaskVM(t)).ToList();
+
 
             projectFolder = new DisplayText()
             {

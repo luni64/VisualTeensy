@@ -132,6 +132,7 @@
     <Compile Include="ViewModel\LibrariesTab\RepositoryVM.cs" />
     <Compile Include="ViewModel\LibrariesTab\LibraryVM.cs" />
     <Compile Include="ViewModel\MainWin\MainVM.cs" />
+    <Compile Include="ViewModel\SaveWin\TaskVM.cs" />
     <Compile Include="ViewModel\SetupTab\SetupTabVM.cs" />
     <Compile Include="Views\FileDisplayWindow.xaml.cs">
       <DependentUpon>FileDisplayWindow.xaml</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace vtCore
 {
     public class AtomGenerator : ICodeGenerator
     {
+        public List<ITask> tasks { get; } = null;
+
         static string mainFile;
         static string taskJsonFile;
         static string settingsFile;
