@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace vtCore
 {
@@ -206,36 +207,81 @@ namespace vtCore
                 }
             }
         }
-        public static bool downloadLibrary(Library lib, string targetFolder)
+        public async static Task downloadLibrary(Library lib, DirectoryInfo libBase)
         {
-            string versionedLibFolder = Path.Combine(targetFolder, Path.GetFileNameWithoutExtension(lib.url));
-            string unversionedLibFolder = versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
-         //   if (Directory.Exists(unversionedLibFolder)) return false;
+            if(!libBase.Exists) libBase.Create();
 
-            WebClient client = null;
-            MemoryStream zippedStream = null;
-            ZipArchive libArchive = null;
+            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName, lib.unversionedLibFolder));            
+            if (libDir.Exists) libDir.Delete(true);
+
+            var tempFile = new FileInfo(Path.GetTempFileName());
+            var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
+            if (tempFolder.Exists) tempFolder.Delete(true);
+
+            WebClient wclient = null;
             try
             {
-                client = new WebClient();                
-                zippedStream = new MemoryStream(client.DownloadData(lib.url));
-                libArchive = new ZipArchive(zippedStream);
-                ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
+                Console.WriteLine(lib.name);
 
-                Directory.Move(versionedLibFolder, unversionedLibFolder);
-                return true;
+                wclient = new WebClient();
+                wclient.Proxy = null;                
+                wclient.DownloadProgressChanged += Wclient_DownloadProgressChanged1;
+                
+                await wclient.DownloadFileTaskAsync(lib.url, tempFile.FullName);
+                await Task.Run(() => ZipFile.ExtractToDirectory(tempFile.FullName, tempFolder.FullName));
+                tempFile.Delete();
+
+                var sourceFolder = tempFolder.GetDirectories().FirstOrDefault();
+                sourceFolder.MoveTo(libDir.FullName);
+                tempFolder.Delete(true);
             }
-            catch //(Exception ex)
+            catch (Exception e)
             {
-                return false;
+                throw e;
             }
             finally
             {
-                if (Directory.Exists(versionedLibFolder)) Directory.Delete(versionedLibFolder);
-                client?.Dispose();
-                zippedStream?.Dispose();
-                libArchive?.Dispose();
+                wclient.DownloadProgressChanged -= Wclient_DownloadProgressChanged1;
+                wclient?.Dispose();
             }
+
+
+
+            //    WebClient client = null;
+            //MemoryStream zippedStream = null;
+            //ZipArchive libArchive = null;
+            //try
+            //{
+            //    client = new WebClient();                
+            //    zippedStream = new MemoryStream(client.DownloadData(lib.url));
+            //    libArchive = new ZipArchive(zippedStream);
+            //    ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
+
+            //    Directory.Move(versionedLibFolder, unversionedLibFolder);
+            //    return true;
+            //}
+            //catch //(Exception ex)
+            //{
+            //    return false;
+            //}
+            //finally
+            //{
+            //    if (Directory.Exists(versionedLibFolder)) Directory.Delete(versionedLibFolder);
+            //    client?.Dispose();
+            //    zippedStream?.Dispose();
+            //    libArchive?.Dispose();
+            //}
+        }
+
+        private static void Wclient_DownloadProgressChanged1(object sender, DownloadProgressChangedEventArgs e)
+        {            
+            Console.WriteLine($"{e.BytesReceived} {e.ProgressPercentage}%");
+        }
+
+       
+        private static void Wclient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            Console.WriteLine(e.BytesReceived);
         }
 
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]

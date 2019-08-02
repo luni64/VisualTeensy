@@ -9,12 +9,14 @@ namespace ViewModel
         public string name => selectedVersion?.name;
         public string description => selectedVersion?.sentence;
         public IEnumerable<Library> versions { get; }
+        //public string parentRepository { get; }
 
         public Library selectedVersion { get; set; }
                        
 
-        public LibraryVM(IEnumerable<Library> lib)
+        public LibraryVM(IEnumerable<Library> lib/*, string repositoryName*/)
         {
+            //parentRepository = string.IsNullOrWhiteSpace(repositoryName) ? "?" : repositoryName;
             this.versions = lib.OrderBy(v => v.version).ToList();
             selectedVersion = this.versions.LastOrDefault();
         }

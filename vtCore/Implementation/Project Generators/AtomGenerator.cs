@@ -7,6 +7,33 @@ namespace vtCore
 {
     public class AtomGenerator : ICodeGenerator
     {
+        public IReadOnlyList<ITask> getTasks(IProject project, LibManager libManager, SetupData setup)
+        {
+            var tasks = new List<ITask>();
+
+            tasks.Add(new PrepareFolders(project));
+
+            tasks.Add(new GenerateSettings(project));
+            tasks.Add(new GenerateIntellisense(project, libManager, setup));
+            tasks.Add(new GenerateMakefile(project, libManager, setup));
+            tasks.Add(new GenerateTasks(project, libManager, setup));
+            tasks.Add(new CopyLibs(project));
+
+            if (project.selectedConfiguration.copyCore)
+            {
+                tasks.Add(new CopyCore(project));
+            }
+
+            if (project.buildSystem == BuildSystem.makefile)
+            {
+                tasks.Add(new GenerateMainCpp(project));
+            }
+            tasks.Add(new CleanBinaries(project));
+
+            return tasks;
+        }
+
+
         public List<ITask> tasks { get; } = null;
 
         static string mainFile;
@@ -82,44 +109,44 @@ namespace vtCore
 
         static public async Task mkGenerator(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)
         {
-            string srcFolder = Path.Combine(project.path, "src");
-            string libFolder = Path.Combine(project.path, "lib");
-            Directory.CreateDirectory(srcFolder);
-            Directory.CreateDirectory(libFolder);
+            //string srcFolder = Path.Combine(project.path, "src");
+            //string libFolder = Path.Combine(project.path, "lib");
+            //Directory.CreateDirectory(srcFolder);
+            //Directory.CreateDirectory(libFolder);
 
-            // copy local libraries -----------------------------------------------------------
-            foreach (Library library in project.selectedConfiguration.localLibs)
-            {
-                if (library.sourceType == Library.SourceType.local)
-                {
-                    progressHandler.Report($"Copy library {library.name}");
-                    await Task.Delay(1);
+            //// copy local libraries -----------------------------------------------------------
+            //foreach (Library library in project.selectedConfiguration.localLibs)
+            //{
+            //    if (library.sourceType == Library.SourceType.local)
+            //    {
+            //        progressHandler.Report($"Copy library {library.name}");
+            //        await Task.Delay(1);
 
-                    DirectoryInfo source = new DirectoryInfo(library.source);
-                    DirectoryInfo target = new DirectoryInfo(Path.Combine(libFolder, library.path));
-                    Helpers.copyFilesRecursively(source, target);
+            //        DirectoryInfo source = new DirectoryInfo(library.source);
+            //        DirectoryInfo target = new DirectoryInfo(Path.Combine(libFolder, library.path));
+            //        Helpers.copyFilesRecursively(source, target);
 
-                    progressHandler.Report($"OK");
-                    await Task.Delay(1);
-                }
-                else
-                {
-                    progressHandler.Report($"Download library {library.name}");
-                    await Task.Delay(1);
+            //        progressHandler.Report($"OK");
+            //        await Task.Delay(1);
+            //    }
+            //    else
+            //    {
+            //        progressHandler.Report($"Download library {library.name}");
+            //        await Task.Delay(1);
 
-                    Helpers.downloadLibrary(library, libFolder);
+            //        await Helpers.downloadLibrary(library, libBase);
 
-                    progressHandler.Report($"OK");
-                    await Task.Delay(1);
-                }
-            }
+            //        progressHandler.Report($"OK");
+            //        await Task.Delay(1);
+            //    }
+            //}
 
-            // generate make.cpp ------------------------------------------------------------------
-            mainFile = Path.Combine(srcFolder, "main.cpp");
-            if (!File.Exists(mainFile))
-            {
-                File.WriteAllText(mainFile, Strings.mainCpp);
-            }
+            //// generate make.cpp ------------------------------------------------------------------
+            //mainFile = Path.Combine(srcFolder, "main.cpp");
+            //if (!File.Exists(mainFile))
+            //{
+            //    File.WriteAllText(mainFile, Strings.mainCpp);
+            //}
         }
     }
 }

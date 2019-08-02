@@ -34,10 +34,10 @@
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsMouseOver}" Value="True">
                     <Setter Property="TextDecorations" Value="Underline" />
                     <Setter Property="Foreground" Value="#FF1A83D6"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>                 
                 </DataTrigger>
             </Style.Triggers>
-        </Style>
+        </Style>       
     </UserControl.Resources>
 
     <Grid Margin="20">
@@ -45,13 +45,14 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
-           
+
         </Grid.ColumnDefinitions>
 
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock  Margin="0,0,0,0"  TextWrapping="WrapWithOverflow">                  
@@ -63,7 +64,7 @@
         </TextBlock>
 
 
-        <ListBox  Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray"
+        <ListBox  Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Margin="0,20,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray"
                 ItemsSource="{Binding projectLibraries}" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -79,7 +80,7 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel>
-                            <TextBlock Grid.Column="0" FontSize ="13" FontWeight="SemiBold" Style="{DynamicResource autoLink}" HorizontalAlignment="Left" MouseDown="TextBlock_MouseDown">
+                            <TextBlock Grid.Column="0" FontSize ="13" FontWeight="SemiBold" Style="{DynamicResource autoLink}" HorizontalAlignment="Left" MouseDown="TextBlock_MouseDown2">
                                     <Run Text="{Binding name, Mode=OneWay}"/> V<Run Text="{Binding version, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock  HorizontalAlignment="Stretch" Text="{Binding sentence}" Foreground="#FF252526"  TextWrapping="WrapWithOverflow" />
@@ -94,23 +95,18 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-
-
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" Width="50" Background="Transparent" />
 
+        <DockPanel Grid.Column="2">
+            <TextBlock   Text="Repositories:" Margin="0,0,10,0"  VerticalAlignment="Center" TextElement.FontSize="15" TextElement.Foreground="{DynamicResource PrimaryHueDarkBrush}" />
+            <ComboBox  Margin="0,0,0,0" ItemsSource="{Binding repos}" DisplayMemberPath="name" VerticalAlignment="Center"/>
+
+        </DockPanel>
 
 
+        <ListView VirtualizingPanel.IsVirtualizingWhenGrouping="True"  x:Name="lb" Grid.Row="1" Grid.Column="2" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray" ItemsSource="{Binding repos.CurrentItem.libVMs, Mode=OneWay}" dd:DragDrop.IsDragSource="True"  >
 
-        <StackPanel Grid.Column="2">
-            <TextBlock  Margin="0,0,0,23" Foreground="{DynamicResource PrimaryHueDarkBrush}" FontSize="18" Text=" Repositories" />
-            <ComboBox  Margin="0,0,0,15" ItemsSource="{Binding repositories}" DisplayMemberPath="name" SelectedItem="{Binding selectedRepository}"  />
-        </StackPanel>
-
-
-        <ListBox x:Name="lb" Grid.Row="2" Grid.Column="2" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray"
-                     ItemsSource="{Binding selectedRepository.libVMs}" dd:DragDrop.IsDragSource="True"  >
-            
-            <ListBox.ItemTemplate>                
+            <ListView.ItemTemplate >
                 <DataTemplate>
                     <Grid Margin="10" >
                         <Grid.ColumnDefinitions>
@@ -129,9 +125,13 @@
                         <!--<Button Grid.Column="1" Grid.Row="1" FontSize="10" Content="Info" Margin="10,5,0,0" VerticalAlignment="Top" Click="Button_Click2"/>-->
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ListView.ItemTemplate>       
+        </ListView>
 
+        <DockPanel  Margin="0,10,0,0" Grid.Row="2" Grid.Column="2">
+            <TextBlock   Text="Search:" Margin="0,0,10,0"  VerticalAlignment="Center" TextElement.FontSize="15" TextElement.Foreground="{DynamicResource PrimaryHueDarkBrush}" />
+            <TextBox  Text="{Binding searchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100, ValidatesOnNotifyDataErrors=False}" VerticalAlignment="Center" />
+        </DockPanel>
 
         <!--</Grid>-->
     </Grid>

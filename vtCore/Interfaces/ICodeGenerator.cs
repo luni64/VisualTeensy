@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace vtCore
 {
     public interface ICodeGenerator
     {
-         Task generate(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler);
-
-        List<ITask> tasks { get; }
+        IReadOnlyList<ITask> getTasks(IProject project, LibManager libManager, SetupData setup);
     }
 }

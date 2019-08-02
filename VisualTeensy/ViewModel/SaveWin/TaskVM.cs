@@ -14,9 +14,9 @@ namespace ViewModel
         public string status => task.status;
         
 
-        public void action()
+        public async Task action()
         {
-            task.action();            
+            await task.action();            
             OnPropertyChanged("status");
         }
 

@@ -1,8 +1,12 @@
 ﻿using GongSolutions.Wpf.DragDrop;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using vtCore;
 
 namespace ViewModel
@@ -15,30 +19,39 @@ namespace ViewModel
             var lib = o as Library;
             projectLibraries.Remove(lib);
         }
+             
 
-        public List<RepositoryVM> repositories { get; }
-        public RepositoryVM selectedRepository
-        {
-            get => _selectedRepository;
-            set => SetProperty(ref _selectedRepository, value);
-        }
-        RepositoryVM _selectedRepository;
-
-        public ObservableCollection<Library> projectLibraries { get; }
-
+        public ObservableCollection<Library> projectLibraries { get; }       
+        public ListCollectionView repos { get; }
+               
         public LibrariesTabVM(IProject project, LibManager libManager)
         {
             this.project = project;
 
             cmdDel = new RelayCommand(doDel);
 
-            repositories = libManager.repositories?.Select(r => new RepositoryVM(r)).ToList();
-            selectedRepository = repositories.FirstOrDefault();
-
-
+        
+            repos = new ListCollectionView(libManager.repositories.Select(r=>new RepositoryVM(r)).ToList());
+            repos.CurrentChanged += (s,e) =>  searchString = searchString; // trigger a filter event on new repo
+              
             projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
+
+       
+        public string searchString
+        {
+            get => _searchString;
+            set
+            {
+                SetProperty(ref _searchString, value);
+                var searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();                
+                ((RepositoryVM) repos.CurrentItem).filter(searchStrings);    
+            }
+        }
+        string _searchString;
+
+      
 
         private void projectLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -75,7 +88,7 @@ namespace ViewModel
 
                 default:
                     break;
-            }           
+            }
         }
 
         public void DragOver(IDropInfo dropInfo)
@@ -91,10 +104,10 @@ namespace ViewModel
 
         public void Drop(IDropInfo dropInfo)
         {
-            var sourceItem = dropInfo.Data as LibraryVM;
-            var lib = sourceItem.selectedVersion;
-            lib.isLocal = !selectedRepository.name.Contains("Shared");
-            projectLibraries.Add(lib);
+            //var sourceItem = dropInfo.Data as LibraryVM;
+            //var lib = sourceItem.selectedVersion;
+            //lib.isLocal = !selectedRepository.name.Contains("Shared");
+            //projectLibraries.Add(lib);
         }
 
         public void update()

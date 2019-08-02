@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace vtCore
 {
@@ -7,6 +8,6 @@ namespace vtCore
         string title { get; }
         string description { get; }
         string status { get; }
-        Action action { get; }      
+        Func<Task> action { get; }      
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace vtCore
 {
@@ -23,7 +24,7 @@ namespace vtCore
             done = vsCodeFolder.Exists && vsTeensyFolder.Exists && srcFolder.Exists;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             if (!done)
             {
@@ -32,6 +33,7 @@ namespace vtCore
                 srcFolder.Create();
             }
             done = true;
+            await Task.CompletedTask;
         };
 
 
@@ -49,7 +51,7 @@ namespace vtCore
             buildFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy", "build"));
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             if (buildFolder.Exists)
             {
@@ -57,10 +59,12 @@ namespace vtCore
             }
             buildFolder.Create();
             done = true;
+            await Task.CompletedTask;
         };
 
         DirectoryInfo buildFolder;
         bool done = false;
+
     }
 
     class GenerateIntellisense : ITask
@@ -80,11 +84,12 @@ namespace vtCore
             done = false;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             string properties = IntellisenseFile.generate(project, libManager, setup);
             File.WriteAllText(c_cpp_propertiesFile.FullName, properties);
             done = true;
+            await Task.CompletedTask;
         };
 
         bool exists, done;
@@ -114,11 +119,12 @@ namespace vtCore
             done = false;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             string properties = ProjectSettings.generate(project);
             File.WriteAllText(settingsFile.FullName, properties);
             done = true;
+            await Task.CompletedTask;
         };
 
         IProject project;
@@ -136,7 +142,7 @@ namespace vtCore
         };
 
         public string status { get; private set; }
-               
+
         public GenerateMakefile(IProject project, LibManager libManager, SetupData setup)
         {
             string oldMakefile = "";
@@ -153,11 +159,12 @@ namespace vtCore
                 status = "Overwrite";
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
-            if(status != "Up-To-Date")
+            if (status != "Up-To-Date")
                 File.WriteAllText(file.FullName, newMakefile);
             status = "OK";
+            await Task.CompletedTask;
         };
 
         string newMakefile;
@@ -181,10 +188,11 @@ namespace vtCore
             done = false;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             File.WriteAllText(file.FullName, tasksJson);
             done = true;
+            await Task.CompletedTask;
         };
 
         string tasksJson;
@@ -197,18 +205,19 @@ namespace vtCore
         public string title => $"Main Sketch";
         public string description => file.FullName;
 
-        public string status => done? "OK" : file.Exists ? "Exists" : "Generate";
+        public string status => done ? "OK" : file.Exists ? "Exists" : "Generate";
 
         public GenerateMainCpp(IProject project)
         {
-            file = new FileInfo(Path.Combine(project.path,"src", "make.cpp"));
+            file = new FileInfo(Path.Combine(project.path, "src", "make.cpp"));
             done = false;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             if (status == "Generate") File.WriteAllText(file.FullName, Strings.mainCpp);
             done = true;
+            await Task.CompletedTask;
         };
 
         bool done = false;
@@ -219,31 +228,76 @@ namespace vtCore
     class CopyCore : ITask
     {
         public string title => $"Copy core libraries";
-        public string description =>$"from: {sourceFolder.FullName}";
+        public string description => $"from: {sourceFolder.FullName} to: ./core/";
 
         public string status => done ? "OK" : targetFolder.Exists ? "Exists" : "Copy";
 
         public CopyCore(IProject project)
         {
             sourceFolder = new DirectoryInfo(project.selectedConfiguration.core);
-            targetFolder = new DirectoryInfo(Path.Combine(project.path, "core"));            
+            targetFolder = new DirectoryInfo(Path.Combine(project.path, "core"));
             done = false;
         }
 
-        public Action action => () =>
+        public Func<Task> action => async () =>
         {
             if (status == "Copy")
-            {                
-                if(targetFolder.Exists) targetFolder.Delete(true);
+            {
+                if (targetFolder.Exists) targetFolder.Delete(true);
                 targetFolder.Create();
                 Helpers.copyFilesRecursively(sourceFolder, targetFolder);
             }
             done = true;
+            await Task.CompletedTask;
         };
 
         bool done = false;
 
         DirectoryInfo targetFolder;
         DirectoryInfo sourceFolder;
+    }
+
+    class CopyLibs : ITask
+    {
+        public string title => $"Copy local libraries";
+        public string description => $"to: ./lib/";
+
+        public string status => done ? "OK" : libBase.Exists ? "Exists" : "Copy";
+
+        public CopyLibs(IProject project)
+        {
+            this.project = project;
+            libBase = new DirectoryInfo(Path.Combine(project.path, "lib"));
+            done = false;
+        }
+
+        public Func<Task> action => async () =>
+        {
+            foreach (Library library in project.selectedConfiguration.localLibs)
+            {
+                var targetFolder = new DirectoryInfo(Path.Combine(libBase.FullName, library.name));
+                if (library.sourceType != Library.SourceType.net)
+                {
+                    var sourceFolder = new DirectoryInfo(library.source);
+                    if (sourceFolder.FullName != targetFolder.FullName)
+                    {
+                        if (targetFolder.Exists) targetFolder.Delete();
+                        Helpers.copyFilesRecursively(sourceFolder, targetFolder);
+                    }
+                }
+                else
+                {                
+                    await Helpers.downloadLibrary(library, libBase);
+                }
+            };
+            done = true;
+        };
+
+        bool done = false;
+
+        DirectoryInfo libBase;
+
+
+        IProject project;
     }
 }

@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Generate Project" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
-        <ListBox  ItemsSource="{Binding tasks}" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray">
+        <ListBox  ItemsSource="{Binding taskVMs}" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

@@ -54,7 +54,7 @@ namespace vtCore
                 foreach (var libDir in Directory.GetDirectories(repository))
                 {
                     Library lib = new Library();
-                    string p;
+                    //string p;
 
                     lib.parse(libDir);
 
