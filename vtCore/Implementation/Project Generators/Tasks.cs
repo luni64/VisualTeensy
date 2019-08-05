@@ -33,7 +33,7 @@ namespace vtCore
                 srcFolder.Create();
             }
             done = true;
-            await Task.CompletedTask;
+            await Task.Delay(1000);
         };
 
 
@@ -59,7 +59,7 @@ namespace vtCore
             }
             buildFolder.Create();
             done = true;
-            await Task.CompletedTask;
+            await Task.Delay(1000);
         };
 
         DirectoryInfo buildFolder;
@@ -89,7 +89,7 @@ namespace vtCore
             string properties = IntellisenseFile.generate(project, libManager, setup);
             File.WriteAllText(c_cpp_propertiesFile.FullName, properties);
             done = true;
-            await Task.CompletedTask;
+            await Task.Delay(1000);
         };
 
         bool exists, done;
@@ -281,7 +281,7 @@ namespace vtCore
                     var sourceFolder = new DirectoryInfo(library.source);
                     if (sourceFolder.FullName != targetFolder.FullName)
                     {
-                        if (targetFolder.Exists) targetFolder.Delete();
+                        if (targetFolder.Exists) targetFolder.Delete(true);
                         Helpers.copyFilesRecursively(sourceFolder, targetFolder);
                     }
                 }

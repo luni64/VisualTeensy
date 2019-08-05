@@ -34,5 +34,11 @@ namespace VisualTeensy
                 scrollViewer.ScrollToBottom();
             }
         }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var lb = (ListBox)sender;
+            lb.ScrollIntoView(lb.SelectedItem);
+        }
     }
 }

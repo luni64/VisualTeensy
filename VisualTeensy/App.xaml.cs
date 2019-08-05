@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using ViewModel;
 using VisualTeensy.Properties;
@@ -76,6 +77,10 @@ namespace VisualTeensy
         {
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            Directory.CreateDirectory(appData);
+
+            
             log4net.Config.XmlConfigurator.Configure();
             var repository = (Hierarchy)LogManager.GetRepository();
             repository.Threshold = Level.All;
@@ -88,6 +93,18 @@ namespace VisualTeensy
             log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
 
             base.OnStartup(e);
+
+            // overwrite local lib index if  older than 7 days 
+            string libIndexTarget = appData + "/VisualTeensy/library_index.json";
+            bool overwrite = !File.Exists(libIndexTarget);
+            overwrite |= (DateTime.Now - File.GetLastWriteTime(libIndexTarget)) > TimeSpan.FromDays(7);
+            overwrite &= Uri.TryCreate("http://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute, out var libIndexSource);
+            if (overwrite)
+            {
+                log.Info($"Download {libIndexSource} to {libIndexTarget}");
+                Task.Run(() => Helpers.downloadFile(libIndexSource, libIndexTarget, TimeSpan.FromDays(7)));
+                log.Info($"Download done");
+            }
             
             try
             {

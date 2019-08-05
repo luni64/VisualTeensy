@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ namespace vtCore
 {
     public static class Helpers
     {
+        static readonly HttpClient client = new HttpClient();
+
+      
         public static string arduinoPath { set; get; }
 
 
@@ -110,7 +114,7 @@ namespace vtCore
             {
                 return folder;
             }
-
+                        
             return null;
         }
 
@@ -207,83 +211,73 @@ namespace vtCore
                 }
             }
         }
+
+         
+
+        public static async Task downloadFile(Uri source, string target, TimeSpan expiry)
+        {
+            if (File.Exists(target))
+            {
+                if ((DateTime.Now - File.GetLastWriteTime(target)) < expiry) return;
+            }
+
+            using (var response = await client.GetAsync(source))
+            {
+                response.EnsureSuccessStatusCode();
+
+                using (var webStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (var fileStream = new FileStream(target, FileMode.Create))
+                    {
+                        await webStream.CopyToAsync(fileStream);
+                    }
+                }
+            }
+        }
+
+
         public async static Task downloadLibrary(Library lib, DirectoryInfo libBase)
         {
-            if(!libBase.Exists) libBase.Create();
+            if (!libBase.Exists) libBase.Create();
 
-            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName, lib.unversionedLibFolder));            
+            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName, lib.unversionedLibFolder));
             if (libDir.Exists) libDir.Delete(true);
 
+            // we will save the *.zip in a temp file and unzip into %temp%/vslib
             var tempFile = new FileInfo(Path.GetTempFileName());
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
             if (tempFolder.Exists) tempFolder.Delete(true);
 
-            WebClient wclient = null;
             try
             {
-                Console.WriteLine(lib.name);
+                Console.Write($"Read {lib.name}... ");
 
-                wclient = new WebClient();
-                wclient.Proxy = null;                
-                wclient.DownloadProgressChanged += Wclient_DownloadProgressChanged1;
-                
-                await wclient.DownloadFileTaskAsync(lib.url, tempFile.FullName);
-                await Task.Run(() => ZipFile.ExtractToDirectory(tempFile.FullName, tempFolder.FullName));
-                tempFile.Delete();
+                using (var response = await client.GetAsync(lib.url))
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    using (var s = await response.Content.ReadAsStreamAsync())
+                    {
+                        using (var archive = new ZipArchive(s))
+                        {
+                            archive.ExtractToDirectory(tempFolder.FullName);
+                        }                        
+                    }
+                }
 
                 var sourceFolder = tempFolder.GetDirectories().FirstOrDefault();
                 sourceFolder.MoveTo(libDir.FullName);
                 tempFolder.Delete(true);
+
+                Console.WriteLine("done");
             }
             catch (Exception e)
             {
-                throw e;
-            }
-            finally
-            {
-                wclient.DownloadProgressChanged -= Wclient_DownloadProgressChanged1;
-                wclient?.Dispose();
-            }
-
-
-
-            //    WebClient client = null;
-            //MemoryStream zippedStream = null;
-            //ZipArchive libArchive = null;
-            //try
-            //{
-            //    client = new WebClient();                
-            //    zippedStream = new MemoryStream(client.DownloadData(lib.url));
-            //    libArchive = new ZipArchive(zippedStream);
-            //    ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
-
-            //    Directory.Move(versionedLibFolder, unversionedLibFolder);
-            //    return true;
-            //}
-            //catch //(Exception ex)
-            //{
-            //    return false;
-            //}
-            //finally
-            //{
-            //    if (Directory.Exists(versionedLibFolder)) Directory.Delete(versionedLibFolder);
-            //    client?.Dispose();
-            //    zippedStream?.Dispose();
-            //    libArchive?.Dispose();
-            //}
+                throw;
+            }            
         }
 
-        private static void Wclient_DownloadProgressChanged1(object sender, DownloadProgressChangedEventArgs e)
-        {            
-            Console.WriteLine($"{e.BytesReceived} {e.ProgressPercentage}%");
-        }
-
-       
-        private static void Wclient_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            Console.WriteLine(e.BytesReceived);
-        }
-
+     
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
         public static string getShortPath(string longPath)

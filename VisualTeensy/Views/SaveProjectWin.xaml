@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"       
         xmlns:vm ="clr-namespace:ViewModel"        
         mc:Ignorable="d"
-        Title="VisualTeensy" Height="450" Width="800"
+        Title="VisualTeensy" Height="600" Width="700"
         d:DataContext="{d:DesignInstance Type=vm:SaveWinVM, IsDesignTimeCreatable=False}"      
         
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Generate Project" FontSize="18" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
 
-        <ListBox  ItemsSource="{Binding taskVMs}" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" HorizontalContentAlignment="Stretch"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray">
+        <ListBox  ItemsSource="{Binding taskVMs}" Grid.Row="1" Grid.Column="0"  Margin="0,0,0,0"  HorizontalContentAlignment="Stretch"  IsSynchronizedWithCurrentItem="True"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="1" BorderBrush="LightGray" SelectionChanged="ListBox_SelectionChanged" ScrollViewer.CanContentScroll="False">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -47,13 +47,9 @@
                             <Run FontSize ="14" FontWeight="SemiBold" Text="{Binding title, Mode=OneWay}"/>                          
                         </TextBlock>
 
-                        <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding description, Mode=OneWay}" FontSize ="11" FontWeight="normal"/>
-                        
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding description, Mode=OneWay}" FontSize ="11" FontWeight="normal"/>                        
                         <TextBlock Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Text="{Binding status, Mode=OneWay}" FontSize ="11" FontWeight="normal" VerticalAlignment="Center"/>
-
-                    </Grid>
-                    
-                    
+                    </Grid>                                       
 
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -180,9 +176,9 @@
         </StackPanel>-->
 
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
-            <Button Content="Generate or Update"  Command="{Binding cmdSave}" Padding="5,0"/>
-            <Button Content="Close"  Width="70"  Margin="5,0,0,0" Click="CloseClick"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Start" Width="80" Command="{Binding cmdSave}" Padding="5,0"/>
+            <Button Content="Cancel"  Width="80"  Margin="5,0,0,0" Click="CloseClick"/>
         </StackPanel>
 
     </Grid>

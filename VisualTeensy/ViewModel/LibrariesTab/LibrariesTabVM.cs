@@ -1,13 +1,12 @@
 ﻿using GongSolutions.Wpf.DragDrop;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using vtCore;
+
+
 
 namespace ViewModel
 {
@@ -28,6 +27,8 @@ namespace ViewModel
         {
             this.project = project;
 
+            
+
             cmdDel = new RelayCommand(doDel);
 
         
@@ -44,6 +45,7 @@ namespace ViewModel
             get => _searchString;
             set
             {
+
                 SetProperty(ref _searchString, value);
                 var searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();                
                 ((RepositoryVM) repos.CurrentItem).filter(searchStrings);    
@@ -104,10 +106,12 @@ namespace ViewModel
 
         public void Drop(IDropInfo dropInfo)
         {
-            //var sourceItem = dropInfo.Data as LibraryVM;
-            //var lib = sourceItem.selectedVersion;
-            //lib.isLocal = !selectedRepository.name.Contains("Shared");
-            //projectLibraries.Add(lib);
+            var sourceItem = dropInfo.Data as LibraryVM;
+            var lib = sourceItem.selectedVersion;
+            var curRepo = repos.CurrentItem as RepositoryVM;
+
+            lib.isLocal = !curRepo.name.Contains("Shared");
+            projectLibraries.Add(lib);
         }
 
         public void update()
