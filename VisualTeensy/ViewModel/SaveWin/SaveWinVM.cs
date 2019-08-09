@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Data;
+using log4net;
+using System.Reflection;
 
 namespace ViewModel
 {
@@ -21,8 +23,13 @@ namespace ViewModel
 
             while (!taskVMs.IsCurrentAfterLast)
             {
-                await ((TaskVM)taskVMs.CurrentItem).action();
+                var task = (TaskVM)taskVMs.CurrentItem;
+                log.Info(task.title);
+
+                await task.action();
                 await Task.Delay(250);
+                log.Info($"{task.title} done");
+
                 taskVMs.MoveCurrentToNext();
                 OnPropertyChanged("tasks");
             }
@@ -44,5 +51,9 @@ namespace ViewModel
 
             taskVMs = new ListCollectionView(tl);
         }
+
+
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }

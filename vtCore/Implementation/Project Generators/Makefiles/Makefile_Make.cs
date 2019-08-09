@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace vtCore
 {
@@ -34,19 +35,19 @@ namespace vtCore
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
             mf.Append(makeEntry("MCU              := ", "build.mcu", options) + "\n\n");
 
-            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepositoryPath)}\n");
+            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepository.repoPath)}\n");
             mf.Append($"LIBS_SHARED      := ");
             foreach (var lib in cfg.sharedLibs)
             {
-                mf.Append($"{lib.path ?? "ERROR"} "); //hack, improve library to distinguish between libraries to download and loacal libs
+                mf.Append($"{lib.sourceFolderName ?? "ERROR"} "); 
             }
             mf.Append("\n\n");
 
             mf.Append($"LIBS_LOCAL_BASE  := lib\n");
             mf.Append($"LIBS_LOCAL       := ");
             foreach (var lib in cfg.localLibs)
-            {
-                mf.Append($"{lib.path ?? lib.name} "); //hack, improve library to distinguish between libraries to download and loacal libs
+            {               
+                mf.Append($"{lib.targetFolderName} ");
             }
             mf.Append("\n\n");
 

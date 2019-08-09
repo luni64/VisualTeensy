@@ -2,9 +2,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using vtCore;
+using vtCore.Interfaces;
 
 
 
@@ -18,58 +20,56 @@ namespace ViewModel
             var lib = o as Library;
             projectLibraries.Remove(lib);
         }
-             
 
-        public ObservableCollection<Library> projectLibraries { get; }       
+
+        public ObservableCollection<Library> projectLibraries { get; }
         public ListCollectionView repos { get; }
-               
+
         public LibrariesTabVM(IProject project, LibManager libManager)
         {
             this.project = project;
 
-            
-
             cmdDel = new RelayCommand(doDel);
 
-        
-            repos = new ListCollectionView(libManager.repositories.Select(r=>new RepositoryVM(r)).ToList());
-            repos.CurrentChanged += (s,e) =>  searchString = searchString; // trigger a filter event on new repo
-              
+            repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
+            repos.CurrentChanged += (s, e) => searchString = searchString; // trigger a filter event on new repo
+
             projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
 
-       
+
         public string searchString
         {
             get => _searchString;
             set
             {
-
                 SetProperty(ref _searchString, value);
-                var searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();                
-                ((RepositoryVM) repos.CurrentItem).filter(searchStrings);    
+                var searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();
+                ((RepositoryVM)repos.CurrentItem).filter(searchStrings);
             }
         }
         string _searchString;
 
-      
-
         private void projectLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+
+                    var curRepo = repos.CurrentItem as RepositoryVM;
+
                     foreach (Library library in e.NewItems)
-                    {
-                        if (library.isLocal)
+                    {                       
+                        if(curRepo.isShared)
                         {
-                            project.selectedConfiguration.localLibs.Add(library);
+                            project.selectedConfiguration.sharedLibs.Add(library);
                         }
                         else
                         {
-                            project.selectedConfiguration.sharedLibs.Add(library);
+                            string safeName = library.unversionedLibFolder; //hack
+                            library.targetUri = new Uri(Path.Combine(project.path, "lib",safeName));
+                            project.selectedConfiguration.localLibs.Add(library);
                         }
                     }
                     break;
@@ -77,7 +77,7 @@ namespace ViewModel
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Library library in e.OldItems)
                     {
-                        if (library.isLocal)
+                        if (library.isLocalSource)
                         {
                             project.selectedConfiguration.localLibs.Remove(library);
                         }
@@ -106,11 +106,10 @@ namespace ViewModel
 
         public void Drop(IDropInfo dropInfo)
         {
+            var col = dropInfo.DragInfo.SourceCollection;
+
             var sourceItem = dropInfo.Data as LibraryVM;
             var lib = sourceItem.selectedVersion;
-            var curRepo = repos.CurrentItem as RepositoryVM;
-
-            lib.isLocal = !curRepo.name.Contains("Shared");
             projectLibraries.Add(lib);
         }
 

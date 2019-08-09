@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,12 +34,15 @@ namespace vtCore
                 srcFolder.Create();
             }
             done = true;
-            await Task.Delay(1000);
+            await Task.CompletedTask;
         };
 
 
         DirectoryInfo vsCodeFolder, vsTeensyFolder, srcFolder;
+
     }
+
+
 
     class CleanBinaries : ITask
     {
@@ -59,7 +63,7 @@ namespace vtCore
             }
             buildFolder.Create();
             done = true;
-            await Task.Delay(1000);
+            await Task.CompletedTask;
         };
 
         DirectoryInfo buildFolder;
@@ -228,24 +232,22 @@ namespace vtCore
     class CopyCore : ITask
     {
         public string title => $"Copy core libraries";
-        public string description => $"from: {sourceFolder.FullName} to: ./core/";
+        public string description => $"from: {sourceUri.AbsolutePath} to: ./core/";
 
-        public string status => done ? "OK" : targetFolder.Exists ? "Exists" : "Copy";
+        public string status => done ? "OK" : Directory.Exists(targetUri.AbsolutePath) ? "Exists" : "Copy";
 
         public CopyCore(IProject project)
         {
-            sourceFolder = new DirectoryInfo(project.selectedConfiguration.core);
-            targetFolder = new DirectoryInfo(Path.Combine(project.path, "core"));
+            sourceUri = new Uri(project.selectedConfiguration.core);
+            targetUri = new Uri(Path.Combine(project.path, "core"));
             done = false;
         }
 
         public Func<Task> action => async () =>
         {
             if (status == "Copy")
-            {
-                if (targetFolder.Exists) targetFolder.Delete(true);
-                targetFolder.Create();
-                Helpers.copyFilesRecursively(sourceFolder, targetFolder);
+            {                
+                Helpers.copyFilesRecursively(sourceUri, targetUri);
             }
             done = true;
             await Task.CompletedTask;
@@ -253,8 +255,7 @@ namespace vtCore
 
         bool done = false;
 
-        DirectoryInfo targetFolder;
-        DirectoryInfo sourceFolder;
+        Uri targetUri, sourceUri;
     }
 
     class CopyLibs : ITask
@@ -271,24 +272,23 @@ namespace vtCore
             done = false;
         }
 
+        
         public Func<Task> action => async () =>
         {
+            var baseUri = new Uri(libBase.FullName);
+
             foreach (Library library in project.selectedConfiguration.localLibs)
-            {
-                var targetFolder = new DirectoryInfo(Path.Combine(libBase.FullName, library.name));
-                if (library.sourceType != Library.SourceType.net)
+            {               
+               // var targetUri = new Uri(Path.Combine(baseUri.AbsolutePath, library.sourceUri.Segments.Last()));
+                                
+                if (library.isLocalSource & library.sourceUri != library.targetUri)
                 {
-                    var sourceFolder = new DirectoryInfo(library.source);
-                    if (sourceFolder.FullName != targetFolder.FullName)
-                    {
-                        if (targetFolder.Exists) targetFolder.Delete(true);
-                        Helpers.copyFilesRecursively(sourceFolder, targetFolder);
-                    }
+                    Helpers.copyFilesRecursively(library.sourceUri, library.targetUri);
                 }
-                else
-                {                
+                else if (library.isWebSource)
+                {
                     await Helpers.downloadLibrary(library, libBase);
-                }
+                }                
             };
             done = true;
         };

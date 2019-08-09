@@ -44,7 +44,7 @@ namespace VisualTeensy
             setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
             setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
             setupData.makeExeBase.path = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Directory.GetCurrentDirectory() : Settings.Default.makeExePath;
-            setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
+            setupData.tdLibBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
             setupData.debugSupportDefault = Settings.Default.debugSupport;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
@@ -69,7 +69,7 @@ namespace VisualTeensy
             Settings.Default.uplCLIBase = setupData.uplCLIBase.path;
             Settings.Default.uplJLinkBase = setupData.uplJLinkBase.path;
             Settings.Default.makeExePath = setupData.makeExeBase.path;
-            Settings.Default.libBase = setupData.libBase;
+            Settings.Default.libBase = setupData.tdLibBase;
             Settings.Default.debugSupport = setupData.debugSupportDefault;
         }
 
@@ -109,7 +109,7 @@ namespace VisualTeensy
             try
             {
                 var setup = loadSetup();               
-                setup.libBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
+                setup.tdLibBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
                
 
                 var  libManager = Factory.makeLibManager(setup);

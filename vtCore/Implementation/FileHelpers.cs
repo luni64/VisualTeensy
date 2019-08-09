@@ -212,7 +212,31 @@ namespace vtCore
             }
         }
 
-         
+
+        public static void copyFilesRecursively(Uri s, Uri t)
+        {
+            DirectoryInfo source = new DirectoryInfo(s.AbsolutePath);
+            DirectoryInfo target = new DirectoryInfo(t.AbsolutePath);
+
+            if (target.Exists) target.Delete(true);
+            copyFilesRecursively(source, target);
+
+            //foreach (DirectoryInfo dir in source.GetDirectories())
+            //{
+            //    copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
+            //}
+
+            //foreach (FileInfo file in source.GetFiles())
+            //{
+            //    string targetFileName = Path.Combine(target.FullName, file.Name);
+            //    if (!File.Exists(targetFileName))
+            //    {
+            //        file.CopyTo(Path.Combine(target.FullName, file.Name));
+            //    }
+            //}
+        }
+
+
 
         public static async Task downloadFile(Uri source, string target, TimeSpan expiry)
         {
@@ -240,9 +264,9 @@ namespace vtCore
         {
             if (!libBase.Exists) libBase.Create();
 
-            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName, lib.unversionedLibFolder));
+            var libDir = new DirectoryInfo(lib.targetUri.AbsolutePath);
             if (libDir.Exists) libDir.Delete(true);
-
+            
             // we will save the *.zip in a temp file and unzip into %temp%/vslib
             var tempFile = new FileInfo(Path.GetTempFileName());
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
@@ -252,7 +276,7 @@ namespace vtCore
             {
                 Console.Write($"Read {lib.name}... ");
 
-                using (var response = await client.GetAsync(lib.url))
+                using (var response = await client.GetAsync(lib.sourceUri))
                 {
                     response.EnsureSuccessStatusCode();
 

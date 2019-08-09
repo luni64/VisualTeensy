@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
 using vtCore;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
@@ -30,6 +31,8 @@ namespace ViewModel
             }
         }
 
+        public bool isShared { get; }
+
         public RepositoryVM(IRepository repo)
         {
             if (repo == null || repo.libraries == null) return;
@@ -41,6 +44,7 @@ namespace ViewModel
                 CustomSort = new AlphabeticSorter(),
             };
 
+            isShared = repo.type == RepoType.shared;
             name = repo.name;
         }
 

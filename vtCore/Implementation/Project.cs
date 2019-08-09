@@ -149,7 +149,6 @@ namespace vtCore
                     target = fileContent.target;
                     debugSupport = fileContent.debugSupport;
 
-
                     foreach (var cfg in fileContent.configurations)
                     {
                         var configuration = (Configuration)cfg;
@@ -171,13 +170,18 @@ namespace vtCore
                         // add libraries installed in ./lib                                                
                         string libPath = Path.Combine(path, "lib");
 
-                        var localLibs = LibraryReader.parseLibraryLocal(libPath)?.Select(version => version.FirstOrDefault());
+                        var ll = new RepositoryLocal("tmp",libPath);
 
+                        var localLibs = ll.libraries?.Select(version => version.FirstOrDefault());
+
+//                        var localLibs = LibraryReader.parseLocalRepository(libPath)?.Select(version => version.FirstOrDefault());
+                                                
                         if (localLibs != null)
                         {
                             foreach (var lib in localLibs)
                             {
-                                lib.source = Path.Combine(libPath, lib.path);  // lib will be copied to local => set source to the local path
+                                //lib.source = Path.Combine(libPath, lib.path);  // lib will be copied to local => set source to the local path
+                                lib.targetUri = lib.sourceUri;
                                 configuration.localLibs.Add(lib);
                             }
                         }

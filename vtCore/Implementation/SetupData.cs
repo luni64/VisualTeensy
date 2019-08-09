@@ -11,8 +11,7 @@ namespace vtCore
 
         // gnu make
         public CheckedPath makeExeBase { get; } = new CheckedPath("make.exe");
-        //public string makeExePathError => makeExeBase != null ? (File.Exists(makeExeBase) ? null : "Error") : "Error";
-
+       
         // uploaders
         public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
         public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
@@ -76,7 +75,7 @@ namespace vtCore
         }
 
         // libraries
-        public string libBase { get; set; }
+        public string tdLibBase { get; set; }
 
         // settings for quick setup
         public string arduinoCoreBase { get; private set; }
