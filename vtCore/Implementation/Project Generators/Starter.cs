@@ -2,7 +2,7 @@
 
 namespace vtCore
 {
-    static class Starter
+    public static class Starter
     {
         static public void start_vsCode(string folder, string file)
         {

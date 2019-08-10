@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace vtCore
+namespace vtCore.Interfaces
 {
     public interface ITask
     {

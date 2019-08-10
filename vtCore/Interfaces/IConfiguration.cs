@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace vtCore
+namespace vtCore.Interfaces
 {
     public enum SetupTypes
     {
@@ -28,8 +28,8 @@ namespace vtCore
         List<IBoard> boards { get; }
         IBoard selectedBoard { get; set; }
 
-        List<Library> sharedLibs { get; }
-        List<Library> localLibs { get; }
+        List<IProjectLibrary> sharedLibs { get; }
+        List<IProjectLibrary> localLibs { get; }
         //List<Library> projectLibs { get; }
 
         void parseBoardsTxt(string bt);

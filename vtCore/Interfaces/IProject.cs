@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using vtCore.Interfaces;
 
-namespace vtCore
+namespace vtCore.Interfaces
 {
     public enum Target
     {
@@ -35,6 +36,8 @@ namespace vtCore
 
         string path { get; set; }
         string pathError { get; }
+
+        string libBase { get; }
 
         Target target{ get; set; }
         BuildSystem buildSystem { get; set; }

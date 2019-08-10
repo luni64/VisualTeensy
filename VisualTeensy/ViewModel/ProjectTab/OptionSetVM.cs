@@ -1,7 +1,7 @@
 ﻿using vtCore;
 using System;
 using System.Collections.Generic;
-
+using vtCore.Interfaces;
 
 namespace ViewModel
 {

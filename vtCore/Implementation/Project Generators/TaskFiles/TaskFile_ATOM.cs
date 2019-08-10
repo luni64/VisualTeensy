@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
+using vtCore.Interfaces;
 
 namespace vtCore
 {

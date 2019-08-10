@@ -20,8 +20,7 @@ namespace VisualTeensy
         {
             this.Close();
         }
-
-        
+               
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -196,7 +197,7 @@ namespace vtCore
         }
 
         public static void copyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {
+        {            
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
                 copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
@@ -215,25 +216,13 @@ namespace vtCore
 
         public static void copyFilesRecursively(Uri s, Uri t)
         {
-            DirectoryInfo source = new DirectoryInfo(s.AbsolutePath);
-            DirectoryInfo target = new DirectoryInfo(t.AbsolutePath);
+            if (s == t) return;
+
+            DirectoryInfo source = new DirectoryInfo(s.LocalPath);
+            DirectoryInfo target = new DirectoryInfo(t.LocalPath);
 
             if (target.Exists) target.Delete(true);
             copyFilesRecursively(source, target);
-
-            //foreach (DirectoryInfo dir in source.GetDirectories())
-            //{
-            //    copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
-            //}
-
-            //foreach (FileInfo file in source.GetFiles())
-            //{
-            //    string targetFileName = Path.Combine(target.FullName, file.Name);
-            //    if (!File.Exists(targetFileName))
-            //    {
-            //        file.CopyTo(Path.Combine(target.FullName, file.Name));
-            //    }
-            //}
         }
 
 
@@ -260,15 +249,14 @@ namespace vtCore
         }
 
 
-        public async static Task downloadLibrary(Library lib, DirectoryInfo libBase)
+        public async static Task downloadLibrary(IProjectLibrary lib, DirectoryInfo libBase)
         {
             if (!libBase.Exists) libBase.Create();
 
-            var libDir = new DirectoryInfo(lib.targetUri.AbsolutePath);
+            var libDir = new DirectoryInfo(lib.targetUri.LocalPath);
             if (libDir.Exists) libDir.Delete(true);
             
-            // we will save the *.zip in a temp file and unzip into %temp%/vslib
-            var tempFile = new FileInfo(Path.GetTempFileName());
+            // we will save the *.zip in a temp file and unzip into %temp%/vslib            
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
             if (tempFolder.Exists) tempFolder.Delete(true);
 
@@ -295,7 +283,7 @@ namespace vtCore
 
                 Console.WriteLine("done");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw;
             }            
@@ -303,7 +291,7 @@ namespace vtCore
 
      
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
+        private static extern int getShortPathName(string longPath, StringBuilder shortPath, int bufSize);
         public static string getShortPath(string longPath)
         {
 
@@ -314,11 +302,11 @@ namespace vtCore
 
             const int maxPath = 255;
             StringBuilder shortPath = new StringBuilder(maxPath);
-            int i = GetShortPathName(longPath, shortPath, maxPath);
+            int i = getShortPathName(longPath, shortPath, maxPath);
             return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
+        public static extern int getLongPathName(string path, StringBuilder longPath, int longPathLength);
     }
 }

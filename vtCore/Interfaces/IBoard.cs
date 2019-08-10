@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace vtCore
+namespace vtCore.Interfaces
 {
     public interface IBoard
     {

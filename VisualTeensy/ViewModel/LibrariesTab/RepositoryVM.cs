@@ -11,7 +11,8 @@ namespace ViewModel
 {
     public class RepositoryVM : BaseViewModel
     {
-        public string name { get; }
+        public string name => repo.name;
+        public string repoPath => repo.repoPath;
         public ListCollectionView libVMs { get; }
 
         public void filter(List<string> sl)
@@ -45,10 +46,13 @@ namespace ViewModel
             };
 
             isShared = repo.type == RepoType.shared;
-            name = repo.name;
+            
+            this.repo = repo;
         }
 
         #region private methods and fields ------------------------------
+
+        private IRepository repo; 
 
         private string _searchString;
 

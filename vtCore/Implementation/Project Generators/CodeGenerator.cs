@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
-    public static class CodeGenerator 
+    public static class CodeGenerator
     {
         public static IReadOnlyList<ITask> getTasks(IProject project, LibManager libManager, SetupData setup)
         {
@@ -15,17 +16,17 @@ namespace vtCore
                     tasks.Add(new GenerateSettings(project));
                     tasks.Add(new GenerateIntellisense(project, libManager, setup));
                     tasks.Add(new GenerateMakefile(project, libManager, setup));
-                    tasks.Add(new GenerateTasks(project, libManager, setup));
-                    tasks.Add(new CopyLibs(project));
-                    if (project.selectedConfiguration.copyCore)
-                    {
-                        tasks.Add(new CopyCore(project));
-                    }
+                    tasks.Add(new GenerateTasks(project, setup));
                     if (project.buildSystem == BuildSystem.makefile)
                     {
-                        tasks.Add(new GenerateMainCpp(project));
+                        tasks.Add(new CopyLibs(project));
+                        if (project.selectedConfiguration.copyCore)
+                        {
+                            tasks.Add(new CopyCore(project));
+                        }
                     }
                     tasks.Add(new CleanBinaries(project));
+                    tasks.Add(new GenerateSketch(project));
                     break;
 
                 case Target.atom:

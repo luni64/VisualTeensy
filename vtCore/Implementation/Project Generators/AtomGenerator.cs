@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -16,7 +17,7 @@ namespace vtCore
             tasks.Add(new GenerateSettings(project));
             tasks.Add(new GenerateIntellisense(project, libManager, setup));
             tasks.Add(new GenerateMakefile(project, libManager, setup));
-            tasks.Add(new GenerateTasks(project, libManager, setup));
+            tasks.Add(new GenerateTasks(project, setup));
             tasks.Add(new CopyLibs(project));
 
             if (project.selectedConfiguration.copyCore)
@@ -26,7 +27,7 @@ namespace vtCore
 
             if (project.buildSystem == BuildSystem.makefile)
             {
-                tasks.Add(new GenerateMainCpp(project));
+                tasks.Add(new GenerateSketch(project));
             }
             tasks.Add(new CleanBinaries(project));
 
@@ -64,7 +65,7 @@ namespace vtCore
             await Task.Delay(1);
 
             // Task_json --------------------------------------------------------------------------
-            var tasksJson = TaskFile.generate(project, libManager, setup);
+            var tasksJson = TaskFile.generate(project, setup);
             File.WriteAllText(taskJsonFile, tasksJson);
             progressHandler.Report("Generate process-palette.json");
             progressHandler.Report("OK");
@@ -147,6 +148,7 @@ namespace vtCore
             //{
             //    File.WriteAllText(mainFile, Strings.mainCpp);
             //}
+            await Task.CompletedTask;
         }
     }
 }

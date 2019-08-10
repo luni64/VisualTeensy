@@ -2,7 +2,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using vtCore.Interfaces;
 using vtCore;
+
 
 namespace ViewModel
 {
@@ -292,7 +294,7 @@ namespace ViewModel
             this.setup = setup;
 
             makefile = Makefile.generate(project, libManager, setup);
-            taskFile = TaskFile.generate(project, libManager, setup);
+            taskFile = TaskFile.generate(project, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
             settFile = ProjectSettings.generate(project);
             debugFile = DebugFile.generate(project, setup);
@@ -316,7 +318,7 @@ namespace ViewModel
            // project.generateFiles();
 
             makefile = Makefile.generate(project, libManager, setup);
-            taskFile = TaskFile.generate(project, libManager, setup);
+            taskFile = TaskFile.generate(project, setup);
             propFile = IntellisenseFile.generate(project, libManager, setup);
             settFile = ProjectSettings.generate(project);
             debugFile = DebugFile.generate(project, setup);

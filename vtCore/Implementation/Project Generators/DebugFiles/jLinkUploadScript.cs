@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using vtCore.Interfaces;
 
 namespace vtCore
 {

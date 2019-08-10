@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -18,32 +19,18 @@ namespace vtCore
         }
     }
 
-
     internal class Project : IProject
     {
         public IEnumerable<IConfiguration> configurations => _configurations;
         public IConfiguration selectedConfiguration => _selectedConfiguration;
 
-        private SetupData setup;
         public LibManager libManager { get; private set; }
 
         public Target target { get; set; } = Target.vsCode;
         public BuildSystem buildSystem { get; set; } = BuildSystem.makefile;
         public DebugSupport debugSupport { get; set; } = DebugSupport.none;
 
-        private List<Configuration> _configurations { get; }
-        private Configuration _selectedConfiguration { get; set; }
-
-        public bool isMakefileBuild { get; set; } = true;
-
-
-
-
-
-        // files ------------------------------------
-        // public string makefile { get; set; }
-
-        public string vsSetup_json { get; set; }
+        // public bool isMakefileBuild { get; set; } = true;
 
         public string path { get; set; }
         public string pathError
@@ -58,6 +45,7 @@ namespace vtCore
                 catch { return "Path to the project folder not valid"; }
             }
         }
+        public string libBase => Path.Combine(path, "lib");
         public string name => Path.GetFileName(path ?? "ERROR");
         public string cleanName => name.Replace(" ", "_");
 
@@ -76,18 +64,13 @@ namespace vtCore
             _configurations.Clear();
             var sc = Configuration.getDefault(setup);
 
-            _selectedConfiguration = sc;// Configuration.getDefault(setup);
-            _configurations.Add(sc);
-            //_configs.Add(selectedConfiguration);
+            _selectedConfiguration = sc;
+            _configurations.Add(sc);           
 
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
             _configurations.Add(dummyConfig);
-
-
-
         }
-
 
         public void openProject(string projectPath)
         {
@@ -111,18 +94,10 @@ namespace vtCore
         {
             this.setup = setup;
             this.libManager = libManager;
-            this._configurations = new List<Configuration>();
-
-            //var userPackages = Directory.GetDirectories(Helpers.arduinoAppPath + "\\packages");
-            //var builtInPackages = Directory.GetDirectories(Helpers.arduinoPath + "\\hardware");
-            //var packages = userPackages.Select(p => new Package(p)).ToList();
+            this._configurations = new List<IConfiguration>();
         }
-
-        public RepositoryIndexJson sharedLibraries { get; }
-
-
-
-        void openNewFolder()
+                
+        private void openNewFolder()
         {
             buildSystem = BuildSystem.makefile;
             target = Target.vsCode;
@@ -132,8 +107,7 @@ namespace vtCore
             _configurations.Add(sc);
             _selectedConfiguration = sc;
         }
-
-        void openExistingFolder(string vsTeensyJsonPath)
+        private void openExistingFolder(string vsTeensyJsonPath)
         {
             try
             {  // read vsTeensy.json
@@ -153,36 +127,32 @@ namespace vtCore
                     {
                         var configuration = (Configuration)cfg;
 
-                        // add shared libraries
+                        // add shared libraries ---------------------
                         if (cfg.sharedLibraries != null)
                         {
                             var sharedLibraries = libManager.sharedRepository.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
+                            
                             foreach (var cfgSharedLib in cfg.sharedLibraries)
                             {
-                                var library = sharedLibraries.FirstOrDefault(lib => lib.path == cfgSharedLib); // find the corresponding lib
+                                var library = sharedLibraries.FirstOrDefault(lib => lib.sourceFolderName == cfgSharedLib); // find the corresponding lib
                                 if (library != null)
                                 {
-                                    configuration.sharedLibs.Add(library);
+                                    configuration.sharedLibs.Add(ProjectLibrary.cloneFromLib(library));
                                 }
                             }
                         }
 
-                        // add libraries installed in ./lib                                                
-                        string libPath = Path.Combine(path, "lib");
+                        // add libraries installed in ./lib ---------------------                                          
+                        var repo = new RepositoryLocal("tmp", libBase);   // Hack, directly store repo instead of lib list???
+                        var localLibs = repo.libraries?.Select(version => version.FirstOrDefault());
 
-                        var ll = new RepositoryLocal("tmp",libPath);
-
-                        var localLibs = ll.libraries?.Select(version => version.FirstOrDefault());
-
-//                        var localLibs = LibraryReader.parseLocalRepository(libPath)?.Select(version => version.FirstOrDefault());
-                                                
                         if (localLibs != null)
                         {
                             foreach (var lib in localLibs)
                             {
-                                //lib.source = Path.Combine(libPath, lib.path);  // lib will be copied to local => set source to the local path
-                                lib.targetUri = lib.sourceUri;
-                                configuration.localLibs.Add(lib);
+                                var pl =  ProjectLibrary.cloneFromLib(lib);
+                                pl.targetUri = lib.sourceUri;
+                                configuration.localLibs.Add(pl);
                             }
                         }
 
@@ -212,15 +182,15 @@ namespace vtCore
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);
-                _selectedConfiguration = sc;// Configuration.getDefault(setup);
-                _configurations.Add(sc);//electedConfiguration);
-                                        //_configs.Add(selectedConfiguration);
-                                        //   generateFiles();
+                _selectedConfiguration = sc;
+                _configurations.Add(sc);
+
                 return;
             }
         }
-
-
+        private List<IConfiguration> _configurations { get; }
+        private IConfiguration _selectedConfiguration { get; set; }
+        private readonly SetupData setup;
     }
 }
 

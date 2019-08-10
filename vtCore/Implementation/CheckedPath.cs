@@ -30,8 +30,8 @@ namespace vtCore
 
 
         string _path;
-        string checkedFile;
-        bool optional;
+        readonly string checkedFile;
+        readonly bool optional;
 
         string check()
         {

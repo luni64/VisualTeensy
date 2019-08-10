@@ -5,43 +5,43 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using vtCore.Interfaces;
 
 namespace vtCore
 {
-    internal class libs
+    internal class Libs
     {
-        public List<idxLib> libraries { get; set; }
+        public List<IdxLib> libraries { get; set; }
     }
 
-    internal class idxLib
+    internal class IdxLib
     {
-        public string name { get; set; }               
-        public string version { get; set; }            
-        public string author { get; set; }             
-        public string maintainer { get; set; }         
-        public string sentence { get; set; }           
-        public string paragraph { get; set; }          
-        public string category { get; set; }           
-        public string archiveFileName { get; set; }    
-        public uint size { get; set; }                 
-        public string website { get; set; }            
-        public string url { get; set; }        
+        public string name { get; set; }
+        public string version { get; set; }
+        public string author { get; set; }
+        public string maintainer { get; set; }
+        public string sentence { get; set; }
+        public string paragraph { get; set; }
+        public string category { get; set; }
+        public string archiveFileName { get; set; }
+        public uint size { get; set; }
+        public string website { get; set; }
+        public string url { get; set; }
         public List<string> architectures { get; set; }
         public List<string> types { get; set; }
         public string checksum { get; set; }
     }
 
     static class LibraryReader
-    {              
-        public static ILookup<string, Library> parseIndexJsonRepository(string library_indexJson)
-        {           
+    {
+        public static ILookup<string, ILibrary> parseIndexJsonRepository(string library_indexJson)
+        {
             try
             {
                 string jsonString = File.ReadAllText(library_indexJson);
-                var jsonLibs = JsonConvert.DeserializeObject<libs>(jsonString).libraries;
-                                
-                return jsonLibs.Select(t => new Library()
+                var jsonLibs = JsonConvert.DeserializeObject<Libs>(jsonString).libraries;
+
+                var ret = jsonLibs.Select(t => new Library()
                 {
                     name = t.name,
                     version = t.version,
@@ -52,15 +52,17 @@ namespace vtCore
                     archiveFileName = t.archiveFileName,
                     website = t.website,
                     sourceUri = new Uri(t.url),
-                    
-                    
+
+
                     architectures = t.architectures,
                     types = t.types,
 
-                    
-                }).ToLookup(k => k.name); // libraries structured by name (more than on version per name possible)
+
+                } as ILibrary).ToLookup(k => k.name); // libraries structured by name (more than on version per name possible)
+
+                return ret;
             }
-            catch //(Exception ex)
+            catch 
             {
                 //log.Warn($"Parsing of {library_indexJson} failed", ex);
                 return null;
@@ -103,8 +105,8 @@ namespace vtCore
         //        lib.paragraph = props.GetValueOrDefault("paragraph");
         //        lib.category = props.GetValueOrDefault("category");
         //        lib.website = props.GetValueOrDefault("url");
-                                
-                
+
+
         //    }
         //    else
         //    {
@@ -123,11 +125,10 @@ namespace vtCore
 
         //    return lib;
         //}
-                
-        public static string GetValueOrDefault(this IDictionary<string, string> dictionary, string key)
-        {
-            string value;
-            return dictionary.TryGetValue(key, out value) ? value.Trim() : null;
+
+        public static string getValueOrDefault(this IDictionary<string, string> dictionary, string key)
+        {            
+            return dictionary.TryGetValue(key, out string value) ? value.Trim() : null;
         }
 
     }

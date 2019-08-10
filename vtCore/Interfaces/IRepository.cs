@@ -11,7 +11,7 @@ namespace vtCore.Interfaces
     {
         string name { get; }
         string repoPath { get; }
-        ILookup<string, Library> libraries { get; }
+        ILookup<string, ILibrary> libraries { get; }
 
         RepoType type { get; }
     }

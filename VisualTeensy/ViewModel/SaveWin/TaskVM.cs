@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using vtCore;
+﻿using System.Threading.Tasks;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
@@ -24,8 +20,7 @@ namespace ViewModel
         {
             this.task = task;
         }
-               
 
-        ITask task;
+        readonly ITask task;
     }
 }

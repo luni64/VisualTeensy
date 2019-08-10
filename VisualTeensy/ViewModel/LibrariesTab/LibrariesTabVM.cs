@@ -9,7 +9,6 @@ using vtCore;
 using vtCore.Interfaces;
 
 
-
 namespace ViewModel
 {
     class LibrariesTabVM : BaseViewModel, IDropTarget
@@ -17,12 +16,12 @@ namespace ViewModel
         public RelayCommand cmdDel { get; }
         void doDel(object o)
         {
-            var lib = o as Library;
+            var lib = o as IProjectLibrary;
             projectLibraries.Remove(lib);
         }
 
 
-        public ObservableCollection<Library> projectLibraries { get; }
+        public ObservableCollection<IProjectLibrary> projectLibraries { get; }
         public ListCollectionView repos { get; }
 
         public LibrariesTabVM(IProject project, LibManager libManager)
@@ -34,7 +33,7 @@ namespace ViewModel
             repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
             repos.CurrentChanged += (s, e) => searchString = searchString; // trigger a filter event on new repo
 
-            projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
+            projectLibraries = new ObservableCollection<IProjectLibrary>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
 
@@ -59,23 +58,30 @@ namespace ViewModel
 
                     var curRepo = repos.CurrentItem as RepositoryVM;
 
-                    foreach (Library library in e.NewItems)
-                    {                       
-                        if(curRepo.isShared)
+                    foreach (IProjectLibrary library in e.NewItems)
+                    {
+                        if (curRepo.isShared)
                         {
                             project.selectedConfiguration.sharedLibs.Add(library);
                         }
                         else
                         {
-                            string safeName = library.unversionedLibFolder; //hack
-                            library.targetUri = new Uri(Path.Combine(project.path, "lib",safeName));
+                            if (library.isLocalSource)
+                            {
+                                var source = library.sourceUri.LocalPath;
+                                library.targetUri = new Uri(source.Replace(curRepo.repoPath, project.libBase));
+                            }
+                            else if (library.isWebSource)
+                            {
+                                library.targetUri = new Uri(Path.Combine(project.libBase, library.name.Replace(' ', '_')));
+                            }
                             project.selectedConfiguration.localLibs.Add(library);
                         }
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (Library library in e.OldItems)
+                    foreach (IProjectLibrary library in e.OldItems)
                     {
                         if (library.isLocalSource)
                         {
@@ -110,7 +116,7 @@ namespace ViewModel
 
             var sourceItem = dropInfo.Data as LibraryVM;
             var lib = sourceItem.selectedVersion;
-            projectLibraries.Add(lib);
+            projectLibraries.Add(ProjectLibrary.cloneFromLib(lib));
         }
 
         public void update()

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using vtCore;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
@@ -9,7 +10,7 @@ namespace ViewModel
         public SetupTabVM setupTabVM { get; }
         public ProjectTabVM projecTabVM { get; }
         public LibrariesTabVM librariesTabVM { get; }
-       
+
         public RelayCommand cmdFileOpen { get; set; }
         void doFileOpen(object path)
         {
@@ -46,12 +47,8 @@ namespace ViewModel
         {
             get
             {
-               
-                   // var v = ApplicationDeployment.CurrentDeployment.CurrentVersion;
-                    var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                    return $"VisualTeensy V{v.Major}.{v.Minor}.{v.Build}.{v.Revision} - lunOptics";
-               
-                
+                var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                return $"VisualTeensy V{v.Major}.{v.Minor}.{v.Build}.{v.Revision} - lunOptics";
             }
         }
 
@@ -61,10 +58,10 @@ namespace ViewModel
             this.libManager = libManager;
             this.setup = setup;
 
-            projecTabVM = new ProjectTabVM(project,libManager,setup);
-            setupTabVM = new SetupTabVM(project,setup);
+            projecTabVM = new ProjectTabVM(project, libManager, setup);
+            setupTabVM = new SetupTabVM(project, setup);
             librariesTabVM = new LibrariesTabVM(project, libManager);
-          
+
             cmdFileOpen = new RelayCommand(doFileOpen);
             cmdFileNew = new RelayCommand(doFileNew);
             cmdClose = new RelayCommand(doClose);

@@ -91,7 +91,7 @@ namespace vtCore
 
         public static SetupData getDefault()
         {
-            SetupData sd = new SetupData();
+            var sd = new SetupData();
             
             sd.arduinoBase = Helpers.findArduinoFolder().Trim();
             Helpers.arduinoPath = sd.arduinoBase;

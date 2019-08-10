@@ -13,6 +13,7 @@ using System.Windows;
 using ViewModel;
 using VisualTeensy.Properties;
 using vtCore;
+using vtCore.Interfaces;
 
 namespace VisualTeensy
 {

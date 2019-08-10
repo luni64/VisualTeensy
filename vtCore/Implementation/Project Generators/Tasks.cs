@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
+    // -----------------------------------------------------------------------
+    // Prepare Folders
+    // -----------------------------------------------------------------------
+
     class PrepareFolders : ITask
     {
         public string title => "Project Folders";
@@ -20,9 +21,9 @@ namespace vtCore
         {
             vsCodeFolder = new DirectoryInfo(Path.Combine(project.path, ".vscode"));
             vsTeensyFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy"));
-            srcFolder = new DirectoryInfo(Path.Combine(project.path, "src"));
-
-            done = vsCodeFolder.Exists && vsTeensyFolder.Exists && srcFolder.Exists;
+            srcFolder = project.buildSystem == BuildSystem.makefile ? new DirectoryInfo(Path.Combine(project.path, "src")) : null;
+            
+            done = vsCodeFolder.Exists && vsTeensyFolder.Exists && srcFolder != null && srcFolder.Exists;
         }
 
         public Func<Task> action => async () =>
@@ -31,18 +32,20 @@ namespace vtCore
             {
                 vsCodeFolder.Create();
                 vsTeensyFolder.Create();
-                srcFolder.Create();
+                srcFolder?.Create();
             }
             done = true;
             await Task.CompletedTask;
         };
 
-
-        DirectoryInfo vsCodeFolder, vsTeensyFolder, srcFolder;
-
+        private readonly DirectoryInfo vsCodeFolder;
+        private readonly DirectoryInfo vsTeensyFolder;
+        private readonly DirectoryInfo srcFolder;
     }
 
-
+    // -----------------------------------------------------------------------
+    // Clean Binaries 
+    // -----------------------------------------------------------------------
 
     class CleanBinaries : ITask
     {
@@ -66,11 +69,14 @@ namespace vtCore
             await Task.CompletedTask;
         };
 
-        DirectoryInfo buildFolder;
+        readonly DirectoryInfo buildFolder;
         bool done = false;
 
     }
 
+    //-----------------------------------------------------------------------
+    // Generate Intellisense 
+    //-----------------------------------------------------------------------
     class GenerateIntellisense : ITask
     {
         public string title => $"Intellisense configuration";
@@ -93,24 +99,29 @@ namespace vtCore
             string properties = IntellisenseFile.generate(project, libManager, setup);
             File.WriteAllText(c_cpp_propertiesFile.FullName, properties);
             done = true;
-            await Task.Delay(1000);
+            await Task.CompletedTask;
         };
 
-        bool exists, done;
-        IProject project;
-        LibManager libManager;
-        SetupData setup;
-
-        FileInfo c_cpp_propertiesFile;
+        private readonly bool exists;
+        private bool done;
+        readonly IProject project;
+        readonly LibManager libManager;
+        readonly SetupData setup;
+        readonly FileInfo c_cpp_propertiesFile;
     }
 
+
+    //-----------------------------------------------------------------------
+    // Generate Settings
+    //-----------------------------------------------------------------------
     class GenerateSettings : ITask
     {
         public string title => $"VisualTeensy settings";
         public string description => settingsFile.FullName;
         public string status => done ? "OK" : exists ? "Overwrite" : "Generate";
 
-        bool exists, done;
+        private readonly bool exists;
+        private bool done;
 
         public GenerateSettings(IProject project)
         {
@@ -122,7 +133,6 @@ namespace vtCore
             exists = settingsFile.Exists;
             done = false;
         }
-
         public Func<Task> action => async () =>
         {
             string properties = ProjectSettings.generate(project);
@@ -131,10 +141,13 @@ namespace vtCore
             await Task.CompletedTask;
         };
 
-        IProject project;
-        FileInfo settingsFile;
+        readonly IProject project;
+        readonly FileInfo settingsFile;
     }
 
+    //-----------------------------------------------------------------------
+    // Generate Makefile 
+    //-----------------------------------------------------------------------
     class GenerateMakefile : ITask
     {
         public string title => $"Makefile";
@@ -171,11 +184,13 @@ namespace vtCore
             await Task.CompletedTask;
         };
 
-        string newMakefile;
-
-        FileInfo file;
+        readonly string newMakefile;
+        readonly FileInfo file;
     }
 
+    //-----------------------------------------------------------------------
+    // Generate  Tasks.json 
+    //-----------------------------------------------------------------------
     class GenerateTasks : ITask
     {
         public string title => $"Tasks File";
@@ -184,10 +199,10 @@ namespace vtCore
 
         bool done;
 
-        public GenerateTasks(IProject project, LibManager libManager, SetupData setup)
+        public GenerateTasks(IProject project, SetupData setup)
         {
             file = new FileInfo(Path.Combine(project.path, ".vscode", "tasks.json"));
-            tasksJson = TaskFile.generate(project, libManager, setup);
+            tasksJson = TaskFile.generate(project, setup);
 
             done = false;
         }
@@ -199,42 +214,66 @@ namespace vtCore
             await Task.CompletedTask;
         };
 
-        string tasksJson;
-
-        FileInfo file;
+        private readonly string tasksJson;
+        private readonly FileInfo file;
     }
 
-    class GenerateMainCpp : ITask
+    //-----------------------------------------------------------------------
+    // Generate Sketch (main.cpp oder name.ino)
+    //-----------------------------------------------------------------------
+    class GenerateSketch : ITask
     {
         public string title => $"Main Sketch";
         public string description => file.FullName;
 
         public string status => done ? "OK" : file.Exists ? "Exists" : "Generate";
 
-        public GenerateMainCpp(IProject project)
+        public GenerateSketch(IProject project)
         {
-            file = new FileInfo(Path.Combine(project.path, "src", "make.cpp"));
+            if (project.buildSystem == BuildSystem.makefile)
+            {
+                file = new FileInfo(Path.Combine(project.path, "src", "main.cpp"));
+                fileContent = Strings.mainCpp;
+            }
+            else
+            {
+                file = new FileInfo(Path.Combine(project.path, project.cleanName + ".ino"));
+                fileContent = Strings.sketchIno;
+            }
             done = false;
+
+            this.project = project;
         }
 
         public Func<Task> action => async () =>
         {
-            if (status == "Generate") File.WriteAllText(file.FullName, Strings.mainCpp);
+            if (status == "Generate")
+            {                
+                File.WriteAllText(file.FullName, fileContent);
+            }
             done = true;
+
+            Starter.start_vsCode(project.path, file.FullName);
+            
             await Task.CompletedTask;
         };
 
         bool done = false;
 
-        FileInfo file;
+        private readonly FileInfo file;
+        private readonly string fileContent;
+        private readonly IProject project;
     }
 
+    //--------------------------------------------------------------------------------------------
+    // Copy Core Libraries 
+    //--------------------------------------------------------------------------------------------
     class CopyCore : ITask
     {
         public string title => $"Copy core libraries";
-        public string description => $"from: {sourceUri.AbsolutePath} to: ./core/";
+        public string description => $"from: {sourceUri.LocalPath} to: ./core/";
 
-        public string status => done ? "OK" : Directory.Exists(targetUri.AbsolutePath) ? "Exists" : "Copy";
+        public string status => done ? "OK" : Directory.Exists(targetUri.LocalPath) ? "Exists" : "Copy";
 
         public CopyCore(IProject project)
         {
@@ -246,7 +285,7 @@ namespace vtCore
         public Func<Task> action => async () =>
         {
             if (status == "Copy")
-            {                
+            {
                 Helpers.copyFilesRecursively(sourceUri, targetUri);
             }
             done = true;
@@ -254,10 +293,13 @@ namespace vtCore
         };
 
         bool done = false;
-
-        Uri targetUri, sourceUri;
+        private readonly Uri targetUri;
+        private readonly Uri sourceUri;
     }
 
+    //--------------------------------------------------------------------------------------------
+    // Copy local libraries
+    //--------------------------------------------------------------------------------------------
     class CopyLibs : ITask
     {
         public string title => $"Copy local libraries";
@@ -272,32 +314,28 @@ namespace vtCore
             done = false;
         }
 
-        
+
         public Func<Task> action => async () =>
         {
             var baseUri = new Uri(libBase.FullName);
 
-            foreach (Library library in project.selectedConfiguration.localLibs)
-            {               
-               // var targetUri = new Uri(Path.Combine(baseUri.AbsolutePath, library.sourceUri.Segments.Last()));
-                                
-                if (library.isLocalSource & library.sourceUri != library.targetUri)
+            foreach (IProjectLibrary library in project.selectedConfiguration.localLibs)
+            {
+                if (library.isLocalSource)
                 {
                     Helpers.copyFilesRecursively(library.sourceUri, library.targetUri);
                 }
                 else if (library.isWebSource)
                 {
                     await Helpers.downloadLibrary(library, libBase);
-                }                
+                }
             };
             done = true;
         };
 
         bool done = false;
 
-        DirectoryInfo libBase;
-
-
-        IProject project;
+        private readonly DirectoryInfo libBase;
+        private readonly IProject project;
     }
 }

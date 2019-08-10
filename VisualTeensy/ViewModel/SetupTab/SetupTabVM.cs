@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using vtCore;
+using vtCore.Interfaces;
 using Task = System.Threading.Tasks.Task;
 
 namespace ViewModel
