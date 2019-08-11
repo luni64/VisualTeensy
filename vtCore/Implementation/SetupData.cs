@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 
 namespace vtCore
@@ -40,7 +41,10 @@ namespace vtCore
 
                         path = Path.Combine(arduinoBase, "hardware", "tools", "arm");
                         arduinoCompiler = Directory.Exists(path) ? path : null;
+
+                        uplPjrcBase.path = arduinoTools;
                     }
+
                 }
                 else
                 {
@@ -88,7 +92,15 @@ namespace vtCore
         public string makefile_builder { get; set; }
         public bool debugSupportDefault { get; set; }
 
-
+        //makefile output colors ---------------
+        public bool isColoredOutput { get; set; }
+        public Color colorCore { get; set; }
+        public Color colorUserLib { get; set; }
+        public Color colorUserSrc { get; set; }
+        public Color colorLink { get; set; }
+        public Color colorErr { get; set; }
+        public Color colorOk { get; set; }
+        
         public static SetupData getDefault()
         {
             var sd = new SetupData();
@@ -105,6 +117,14 @@ namespace vtCore
             
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
+
+            sd.isColoredOutput = true;
+            sd.colorCore = Color.BlueViolet;
+            sd.colorUserLib = Color.CadetBlue;
+            sd.colorUserSrc = Color.CornflowerBlue;
+            sd.colorOk = Color.DarkGreen;
+            sd.colorLink = Color.Yellow;
+            sd.colorErr = Color.Red;
 
             return sd;
         }

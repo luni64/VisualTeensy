@@ -4,6 +4,7 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -35,18 +36,31 @@ namespace VisualTeensy
 
             var setupData = new SetupData();
 
+            //var setupData = SetupData.getDefault();
+
 
             setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder()?.Trim() : Settings.Default.arduinoBase;
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-            setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
+           // setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
             setupData.uplTyBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
             setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
             setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
             setupData.makeExeBase.path = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Directory.GetCurrentDirectory() : Settings.Default.makeExePath;
             setupData.tdLibBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
             setupData.debugSupportDefault = Settings.Default.debugSupport;
+
+          
+
+            setupData.isColoredOutput = Settings.Default.ColorEnabled;
+            setupData.colorCore = Settings.Default.ColCore.IsEmpty ? Color.BlueViolet : Settings.Default.ColCore;
+            setupData.colorUserLib = Settings.Default.ColLib.IsEmpty ? Color.CadetBlue : Settings.Default.ColLib;
+            setupData.colorUserSrc = Settings.Default.ColSrc.IsEmpty ? Color.CornflowerBlue : Settings.Default.ColSrc;
+            setupData.colorOk = Settings.Default.ColOk.IsEmpty ? Color.DarkGreen : Settings.Default.ColOk;
+            setupData.colorLink = Settings.Default.ColLink.IsEmpty ? Color.Yellow : Settings.Default.ColLink;
+            setupData.colorErr = Settings.Default.ColErr.IsEmpty ? Color.Red : Settings.Default.ColErr;
+
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
@@ -72,7 +86,17 @@ namespace VisualTeensy
             Settings.Default.makeExePath = setupData.makeExeBase.path;
             Settings.Default.libBase = setupData.tdLibBase;
             Settings.Default.debugSupport = setupData.debugSupportDefault;
+            Settings.Default.ColorEnabled = setupData.isColoredOutput;
+            Settings.Default.ColCore = setupData.colorCore;
+            Settings.Default.ColLib = setupData.colorUserLib;
+            Settings.Default.ColSrc = setupData.colorUserSrc;
+            Settings.Default.ColOk = setupData.colorOk;
+            Settings.Default.ColLink = setupData.colorLink;
+            Settings.Default.ColErr = setupData.colorErr;
         }
+
+        static public MainWindow mainWin { get; private set; }
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -112,7 +136,6 @@ namespace VisualTeensy
                 var setup = loadSetup();               
                 setup.tdLibBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
                
-
                 var  libManager = Factory.makeLibManager(setup);
                 var project =  Factory.makeProject(setup, libManager);
 
@@ -127,7 +150,7 @@ namespace VisualTeensy
 
                 var mainVM = new MainVM(project, libManager, setup);
 
-                var mainWin = new MainWindow()
+                mainWin = new MainWindow()
                 {
                     DataContext = mainVM,
                     Left = Settings.Default.mainWinBounds.Left,
@@ -137,6 +160,8 @@ namespace VisualTeensy
                 };
 
                 mainWin.ShowDialog();
+
+                           
 
                 saveSetup(setup);
 

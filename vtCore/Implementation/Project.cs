@@ -48,6 +48,7 @@ namespace vtCore
         public string libBase => Path.Combine(path, "lib");
         public string name => Path.GetFileName(path ?? "ERROR");
         public string cleanName => name.Replace(" ", "_");
+        public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName, ".ino");
 
         public void newProject()
         {
@@ -178,7 +179,7 @@ namespace vtCore
                 }
 
             }
-            catch (Exception ex)
+            catch //(Exception ex)
             {
                 //log.Warn($"config file {vsTeensyJson} does not exist");
                 var sc = Configuration.getDefault(setup);

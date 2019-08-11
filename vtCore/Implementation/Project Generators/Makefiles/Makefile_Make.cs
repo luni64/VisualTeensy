@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using vtCore.Interfaces;
+using System.Drawing;
 
 namespace vtCore
 {
@@ -11,6 +12,8 @@ namespace vtCore
     {
         static public string generate(IProject project, LibManager libManager, SetupData setup)
         {
+            const char esc = (char)27;
+
             var cfg = project.selectedConfiguration;
             var board = cfg.selectedBoard;
             if (board == null) return "";
@@ -68,7 +71,11 @@ namespace vtCore
             if (!String.IsNullOrWhiteSpace(setup.uplJLinkBase.path)) mf.Append($"UPL_JLINK_B      := {setup.uplJLinkBase.shortPath}\n");
             if (!String.IsNullOrWhiteSpace(setup.uplCLIBase.path)) mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n");
 
-            mf.Append("\n");
+
+            mf.Append("\n#******************************************************************************\n");
+            mf.Append("# Flags and Defines\n");
+            mf.Append("#******************************************************************************\n");            
+           
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
@@ -104,6 +111,21 @@ namespace vtCore
                 mf.Append("\n");
             }
 
+            if(setup.isColoredOutput)
+            {
+                mf.Append("\n#******************************************************************************\n");
+                mf.Append("# Colors\n");
+                mf.Append("#******************************************************************************\n");
+                mf.Append($"COL_CORE    := {colEsc(setup.colorCore)}\n");
+                mf.Append($"COL_LIB     := {colEsc(setup.colorUserLib)}\n");
+                mf.Append($"COL_SRC     := {colEsc(setup.colorUserSrc)}\n");
+                mf.Append($"COL_LINK    := {colEsc(setup.colorLink)}\n");
+                mf.Append($"COL_ERR     := {colEsc(setup.colorErr)}\n");
+                mf.Append($"COL_OK      := {colEsc(setup.colorOk)}\n");
+            }
+
+            mf.Append("\n");
+
             mf.Append(setup.makefile_fixed);
 
             return mf.ToString();
@@ -112,15 +134,12 @@ namespace vtCore
         private static string makeEntry(String txt, String key, Dictionary<String, String> options)
         {
             return options.ContainsKey(key) ? $"{txt}{options[key]}" : "";
+        }
 
-            //if (options.ContainsKey(key))
-            //{
-            //    return $"{txt}{options[key]}";
-            //}
-            //else
-            //{
-            //    return "";
-            //}
+        private static string colEsc(Color c)
+        {
+            const char esc = (char)27;
+            return  $"{esc}[38;2;{c.R};{c.G};{c.B}m" ;
         }
     }
 }

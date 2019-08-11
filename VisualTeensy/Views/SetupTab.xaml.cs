@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Navigation;
 
 namespace VisualTeensy
@@ -24,6 +25,23 @@ namespace VisualTeensy
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void Rectangle_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var x = sender as System.Windows.Shapes.Rectangle;
+            var color = (System.Drawing.Color)x.Tag;
+
+            var colorDialog = new System.Windows.Forms.ColorDialog()
+            {
+                SolidColorOnly = true,
+                FullOpen = true,
+                Color = color,
+            };
+            colorDialog.ShowDialog();
+
+            var c = colorDialog.Color;
+            x.Fill = new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
         }
     }
 }

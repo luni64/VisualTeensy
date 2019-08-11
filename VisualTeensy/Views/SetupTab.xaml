@@ -17,6 +17,9 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" >
 
+    <UserControl.Resources>
+        <local:SystemColorToSolidBrushConverter x:Key="stbc"/>
+    </UserControl.Resources>
 
     <Grid Margin="20" >
         <Grid.ColumnDefinitions>
@@ -71,28 +74,44 @@
                 </StackPanel>
 
                 <TextBlock Text="Build System"  FontSize="14" Margin="0,25,0,0"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
-
                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0" >
                     <RadioButton Content="Makefile" IsChecked="{Binding isMakefileBuild}"  Width="100"/>
                     <RadioButton Content="Arduino-Builder" IsChecked="{Binding isArduinoBuild}" Margin="0,0,10,0" />
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,35,0,10">
+                    <TextBlock Text="Colored Output from Make"  FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}"/>
+                    <ToggleButton HorizontalAlignment="Left" IsEnabled="{Binding isMakefileBuild}"  Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding isColorEnabled}" Height="18" Margin="20,0,0,0" />
+                </StackPanel>
+                <Grid IsEnabled="{Binding isColorEnabled}" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="135"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="135"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
 
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text ="Compile Core"  VerticalAlignment="Center" IsEnabled="False"/>
+                    <Rectangle Grid.Row="0" Grid.Column="1" Tag="{Binding colorCore}" Fill="{Binding colorCore, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text ="Compile User Libraries" VerticalAlignment="Center"/>
+                    <Rectangle Grid.Row="0" Grid.Column="4" Tag="{Binding colorLib}" Fill="{Binding colorLib, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
 
-                <!--<TextBlock Margin="0,25,0,0" FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}" VerticalAlignment="Center">
-                    <Span> Debug support (see </Span>
-                    <Span>
-                        <Hyperlink NavigateUri="https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug" RequestNavigate="Hyperlink_RequestNavigate_1" >
-                            cortex-debug
-                        </Hyperlink>
-                    </Span>
-                    <Span>)</Span>
-                </TextBlock>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0" >
-                    <Label Content="Off" Padding="1" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <ToggleButton HorizontalAlignment="Left"   Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding isDebugEnabled}" />
-                    <Label Content="On"/>
-                </StackPanel>-->
-                
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text ="Compile User Sources"  VerticalAlignment="Center"/>
+                    <Rectangle Grid.Row="1" Grid.Column="1" Tag="{Binding colorSrc}" Fill="{Binding colorSrc, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text ="Linking, HEX and LST" VerticalAlignment="Center"/>
+                    <Rectangle  Grid.Row="1" Grid.Column="4" Tag="{Binding colorLink}" Fill="{Binding colorLink, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text ="Errors"  VerticalAlignment="Center"/>
+                    <Rectangle Grid.Row="2" Grid.Column="1" Tag="{Binding colorErr}" Fill="{Binding colorErr, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text ="Passed results" VerticalAlignment="Center"/>
+                    <Rectangle  Grid.Row="2" Grid.Column="4" Tag="{Binding colorOk}" Fill="{Binding colorOk, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
+
+                </Grid>
             </StackPanel>
         </Grid>
 

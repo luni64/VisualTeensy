@@ -23,12 +23,32 @@ namespace VisualTeensy
             mvm?.projecTabVM?.cmdClose.Execute(null);
         }
 
+        SaveProjectWin saveProjectWin;
+
         private void openOutputClick(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as MainVM;
-            var dlg = new SaveProjectWin(new SaveWinVM(vm.project, vm.libManager, vm.setup));
+            var svvm = new SaveWinVM(vm.project, vm.libManager, vm.setup);
 
-            dlg.ShowDialog();
+            svvm.PropertyChanged += Svvm_PropertyChanged;
+
+            saveProjectWin = new SaveProjectWin(svvm);
+
+
+            saveProjectWin.ShowDialog();
+        }
+
+        private void Svvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == "isReady")
+            {
+                var vm = sender as SaveWinVM;
+                if(vm.isReady == false)
+                {
+                    saveProjectWin.Close();
+                }
+            }
+           
         }
 
         private void saveAs(object sender, RoutedEventArgs e)

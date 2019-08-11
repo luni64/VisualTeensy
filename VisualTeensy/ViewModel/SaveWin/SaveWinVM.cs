@@ -1,25 +1,25 @@
 ﻿using log4net;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Threading;
 using vtCore;
 using vtCore.Interfaces;
 
 namespace ViewModel
 {
+
     public class SaveWinVM : BaseViewModel
     {
         public AsyncCommand cmdSave { get; private set; }
         public ListCollectionView taskVMs { get; }
 
         public bool isReady { get; private set; } = true;
-        
+
         async Task doSave()
         {
-            isReady = false;
-            OnPropertyChanged("isReady");
-
             taskVMs.MoveCurrentToFirst();
 
             while (!taskVMs.IsCurrentAfterLast)
@@ -34,13 +34,22 @@ namespace ViewModel
                 taskVMs.MoveCurrentToNext();
                 OnPropertyChanged("tasks");
             }
-            //await Task.Delay(5000);
-            //System.Windows.Application.Current.Shutdown();
+            try
+            {
+                await Task.Delay(1000);
+                Starter.start_vsCode(project.path, project.mainSketchPath);
+                log.Info($"Launched vsCode");
+            }
+            catch { log.Error($"vsCode launch failed"); }
+
+            isReady = false;  // closes the save window
+            OnPropertyChanged("isReady");
+
         }
 
         public SaveWinVM(IProject project, LibManager libManager, SetupData setup)
         {
-            cmdSave = new AsyncCommand(doSave);          
+            cmdSave = new AsyncCommand(doSave);
 
             var taskList = CodeGenerator.getTasks(project, libManager, setup).Select(t => new TaskVM(t)).ToList();
             taskVMs = new ListCollectionView(taskList);

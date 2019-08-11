@@ -224,20 +224,19 @@ namespace vtCore
     class GenerateSketch : ITask
     {
         public string title => $"Main Sketch";
-        public string description => file.FullName;
+        public string description => mainSketch.FullName;
 
-        public string status => done ? "OK" : file.Exists ? "Exists" : "Generate";
+        public string status => done ? "OK" : mainSketch.Exists ? "Exists" : "Generate";
 
         public GenerateSketch(IProject project)
         {
+            mainSketch = new FileInfo(project.mainSketchPath);
             if (project.buildSystem == BuildSystem.makefile)
             {
-                file = new FileInfo(Path.Combine(project.path, "src", "main.cpp"));
                 fileContent = Strings.mainCpp;
             }
             else
-            {
-                file = new FileInfo(Path.Combine(project.path, project.cleanName + ".ino"));
+            {                
                 fileContent = Strings.sketchIno;
             }
             done = false;
@@ -249,18 +248,16 @@ namespace vtCore
         {
             if (status == "Generate")
             {                
-                File.WriteAllText(file.FullName, fileContent);
+                File.WriteAllText(mainSketch.FullName, fileContent);
             }
             done = true;
-
-            Starter.start_vsCode(project.path, file.FullName);
-            
+                       
             await Task.CompletedTask;
         };
 
         bool done = false;
 
-        private readonly FileInfo file;
+        private readonly FileInfo mainSketch;
         private readonly string fileContent;
         private readonly IProject project;
     }

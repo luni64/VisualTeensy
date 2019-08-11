@@ -12,7 +12,7 @@ namespace VisualTeensy.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -188,6 +188,84 @@ namespace VisualTeensy.Properties {
             }
             set {
                 this["debugSupport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColCore {
+            get {
+                return ((global::System.Drawing.Color)(this["ColCore"]));
+            }
+            set {
+                this["ColCore"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColLib {
+            get {
+                return ((global::System.Drawing.Color)(this["ColLib"]));
+            }
+            set {
+                this["ColLib"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColSrc {
+            get {
+                return ((global::System.Drawing.Color)(this["ColSrc"]));
+            }
+            set {
+                this["ColSrc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColLink {
+            get {
+                return ((global::System.Drawing.Color)(this["ColLink"]));
+            }
+            set {
+                this["ColLink"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColErr {
+            get {
+                return ((global::System.Drawing.Color)(this["ColErr"]));
+            }
+            set {
+                this["ColErr"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Color ColOk {
+            get {
+                return ((global::System.Drawing.Color)(this["ColOk"]));
+            }
+            set {
+                this["ColOk"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ColorEnabled {
+            get {
+                return ((bool)(this["ColorEnabled"]));
+            }
+            set {
+                this["ColorEnabled"] = value;
             }
         }
     }
