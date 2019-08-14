@@ -43,7 +43,7 @@ namespace VisualTeensy
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-           // setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
+            // setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
             setupData.uplTyBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
             setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
             setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
@@ -51,15 +51,15 @@ namespace VisualTeensy
             setupData.tdLibBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
             setupData.debugSupportDefault = Settings.Default.debugSupport;
 
-          
+
 
             setupData.isColoredOutput = Settings.Default.ColorEnabled;
-            setupData.colorCore = Settings.Default.ColCore.IsEmpty ? Color.BlueViolet : Settings.Default.ColCore;
-            setupData.colorUserLib = Settings.Default.ColLib.IsEmpty ? Color.CadetBlue : Settings.Default.ColLib;
-            setupData.colorUserSrc = Settings.Default.ColSrc.IsEmpty ? Color.CornflowerBlue : Settings.Default.ColSrc;
-            setupData.colorOk = Settings.Default.ColOk.IsEmpty ? Color.DarkGreen : Settings.Default.ColOk;
-            setupData.colorLink = Settings.Default.ColLink.IsEmpty ? Color.Yellow : Settings.Default.ColLink;
-            setupData.colorErr = Settings.Default.ColErr.IsEmpty ? Color.Red : Settings.Default.ColErr;
+            setupData.colorCore = Settings.Default.ColCore.IsEmpty ? Color.FromArgb(255, 187, 206, 251) : Settings.Default.ColCore;
+            setupData.colorUserLib = Settings.Default.ColLib.IsEmpty ? Color.FromArgb(255, 206, 244, 253) : Settings.Default.ColLib;
+            setupData.colorUserSrc = Settings.Default.ColSrc.IsEmpty ? Color.FromArgb(255, 100, 149, 237) : Settings.Default.ColSrc;
+            setupData.colorOk = Settings.Default.ColOk.IsEmpty ? Color.FromArgb(255, 179, 255, 179) : Settings.Default.ColOk;
+            setupData.colorLink = Settings.Default.ColLink.IsEmpty ? Color.FromArgb(255, 255, 255, 202) : Settings.Default.ColLink;
+            setupData.colorErr = Settings.Default.ColErr.IsEmpty ? Color.FromArgb(255, 255, 159, 159) : Settings.Default.ColErr;
 
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
@@ -70,7 +70,7 @@ namespace VisualTeensy
             {
                 setupData.makefile_builder = reader.ReadToEnd();
             }
-          //  Helpers.arduinoPath = setupData.arduinoBase;
+            //  Helpers.arduinoPath = setupData.arduinoBase;
 
             return setupData;
         }
@@ -105,14 +105,14 @@ namespace VisualTeensy
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             Directory.CreateDirectory(appData);
 
-            
+
             log4net.Config.XmlConfigurator.Configure();
             var repository = (Hierarchy)LogManager.GetRepository();
             repository.Threshold = Level.All;
             var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
             fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
             fa.ActivateOptions();
-            
+
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             log.Info($"------------------------------------------");
             log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
@@ -130,14 +130,14 @@ namespace VisualTeensy
                 Task.Run(() => Helpers.downloadFile(libIndexSource, libIndexTarget, TimeSpan.FromDays(7)));
                 log.Info($"Download done");
             }
-            
+
             try
             {
-                var setup = loadSetup();               
-                setup.tdLibBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
-               
-                var  libManager = Factory.makeLibManager(setup);
-                var project =  Factory.makeProject(setup, libManager);
+                var setup = loadSetup();
+                setup.tdLibBase = setup.arduinoBoardsTxt != null ? Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
+
+                var libManager = Factory.makeLibManager(setup);
+                var project = Factory.makeProject(setup, libManager);
 
                 if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
                 {
@@ -161,7 +161,7 @@ namespace VisualTeensy
 
                 mainWin.ShowDialog();
 
-                           
+
 
                 saveSetup(setup);
 

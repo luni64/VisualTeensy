@@ -9,12 +9,7 @@
     <AssemblyVersion>0.1.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Implementation\Project Generators\TaskFiles\TaskFile_atom_builder.cs" />
-    <Compile Remove="Implementation\Project Generators\TaskFiles\TaskFile_vsCode_builder.cs" />
-  </ItemGroup>
-
+ 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>

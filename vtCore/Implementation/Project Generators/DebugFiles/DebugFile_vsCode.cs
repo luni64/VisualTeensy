@@ -10,8 +10,7 @@ namespace vtCore
         {
             IConfiguration cfg = project.selectedConfiguration;
             (string target, string svd) = DebugFile.seggerDebugTargets.TryGetValue(cfg.selectedBoard.id, out (string, string) value) ? value : ("unknown", "unknown");
-            string compilerBase =(cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase.shortPath).Replace('\\', '/'); 
-            //Helpers.getShortPath(cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase).Replace('\\', '/'); ;
+            string compilerBase = (cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase.shortPath).Replace('\\', '/');
 
             var launchJson = new
             {
@@ -22,7 +21,7 @@ namespace vtCore
                   {
                       name = "Cortex Debug - ATTACH",
                       cwd = "${workspaceRoot}",
-                      executable = ".vsteensy/build/" + project.name?.Replace(" ", "_") + ".elf",
+                      executable = ".vsteensy/build/" + project.cleanName +".elf",
                       request = "attach",
                       type = "cortex-debug",
                       servertype = "jlink",
@@ -34,7 +33,7 @@ namespace vtCore
                   {
                       name = "Cortex Debug - LAUNCH",
                       cwd = "${workspaceRoot}",
-                      executable = ".vsteensy/build/" + project.name?.Replace(" ", "_") + ".elf",
+                      executable = ".vsteensy/build/" + project.cleanName +".elf",
                       request = "launch",
                       type = "cortex-debug",
                       servertype = "jlink",

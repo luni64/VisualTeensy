@@ -22,7 +22,7 @@ namespace vtCore
             vsCodeFolder = new DirectoryInfo(Path.Combine(project.path, ".vscode"));
             vsTeensyFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy"));
             srcFolder = project.buildSystem == BuildSystem.makefile ? new DirectoryInfo(Path.Combine(project.path, "src")) : null;
-            
+
             done = vsCodeFolder.Exists && vsTeensyFolder.Exists && srcFolder != null && srcFolder.Exists;
         }
 
@@ -236,7 +236,7 @@ namespace vtCore
                 fileContent = Strings.mainCpp;
             }
             else
-            {                
+            {
                 fileContent = Strings.sketchIno;
             }
             done = false;
@@ -247,11 +247,11 @@ namespace vtCore
         public Func<Task> action => async () =>
         {
             if (status == "Generate")
-            {                
+            {
                 File.WriteAllText(mainSketch.FullName, fileContent);
             }
             done = true;
-                       
+
             await Task.CompletedTask;
         };
 
@@ -334,5 +334,41 @@ namespace vtCore
 
         private readonly DirectoryInfo libBase;
         private readonly IProject project;
+    }
+
+    //-----------------------------------------------------------------------
+    // Debugging
+    //-----------------------------------------------------------------------
+    class GenerateDebugSupport : ITask
+    {
+        public string title => $"Debug Support";
+        public string description => $"{launchJsonFile.Name} {jLinkUplFile.Name}";
+        public string status => done ? "OK" : launchJsonFile.Exists ? "Overwrite" : "Generate";
+
+        bool done;
+
+        public GenerateDebugSupport(IProject project, SetupData setup)
+        {
+            launchJsonFile = new FileInfo(Path.Combine(project.path, ".vscode", "launch.json"));
+            launchJsonContent = DebugFile_vsCode.generate(project, setup);
+
+            jLinkUplFile = new FileInfo(Path.Combine(project.path, ".vsteensy", "flash.jlink"));
+            jLinkUPlScrCnt = JLinkUploadScript.generate(project, setup);
+
+            done = false;
+        }
+
+        public Func<Task> action => async () =>
+        {
+            File.WriteAllText(launchJsonFile.FullName, launchJsonContent);
+            File.WriteAllText(jLinkUplFile.FullName, jLinkUPlScrCnt);
+            done = true;
+            await Task.CompletedTask;
+        };
+
+        private readonly FileInfo launchJsonFile;
+        private readonly FileInfo jLinkUplFile;
+        private readonly string launchJsonContent;
+        private readonly string jLinkUPlScrCnt;
     }
 }

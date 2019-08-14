@@ -25,6 +25,10 @@ namespace vtCore
                             tasks.Add(new CopyCore(project));
                         }
                     }
+                    if(project.debugSupport == DebugSupport.cortex_debug)
+                    {
+                        tasks.Add(new GenerateDebugSupport(project, setup));                            
+                    }
                     tasks.Add(new CleanBinaries(project));
                     tasks.Add(new GenerateSketch(project));
                     break;

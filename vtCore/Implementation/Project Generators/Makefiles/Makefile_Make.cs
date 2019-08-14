@@ -12,8 +12,6 @@ namespace vtCore
     {
         static public string generate(IProject project, LibManager libManager, SetupData setup)
         {
-            const char esc = (char)27;
-
             var cfg = project.selectedConfiguration;
             var board = cfg.selectedBoard;
             if (board == null) return "";
@@ -43,26 +41,26 @@ namespace vtCore
             mf.Append($"LIBS_SHARED      := ");
             foreach (var lib in cfg.sharedLibs)
             {
-                mf.Append($"{lib.sourceFolderName ?? "ERROR"} "); 
+                mf.Append($"{lib.sourceFolderName ?? "ERROR"} ");
             }
             mf.Append("\n\n");
 
             mf.Append($"LIBS_LOCAL_BASE  := lib\n");
             mf.Append($"LIBS_LOCAL       := ");
             foreach (var lib in cfg.localLibs)
-            {               
+            {
                 mf.Append($"{lib.targetFolderName} ");
             }
             mf.Append("\n\n");
 
             if (cfg.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase,"cores", cfg.selectedBoard.core))}\n");
+                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase, "cores", cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
                 mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
-            {                
+            {
                 mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase.path) == project.path)) ? "core" : Helpers.getShortPath(cfg.core))}\n");
                 mf.Append($"GCC_BASE         := {cfg.compilerBase.shortPath}\n");
                 mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
@@ -74,8 +72,8 @@ namespace vtCore
 
             mf.Append("\n#******************************************************************************\n");
             mf.Append("# Flags and Defines\n");
-            mf.Append("#******************************************************************************\n");            
-           
+            mf.Append("#******************************************************************************\n");
+
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
@@ -111,21 +109,31 @@ namespace vtCore
                 mf.Append("\n");
             }
 
-            if(setup.isColoredOutput)
+            mf.Append("\n#******************************************************************************\n");
+            mf.Append("# Colors\n");
+            mf.Append("#******************************************************************************\n");
+            if (setup.isColoredOutput)
             {
-                mf.Append("\n#******************************************************************************\n");
-                mf.Append("# Colors\n");
-                mf.Append("#******************************************************************************\n");
                 mf.Append($"COL_CORE    := {colEsc(setup.colorCore)}\n");
                 mf.Append($"COL_LIB     := {colEsc(setup.colorUserLib)}\n");
                 mf.Append($"COL_SRC     := {colEsc(setup.colorUserSrc)}\n");
                 mf.Append($"COL_LINK    := {colEsc(setup.colorLink)}\n");
                 mf.Append($"COL_ERR     := {colEsc(setup.colorErr)}\n");
                 mf.Append($"COL_OK      := {colEsc(setup.colorOk)}\n");
+                mf.Append($"COL_RESET   := {colReset}\n");
+            }
+            else
+            {
+                mf.Append($"COL_CORE    := {colReset}\n");
+                mf.Append($"COL_Lib     := {colReset}\n");
+                mf.Append($"COL_SRC     := {colReset}\n");
+                mf.Append($"COL_LINK    := {colReset}\n");
+                mf.Append($"COL_ERR     := {colReset}\n");
+                mf.Append($"COL_OK      := {colReset}\n");
+                mf.Append($"COL_RESET   := {colReset}\n");
             }
 
             mf.Append("\n");
-
             mf.Append(setup.makefile_fixed);
 
             return mf.ToString();
@@ -137,10 +145,11 @@ namespace vtCore
         }
 
         private static string colEsc(Color c)
-        {
-            const char esc = (char)27;
-            return  $"{esc}[38;2;{c.R};{c.G};{c.B}m" ;
+        {            
+            return $"{(char)27}[38;2;{c.R};{c.G};{c.B}m";
         }
+
+        private static string colReset = $"{(char)27}[0m";
     }
 }
 

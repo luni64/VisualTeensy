@@ -12,6 +12,7 @@ namespace vtCore
         public static Dictionary<string, (string, string)> seggerDebugTargets = new Dictionary<string, (string, string)>
         {//    Board ID     Segger Device     SVD File
             { "teensyLC", ("MKL26Z64xxx4",   "xx1.svd") },
+            { "teensy30", ("MK20DX128xxx5", "xx2.svd") },
             { "teensy31", ("MK20DX256xxx7",  "xx2.svd") },
             { "teensy35", ("MK64FX512xxx12", "MK64F12.svd") },
             { "teensy36", ("MK66FX1M0xxx18", "xx3.svd") },
