@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using vtCore;
 using System.Linq;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
@@ -8,13 +9,15 @@ namespace ViewModel
     {
         public string name => selectedVersion?.name;
         public string description => selectedVersion?.sentence;
-        public IEnumerable<Library> versions { get; }
+        public IEnumerable<ILibrary> versions { get; }
+        //public string parentRepository { get; }
 
-        public Library selectedVersion { get; set; }
+        public ILibrary selectedVersion { get; set; }
                        
 
-        public LibraryVM(IEnumerable<Library> lib)
+        public LibraryVM(IEnumerable<ILibrary> lib/*, string repositoryName*/)
         {
+            //parentRepository = string.IsNullOrWhiteSpace(repositoryName) ? "?" : repositoryName;
             this.versions = lib.OrderBy(v => v.version).ToList();
             selectedVersion = this.versions.LastOrDefault();
         }

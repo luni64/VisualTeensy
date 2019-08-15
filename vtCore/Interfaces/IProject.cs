@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using vtCore.Interfaces;
 
-namespace vtCore
+namespace vtCore.Interfaces
 {
     public enum Target
     {
@@ -28,7 +29,7 @@ namespace vtCore
         string cleanName { get; }
 
         IEnumerable<IConfiguration> configurations { get; }
-        IConfiguration selectedConfiguration { get;  }
+        IConfiguration selectedConfiguration { get; }
 
         void openProject(string path);
         void newProject();
@@ -36,7 +37,10 @@ namespace vtCore
         string path { get; set; }
         string pathError { get; }
 
-        Target target{ get; set; }
+        string libBase { get; }
+        string mainSketchPath { get; }
+
+        Target target { get; set; }
         BuildSystem buildSystem { get; set; }
         DebugSupport debugSupport { get; set; }
     }

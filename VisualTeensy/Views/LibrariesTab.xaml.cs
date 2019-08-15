@@ -39,11 +39,11 @@ namespace VisualTeensy
             dc.cmdDel.Execute(button);
         }
 
-        private void TextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            var library = ((TextBlock)sender).DataContext as Library;
-            new LibInfoWin(new LibraryVM(Enumerable.Repeat(library, 1))).ShowDialog();
-        }
+        //private void TextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        //{
+        //    //var library = ((TextBlock)sender).DataContext as Library;
+        //    //new LibInfoWin(new LibraryVM(Enumerable.Repeat(library, 1))).ShowDialog();
+        //}
 
         private void TextBlock_MouseDown2(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {

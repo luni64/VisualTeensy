@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -94,8 +95,10 @@ namespace vtCore
                 name = configuration.name;
                 guid = configuration.guid;
 
-                sharedLibraries = configuration.sharedLibs.Select(lib => lib.path);
-                projectLibraries = configuration.localLibs.Select(lib => lib.sourceType == Library.SourceType.local ? lib.path : lib.unversionedLibFolder);
+                //sharedLibraries = configuration.sharedLibs.Select(lib => lib.path);
+                //projectLibraries = configuration.localLibs.Select(lib => lib.isLocalSource ? lib.path : lib.unversionedLibFolder);
+                sharedLibraries = configuration.sharedLibs.Select(lib => lib.sourceUri.Segments.Last());
+                projectLibraries = configuration.localLibs.Select(lib => lib.sourceUri.Segments.Last());
 
                 makefileExtension = configuration.makefileExtension;
                 compilerBase = configuration.compilerBase.path;

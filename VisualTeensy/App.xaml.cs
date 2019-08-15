@@ -4,14 +4,17 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using ViewModel;
 using VisualTeensy.Properties;
 using vtCore;
+using vtCore.Interfaces;
 
 namespace VisualTeensy
 {
@@ -33,18 +36,31 @@ namespace VisualTeensy
 
             var setupData = new SetupData();
 
+            //var setupData = SetupData.getDefault();
+
 
             setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder()?.Trim() : Settings.Default.arduinoBase;
             Helpers.arduinoPath = setupData.arduinoBase;
 
             setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-            setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
+            // setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
             setupData.uplTyBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
             setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
             setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
             setupData.makeExeBase.path = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Directory.GetCurrentDirectory() : Settings.Default.makeExePath;
-            setupData.libBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
+            setupData.tdLibBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
             setupData.debugSupportDefault = Settings.Default.debugSupport;
+
+
+
+            setupData.isColoredOutput = Settings.Default.ColorEnabled;
+            setupData.colorCore = Settings.Default.ColCore.IsEmpty ? Color.FromArgb(255, 187, 206, 251) : Settings.Default.ColCore;
+            setupData.colorUserLib = Settings.Default.ColLib.IsEmpty ? Color.FromArgb(255, 206, 244, 253) : Settings.Default.ColLib;
+            setupData.colorUserSrc = Settings.Default.ColSrc.IsEmpty ? Color.FromArgb(255, 100, 149, 237) : Settings.Default.ColSrc;
+            setupData.colorOk = Settings.Default.ColOk.IsEmpty ? Color.FromArgb(255, 179, 255, 179) : Settings.Default.ColOk;
+            setupData.colorLink = Settings.Default.ColLink.IsEmpty ? Color.FromArgb(255, 255, 255, 202) : Settings.Default.ColLink;
+            setupData.colorErr = Settings.Default.ColErr.IsEmpty ? Color.FromArgb(255, 255, 159, 159) : Settings.Default.ColErr;
+
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
@@ -54,7 +70,7 @@ namespace VisualTeensy
             {
                 setupData.makefile_builder = reader.ReadToEnd();
             }
-          //  Helpers.arduinoPath = setupData.arduinoBase;
+            //  Helpers.arduinoPath = setupData.arduinoBase;
 
             return setupData;
         }
@@ -68,13 +84,27 @@ namespace VisualTeensy
             Settings.Default.uplCLIBase = setupData.uplCLIBase.path;
             Settings.Default.uplJLinkBase = setupData.uplJLinkBase.path;
             Settings.Default.makeExePath = setupData.makeExeBase.path;
-            Settings.Default.libBase = setupData.libBase;
+            Settings.Default.libBase = setupData.tdLibBase;
             Settings.Default.debugSupport = setupData.debugSupportDefault;
+            Settings.Default.ColorEnabled = setupData.isColoredOutput;
+            Settings.Default.ColCore = setupData.colorCore;
+            Settings.Default.ColLib = setupData.colorUserLib;
+            Settings.Default.ColSrc = setupData.colorUserSrc;
+            Settings.Default.ColOk = setupData.colorOk;
+            Settings.Default.ColLink = setupData.colorLink;
+            Settings.Default.ColErr = setupData.colorErr;
         }
+
+        static public MainWindow mainWin { get; private set; }
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            Directory.CreateDirectory(appData);
+
 
             log4net.Config.XmlConfigurator.Configure();
             var repository = (Hierarchy)LogManager.GetRepository();
@@ -82,21 +112,32 @@ namespace VisualTeensy
             var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
             fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
             fa.ActivateOptions();
-            
+
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             log.Info($"------------------------------------------");
             log.Info($"Startup v{v.Major}.{v.Minor} ({v.Revision})");
 
             base.OnStartup(e);
-            
+
+            // overwrite local lib index if  older than 7 days 
+            string libIndexTarget = appData + "/VisualTeensy/library_index.json";
+            bool overwrite = !File.Exists(libIndexTarget);
+            overwrite |= (DateTime.Now - File.GetLastWriteTime(libIndexTarget)) > TimeSpan.FromDays(7);
+            overwrite &= Uri.TryCreate("http://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute, out var libIndexSource);
+            if (overwrite)
+            {
+                log.Info($"Download {libIndexSource} to {libIndexTarget}");
+                Task.Run(() => Helpers.downloadFile(libIndexSource, libIndexTarget, TimeSpan.FromDays(7)));
+                log.Info($"Download done");
+            }
+
             try
             {
-                var setup = loadSetup();               
-                setup.libBase = setup.arduinoBoardsTxt != null?  Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
-               
+                var setup = loadSetup();
+                setup.tdLibBase = setup.arduinoBoardsTxt != null ? Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
 
-                var  libManager = Factory.makeLibManager(setup);
-                var project =  Factory.makeProject(setup, libManager);
+                var libManager = Factory.makeLibManager(setup);
+                var project = Factory.makeProject(setup, libManager);
 
                 if (!string.IsNullOrWhiteSpace(Settings.Default.lastProject))
                 {
@@ -109,7 +150,7 @@ namespace VisualTeensy
 
                 var mainVM = new MainVM(project, libManager, setup);
 
-                var mainWin = new MainWindow()
+                mainWin = new MainWindow()
                 {
                     DataContext = mainVM,
                     Left = Settings.Default.mainWinBounds.Left,
@@ -119,6 +160,8 @@ namespace VisualTeensy
                 };
 
                 mainWin.ShowDialog();
+
+
 
                 saveSetup(setup);
 

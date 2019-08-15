@@ -1,4 +1,6 @@
-﻿namespace vtCore
+﻿using vtCore.Interfaces;
+
+namespace vtCore
 {
     public class Makefile
     {

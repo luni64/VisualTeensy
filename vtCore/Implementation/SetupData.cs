@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 
 namespace vtCore
@@ -11,8 +12,7 @@ namespace vtCore
 
         // gnu make
         public CheckedPath makeExeBase { get; } = new CheckedPath("make.exe");
-        //public string makeExePathError => makeExeBase != null ? (File.Exists(makeExeBase) ? null : "Error") : "Error";
-
+       
         // uploaders
         public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
         public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
@@ -41,7 +41,10 @@ namespace vtCore
 
                         path = Path.Combine(arduinoBase, "hardware", "tools", "arm");
                         arduinoCompiler = Directory.Exists(path) ? path : null;
+
+                        uplPjrcBase.path = arduinoTools;
                     }
+
                 }
                 else
                 {
@@ -76,7 +79,7 @@ namespace vtCore
         }
 
         // libraries
-        public string libBase { get; set; }
+        public string tdLibBase { get; set; }
 
         // settings for quick setup
         public string arduinoCoreBase { get; private set; }
@@ -89,10 +92,18 @@ namespace vtCore
         public string makefile_builder { get; set; }
         public bool debugSupportDefault { get; set; }
 
-
+        //makefile output colors ---------------
+        public bool isColoredOutput { get; set; }
+        public Color colorCore { get; set; }
+        public Color colorUserLib { get; set; }
+        public Color colorUserSrc { get; set; }
+        public Color colorLink { get; set; }
+        public Color colorErr { get; set; }
+        public Color colorOk { get; set; }
+        
         public static SetupData getDefault()
         {
-            SetupData sd = new SetupData();
+            var sd = new SetupData();
             
             sd.arduinoBase = Helpers.findArduinoFolder().Trim();
             Helpers.arduinoPath = sd.arduinoBase;
@@ -106,6 +117,14 @@ namespace vtCore
             
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
+
+            sd.isColoredOutput = true;
+            sd.colorCore = Color.BlueViolet;
+            sd.colorUserLib = Color.CadetBlue;
+            sd.colorUserSrc = Color.CornflowerBlue;
+            sd.colorOk = Color.DarkGreen;
+            sd.colorLink = Color.Yellow;
+            sd.colorErr = Color.Red;
 
             return sd;
         }

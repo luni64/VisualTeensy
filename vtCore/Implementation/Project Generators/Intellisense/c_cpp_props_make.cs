@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -44,12 +45,12 @@ namespace vtCore
             }
             foreach (var lib in cfg.sharedLibs)
             {
-                cfgp.includePath.Add(Path.Combine(lib.source, "**").Replace('\\', '/'));
+                cfgp.includePath.Add(Path.Combine(lib.sourceUri.AbsolutePath, "**").Replace('\\', '/'));
             }
 
             foreach (var lib in cfg.localLibs)
             {
-                cfgp.includePath.Add(Path.Combine("lib",lib.name, "**").Replace('\\', '/'));
+                cfgp.includePath.Add(Path.Combine("lib",lib.targetFolderName, "**").Replace('\\', '/'));
             }
 
             // Compiler switches ----------------------------------------------------------

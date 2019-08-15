@@ -1,8 +1,10 @@
-﻿namespace vtCore
+﻿using vtCore.Interfaces;
+
+namespace vtCore
 {
     public class TaskFile
     {
-        public static string generate(IProject project, LibManager libManager, SetupData setup)
+        public static string generate(IProject project, SetupData setup)
         {
             switch (project.target)
             {

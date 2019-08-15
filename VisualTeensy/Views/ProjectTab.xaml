@@ -45,7 +45,7 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/> 
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -58,12 +58,12 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                         Quick Setup uses your Arduino installation to generate the project.
                     </RadioButton.ToolTip>
                 </RadioButton>
-                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="10,0,0,0" Visibility="{Binding isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" >
+                <RadioButton x:Name="radioButton1"  Content="Expert Setup" IsChecked="True" Margin="10,0,40,0" Visibility="{Binding isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" >
                     <RadioButton.ToolTip>
                         Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
                     </RadioButton.ToolTip>
                 </RadioButton>
-                <Label Content="Debug Support" Margin="40,0,10,0" VerticalAlignment="Center" Padding="0"/>
+                <Label Content="Debug Support" Margin="0,0,10,0" VerticalAlignment="Center" Padding="0"/>
                 <ToggleButton HorizontalAlignment="Left"   Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding hasDebugSupport}" Height="18" VerticalAlignment="Top" />
             </StackPanel>
 

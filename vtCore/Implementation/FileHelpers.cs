@@ -3,13 +3,19 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
     public static class Helpers
     {
+        static readonly HttpClient client = new HttpClient();
+
+      
         public static string arduinoPath { set; get; }
 
 
@@ -109,7 +115,7 @@ namespace vtCore
             {
                 return folder;
             }
-
+                        
             return null;
         }
 
@@ -191,7 +197,7 @@ namespace vtCore
         }
 
         public static void copyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {
+        {            
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
                 copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
@@ -206,40 +212,86 @@ namespace vtCore
                 }
             }
         }
-        public static bool downloadLibrary(Library lib, string targetFolder)
+
+
+        public static void copyFilesRecursively(Uri s, Uri t)
         {
-            string versionedLibFolder = Path.Combine(targetFolder, Path.GetFileNameWithoutExtension(lib.url));
-            string unversionedLibFolder = versionedLibFolder.Substring(0, versionedLibFolder.LastIndexOf('-'));
-         //   if (Directory.Exists(unversionedLibFolder)) return false;
+            if (s == t) return;
 
-            WebClient client = null;
-            MemoryStream zippedStream = null;
-            ZipArchive libArchive = null;
-            try
-            {
-                client = new WebClient();                
-                zippedStream = new MemoryStream(client.DownloadData(lib.url));
-                libArchive = new ZipArchive(zippedStream);
-                ZipFileExtensions.ExtractToDirectory(libArchive, targetFolder);
+            DirectoryInfo source = new DirectoryInfo(s.LocalPath);
+            DirectoryInfo target = new DirectoryInfo(t.LocalPath);
 
-                Directory.Move(versionedLibFolder, unversionedLibFolder);
-                return true;
-            }
-            catch //(Exception ex)
+            if (target.Exists) target.Delete(true);
+            copyFilesRecursively(source, target);
+        }
+
+
+
+        public static async Task downloadFile(Uri source, string target, TimeSpan expiry)
+        {
+            if (File.Exists(target))
             {
-                return false;
+                if ((DateTime.Now - File.GetLastWriteTime(target)) < expiry) return;
             }
-            finally
+
+            using (var response = await client.GetAsync(source))
             {
-                if (Directory.Exists(versionedLibFolder)) Directory.Delete(versionedLibFolder);
-                client?.Dispose();
-                zippedStream?.Dispose();
-                libArchive?.Dispose();
+                response.EnsureSuccessStatusCode();
+
+                using (var webStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (var fileStream = new FileStream(target, FileMode.Create))
+                    {
+                        await webStream.CopyToAsync(fileStream);
+                    }
+                }
             }
         }
 
+
+        public async static Task downloadLibrary(IProjectLibrary lib, DirectoryInfo libBase)
+        {
+            if (!libBase.Exists) libBase.Create();
+
+            var libDir = new DirectoryInfo(lib.targetUri.LocalPath);
+            if (libDir.Exists) libDir.Delete(true);
+            
+            // we will save the *.zip in a temp file and unzip into %temp%/vslib            
+            var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
+            if (tempFolder.Exists) tempFolder.Delete(true);
+
+            try
+            {
+                Console.Write($"Read {lib.name}... ");
+
+                using (var response = await client.GetAsync(lib.sourceUri))
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    using (var s = await response.Content.ReadAsStreamAsync())
+                    {
+                        using (var archive = new ZipArchive(s))
+                        {
+                            archive.ExtractToDirectory(tempFolder.FullName);
+                        }                        
+                    }
+                }
+
+                var sourceFolder = tempFolder.GetDirectories().FirstOrDefault();
+                sourceFolder.MoveTo(libDir.FullName);
+                tempFolder.Delete(true);
+
+                Console.WriteLine("done");
+            }
+            catch (Exception)
+            {
+                throw;
+            }            
+        }
+
+     
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetShortPathName(string longPath, StringBuilder shortPath, int bufSize);
+        private static extern int getShortPathName(string longPath, StringBuilder shortPath, int bufSize);
         public static string getShortPath(string longPath)
         {
 
@@ -250,11 +302,11 @@ namespace vtCore
 
             const int maxPath = 255;
             StringBuilder shortPath = new StringBuilder(maxPath);
-            int i = GetShortPathName(longPath, shortPath, maxPath);
+            int i = getShortPathName(longPath, shortPath, maxPath);
             return i > 0 ? shortPath.ToString() : "ERROR IN PATH";
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetLongPathName(string path, StringBuilder longPath, int longPathLength);
+        public static extern int getLongPathName(string path, StringBuilder longPath, int longPathLength);
     }
 }

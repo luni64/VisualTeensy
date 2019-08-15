@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -10,6 +11,8 @@ namespace vtCore
     {
         public static string generate(IProject project, LibManager libManager, SetupData setup)
         {
+            var cfg = project.selectedConfiguration;
+
             var props = new PropertiesJson()
             {
                 configurations = new List<ConfigurationJson>()
@@ -17,25 +20,27 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(project.selectedConfiguration.compilerBase.path ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(cfg.compilerBase.path ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>()
                         {
-                            project.selectedConfiguration.coreBase.path?.Replace('\\','/') + "/*",                         
+                            $"{Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**"}",                            
                             $"{Path.Combine(setup.arduinoBase, "hardware", "teensy", "avr", "libraries/**")}".Replace('\\','/'),
                             $"{Path.Combine(setup.arduinoBase ,"libraries/**")}".Replace('\\','/'),
                             $"{Path.Combine(Helpers.getSketchbookFolder() ,"libraries/**")}".Replace('\\','/'),
                         },
+
                         forcedInclude = new List<string>()
                         {
-                            Path.Combine(project.selectedConfiguration.coreBase.path,"arduino.h").Replace('\\','/'),
+                            Path.Combine(setup.arduinoCoreBase,"cores",cfg.core,"arduino.h").Replace('\\','/'),
                         },
+
                         defines = new List<string>()
                     }
                 }
             };
 
-            var options = project.selectedConfiguration.selectedBoard.getAllOptions();
+            var options = cfg.selectedBoard.getAllOptions();
             var defines = options.FirstOrDefault(o => o.Key == "build.flags.defs");
             if (defines.Value != null)
             {

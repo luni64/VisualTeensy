@@ -1,72 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using vtCore;
-using Task = System.Threading.Tasks.Task;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
     public class SetupTabVM : BaseViewModel, IDataErrorInfo
-    {
-        public AsyncCommand cmdDownloadMake { get; private set; }
-        async System.Threading.Tasks.Task doDownload()
-        {
-            await Task.Delay(1);
-            return;
-
-            //try
-            //{
-            //    const string url = "ftp://ftp.equation.com/make/64/make.exe";
-            //    NetworkCredential credentials = new NetworkCredential("anonymous", "lutz.niggl@lunoptics.com");
-
-            //    // Query size of the file to be downloaded
-            //    WebRequest sizeRequest = WebRequest.Create(url);
-            //    sizeRequest.Credentials = credentials;
-            //    sizeRequest.Method = WebRequestMethods.Ftp.GetFileSize;
-
-            //    var t = sizeRequest.GetResponseAsync();
-            //    while(!t.IsCompleted)
-            //    {
-            //        Console.Write(".");
-            //        await System.Threading.Tasks.Task.Delay(10);
-            //    }
-
-
-            //    int size = (int) (t.Result ).ContentLength;
-            //    Console.WriteLine();
-            //    Console.WriteLine(size);
-
-            //    //progressBar1.Invoke(
-            //    //    (MethodInvoker)(() => progressBar1.Maximum = size));
-
-            //    // Download the file
-            //    WebRequest request = WebRequest.Create(url);
-            //    request.Credentials = credentials;
-            //    request.Method = WebRequestMethods.Ftp.DownloadFile;
-
-            //    var response  = await request.GetResponseAsync();
-            //    var ftpStream = response.GetResponseStream();
-
-
-            //    using (Stream fileStream = File.Create(@"C:\toolchain\test.exe"))
-            //    {
-            //        byte[] buffer = new byte[10240];
-            //        int read;
-            //        while ((read = ftpStream.Read(buffer, 0, buffer.Length)) > 0)
-            //        {
-            //            fileStream.Write(buffer, 0, read);
-            //            int position = (int)fileStream.Position;
-            //            //progressBar1.Invoke(
-            //            //    (MethodInvoker)(() => progressBar1.Value = position));
-            //        }
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //   // MessageBox.Show(e.Message);
-            //}
-        }
-
-        public string Error => throw new NotImplementedException();
+    {     
+        public string Error => "ERROR";
         public string this[string columnName]
         {
             get
@@ -107,6 +49,7 @@ namespace ViewModel
             }
         }
 
+        // Folders
         public String arduinoBase
         {
             get => setup.arduinoBase;
@@ -115,7 +58,7 @@ namespace ViewModel
                 if (value != setup.arduinoBase)
                 {
                     setup.arduinoBase = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -191,19 +134,8 @@ namespace ViewModel
                 }
             }
         }
-        public bool hasDebugSupport
-        {
-            get => setup.debugSupportDefault;
-            set
-            {
-                if (setup.debugSupportDefault != value)
-                {
-                    setup.debugSupportDefault = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
+        // Targets
         public bool isTargetvsCode
         {
             get => project.target == Target.vsCode;
@@ -223,13 +155,14 @@ namespace ViewModel
             }
         }
 
+        // Build System
         public bool isMakefileBuild
         {
             get => project.buildSystem == BuildSystem.makefile;
             set
             {
                 if (value == true) project.buildSystem = BuildSystem.makefile;
-                OnPropertyChanged();
+                OnPropertyChanged("");
             }
         }
         public bool isArduinoBuild
@@ -239,6 +172,20 @@ namespace ViewModel
             {
                 if (value == true) project.buildSystem = BuildSystem.arduino;
                 OnPropertyChanged();
+            }
+        }
+
+        // Debugging
+        public bool hasDebugSupport
+        {
+            get => setup.debugSupportDefault;
+            set
+            {
+                if (setup.debugSupportDefault != value)
+                {
+                    setup.debugSupportDefault = value;
+                    OnPropertyChanged();
+                }
             }
         }
         public bool isDebugEnabled
@@ -251,19 +198,79 @@ namespace ViewModel
             }
         }
 
-
+        // Colored Output
+        public bool isColorEnabled
+        {
+            get => setup.isColoredOutput;
+            set
+            {
+                setup.isColoredOutput = value;
+                OnPropertyChanged("");
+            }
+        }
+        public Color colorCore
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorCore : Color.LightGray;
+            set
+            {
+                setup.colorCore = value;
+                OnPropertyChanged();
+            }
+        }
+        public Color colorLib
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorUserLib : Color.LightGray;
+            set
+            {
+                setup.colorUserLib = value;
+                OnPropertyChanged();
+            }
+        }
+        public Color colorSrc
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorUserSrc : Color.LightGray;
+            set
+            {
+                setup.colorUserSrc = value;
+                OnPropertyChanged();
+            }
+        }
+        public Color colorLink
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorLink : Color.LightGray;
+            set
+            {
+                setup.colorLink = value;
+                OnPropertyChanged();
+            }
+        }
+        public Color colorOk
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorOk : Color.LightGray;
+            set
+            {
+                setup.colorOk = value;
+                OnPropertyChanged();
+            }
+        }
+        public Color colorErr
+        {
+            get => isColorEnabled && isMakefileBuild ? setup.colorErr : Color.LightGray;
+            set
+            {
+                setup.colorErr = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public SetupTabVM(IProject project, SetupData setup)
         {
             this.project = project;
             this.setup = setup;
-
-            cmdDownloadMake = new AsyncCommand(doDownload);
         }
 
-
-        SetupData setup;
-
-        IProject project;
+        private readonly SetupData setup;
+        private readonly IProject project;
     }
 }
 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -35,8 +35,8 @@ namespace vtCore
         public string makefileExtension { get; set; }
         
         // libraries ---------------------------------
-        public List<Library> sharedLibs { get; set; }
-        public List<Library> localLibs { get; set; }
+        public List<IProjectLibrary> sharedLibs { get; set; }
+        public List<IProjectLibrary> localLibs { get; set; }
         
         // boards
         public List<IBoard> boards { get; private set; }
@@ -46,8 +46,8 @@ namespace vtCore
         {
           //  this.setup = settings;
             boards = new List<IBoard>();
-            sharedLibs = new List<Library>();
-            localLibs = new List<Library>();
+            sharedLibs = new List<IProjectLibrary>();
+            localLibs = new List<IProjectLibrary>();
             guid = Guid.NewGuid().ToString();
         }
    
@@ -63,7 +63,7 @@ namespace vtCore
             //log.Debug(sb.ToString());
         }
 
-        public static Configuration getDefault(SetupData setupData)
+        public static IConfiguration getDefault(SetupData setupData)
         {
             //log.Info("enter");
             var pd = new Configuration(setupData)

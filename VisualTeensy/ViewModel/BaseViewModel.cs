@@ -113,7 +113,7 @@ namespace ViewModel
                 OnCanExecuteChanged();
                 try
                 {
-                    await _execute();
+                        await _execute();
                 }
                 finally
                 {

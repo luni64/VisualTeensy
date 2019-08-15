@@ -1,4 +1,5 @@
-﻿using vtCore;
+﻿using vtCore.Interfaces;
+using vtCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

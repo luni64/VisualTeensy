@@ -28,10 +28,9 @@ namespace vtCore
         public bool isOk => error == null;
         public string error { get; private set; }
 
-
         string _path;
-        string checkedFile;
-        bool optional;
+        readonly string checkedFile;
+        readonly bool optional;
 
         string check()
         {

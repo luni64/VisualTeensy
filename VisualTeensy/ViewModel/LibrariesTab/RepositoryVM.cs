@@ -1,39 +1,88 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Data;
 using vtCore;
+using vtCore.Interfaces;
 
 namespace ViewModel
 {
     public class RepositoryVM : BaseViewModel
     {
-        public string name { get; private set; }
+        public string name => repo.name;
+        public string repoPath => repo.repoPath;
+        public ListCollectionView libVMs { get; }
 
-        public ObservableCollection<LibraryVM> libVMs { get; }
-        public LibraryVM selectedLib
+        public void filter(List<string> sl)
         {
-            get => _selectedLib;
-            set => SetProperty(ref _selectedLib, value);
+            searchStrings = sl;
+            libVMs.Refresh();
         }
-        LibraryVM _selectedLib;
+
+        public string searchString
+        {
+            get => _searchString;
+            set
+            {
+                SetProperty(ref _searchString, value);
+                searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();
+                libVMs.Refresh();
+            }
+        }
+
+        public bool isShared { get; }
 
         public RepositoryVM(IRepository repo)
         {
-            if (repo != null && repo.libraries != null)
+            if (repo == null || repo.libraries == null) return;
+            
+            var libList = repo.libraries.Select(lib => new LibraryVM(lib)).ToList();
+            libVMs = new ListCollectionView(libList)
             {
-                libVMs = new ObservableCollection<LibraryVM>(
-                    repo
-                    .libraries?
-                    .OrderBy(lib => lib.Key)
-                    .Select(lib => new LibraryVM(lib)));
+                Filter = (o) => filterLibs(o),
+                CustomSort = new AlphabeticSorter(),
+            };
 
-                selectedLib = libVMs.FirstOrDefault();
-                this.name = repo.name;
-            }
-            else
+            isShared = repo.type == RepoType.shared;
+            
+            this.repo = repo;
+        }
+
+        #region private methods and fields ------------------------------
+
+        private IRepository repo; 
+
+        private string _searchString;
+
+        private List<string> searchStrings;
+
+        private bool filterLibs(object o)
+        {
+            if (searchStrings == null) return true;
+
+            var libVM = o as LibraryVM;
+            var name = libVM.name.ToLower();
+            var description = libVM.description.ToLower();
+
+            foreach (var searchString in searchStrings)
             {
-                name = "used";
-                libVMs = new ObservableCollection<LibraryVM>();
+                if (!name.Contains(searchString) && !description.Contains(searchString)) return false;
+            }
+            return true;
+        }
+
+        private class AlphabeticSorter : IComparer
+        {
+            public int Compare(object x, object y)
+            {
+                var X = x as LibraryVM;
+                var Y = y as LibraryVM;
+                return X.name.CompareTo(Y.name);
             }
         }
+
+        #endregion
     }
 }

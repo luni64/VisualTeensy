@@ -20,8 +20,7 @@ namespace VisualTeensy
         {
             this.Close();
         }
-
-        
+               
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -33,6 +32,12 @@ namespace VisualTeensy
              //   var scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
                 scrollViewer.ScrollToBottom();
             }
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var lb = (ListBox)sender;
+            lb.ScrollIntoView(lb.SelectedItem);
         }
     }
 }

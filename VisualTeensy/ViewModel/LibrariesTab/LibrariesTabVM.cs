@@ -1,9 +1,13 @@
 ﻿using GongSolutions.Wpf.DragDrop;
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Windows.Data;
 using vtCore;
+using vtCore.Interfaces;
+
 
 namespace ViewModel
 {
@@ -12,19 +16,13 @@ namespace ViewModel
         public RelayCommand cmdDel { get; }
         void doDel(object o)
         {
-            var lib = o as Library;
+            var lib = o as IProjectLibrary;
             projectLibraries.Remove(lib);
         }
 
-        public List<RepositoryVM> repositories { get; }
-        public RepositoryVM selectedRepository
-        {
-            get => _selectedRepository;
-            set => SetProperty(ref _selectedRepository, value);
-        }
-        RepositoryVM _selectedRepository;
 
-        public ObservableCollection<Library> projectLibraries { get; }
+        public ObservableCollection<IProjectLibrary> projectLibraries { get; }
+        public ListCollectionView repos { get; }
 
         public LibrariesTabVM(IProject project, LibManager libManager)
         {
@@ -32,37 +30,60 @@ namespace ViewModel
 
             cmdDel = new RelayCommand(doDel);
 
-            repositories = libManager.repositories?.Select(r => new RepositoryVM(r)).ToList();
-            selectedRepository = repositories.FirstOrDefault();
+            repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
+            repos.CurrentChanged += (s, e) => searchString = searchString; // trigger a filter event on new repo
 
-
-            projectLibraries = new ObservableCollection<Library>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
+            projectLibraries = new ObservableCollection<IProjectLibrary>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
 
+
+        public string searchString
+        {
+            get => _searchString;
+            set
+            {
+                SetProperty(ref _searchString, value);
+                var searchStrings = _searchString?.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToLower()).ToList();
+                ((RepositoryVM)repos.CurrentItem).filter(searchStrings);
+            }
+        }
+        string _searchString;
+
         private void projectLibrariesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (Library library in e.NewItems)
+
+                    var curRepo = repos.CurrentItem as RepositoryVM;
+
+                    foreach (IProjectLibrary library in e.NewItems)
                     {
-                        if (library.isLocal)
+                        if (curRepo.isShared)
                         {
-                            project.selectedConfiguration.localLibs.Add(library);
+                            project.selectedConfiguration.sharedLibs.Add(library);
                         }
                         else
                         {
-                            project.selectedConfiguration.sharedLibs.Add(library);
+                            if (library.isLocalSource)
+                            {
+                                var source = library.sourceUri.LocalPath;
+                                library.targetUri = new Uri(source.Replace(curRepo.repoPath, project.libBase));
+                            }
+                            else if (library.isWebSource)
+                            {
+                                library.targetUri = new Uri(Path.Combine(project.libBase, library.name.Replace(' ', '_')));
+                            }
+                            project.selectedConfiguration.localLibs.Add(library);
                         }
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (Library library in e.OldItems)
+                    foreach (IProjectLibrary library in e.OldItems)
                     {
-                        if (library.isLocal)
+                        if (library.isLocalSource)
                         {
                             project.selectedConfiguration.localLibs.Remove(library);
                         }
@@ -75,7 +96,7 @@ namespace ViewModel
 
                 default:
                     break;
-            }           
+            }
         }
 
         public void DragOver(IDropInfo dropInfo)
@@ -91,10 +112,11 @@ namespace ViewModel
 
         public void Drop(IDropInfo dropInfo)
         {
+            var col = dropInfo.DragInfo.SourceCollection;
+
             var sourceItem = dropInfo.Data as LibraryVM;
             var lib = sourceItem.selectedVersion;
-            lib.isLocal = !selectedRepository.name.Contains("Shared");
-            projectLibraries.Add(lib);
+            projectLibraries.Add(ProjectLibrary.cloneFromLib(lib));
         }
 
         public void update()
