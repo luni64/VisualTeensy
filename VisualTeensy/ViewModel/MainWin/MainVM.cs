@@ -68,7 +68,7 @@ namespace ViewModel
 
             setupTabVM.PropertyChanged += (s, e) =>
             {
-                projecTabVM.updateFiles();
+               projecTabVM.updateAll();
                 projecTabVM.OnPropertyChanged("");
             };
         }

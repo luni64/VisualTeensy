@@ -26,29 +26,29 @@ namespace ViewModel
                     //    error = project.pathError;
                     //    break;
 
-                    //case "arduinoBase":
-                    //    error = project.setup.arduinoBaseError;
-                    //    break;
+                    case "arduinoBase":
+                        error = setup.arduinoBaseError;
+                        break;
 
                     //case "boardTxtPath":
                     //    error = project.selectedConfiguration.boardTxtPathError;
                     //    break;
 
-                    //case "corePath":
-                    //    error = project.selectedConfiguration.setupType == SetupTypes.expert ? project.selectedConfiguration.corePathError : null;
-                    //    break;
+                    case "corePath":
+                        error = project.selectedConfiguration.setupType == SetupTypes.expert ? project.selectedConfiguration.coreBase.error : null;
+                        break;
 
-                    //case "compilerPath":
-                    //    error = project.selectedConfiguration.compilerPathError;
-                    //    break;
+                    case "compilerPath":
+                        error = project.selectedConfiguration.compilerBase.error;
+                        break;
 
                     //case "makePath":
                     //    error = project.setup.makeExePathError;
                     //    break;
 
-                    //case "boardVMs":
-                    //    error = null;
-                    //    break;
+                    case "boardVMs":
+                        error = project.selectedConfiguration.selectedBoard == null ? "No board selected" : null;
+                        break;
 
                     default:
                         error = null;
@@ -182,10 +182,6 @@ namespace ViewModel
         }
         string _settFile;
 
-        // public String propFile => project.props_json;
-        //public String taskFile => project.tasks_json;
-        // public String settFile => project.vsSetup_json;
-
         public String arduinoBase
         {
             get => setup.arduinoBase;
@@ -254,8 +250,8 @@ namespace ViewModel
                 if (value != project.selectedConfiguration.coreBase.path)
                 {
                     project.selectedConfiguration.coreBase.path = value.Trim();
-                    OnPropertyChanged();
-                    updateFiles();
+                    updateAll();
+                    OnPropertyChanged("");
                 }
             }
         }
@@ -307,15 +303,15 @@ namespace ViewModel
             updateBoards();
         }
 
-        private void updateAll()
+        internal void updateAll()
         {
             project.selectedConfiguration.parseBoardsTxt(null); //ERRORR!!!!! fix 
             updateBoards();
             updateFiles();
         }
-        public void updateFiles()
+        internal void updateFiles()
         {
-           // project.generateFiles();
+           
 
             makefile = Makefile.generate(project, libManager, setup);
             taskFile = TaskFile.generate(project, setup);

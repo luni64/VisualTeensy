@@ -136,6 +136,7 @@
     <Compile Include="ViewModel\MainWin\MainVM.cs" />
     <Compile Include="ViewModel\SaveWin\TaskVM.cs" />
     <Compile Include="ViewModel\SetupTab\SetupTabVM.cs" />
+    <Compile Include="ViewModel\StartupSettingsVM.cs" />
     <Compile Include="Views\ColorBrushConverter.cs" />
     <Compile Include="Views\FileDisplayWindow.xaml.cs">
       <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
@@ -145,6 +146,9 @@
     </Compile>
     <Compile Include="Views\LibrariesTab.xaml.cs">
       <DependentUpon>LibrariesTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StartupSettingsView.xaml.cs">
+      <DependentUpon>StartupSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SetupTab.xaml.cs">
       <DependentUpon>SetupTab.xaml</DependentUpon>
@@ -185,6 +189,10 @@
     <Page Include="Views\MiscRessources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StartupSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SetupTab.xaml">
       <SubType>Designer</SubType>

@@ -103,9 +103,9 @@
 
 
         <TabControl Grid.Row="2" Margin="20,0,20,20" >
-            <!--<TabControl.Effect>
+            <TabControl.Effect>
                 <DropShadowEffect BlurRadius="15" Direction="314" Color="#FFDADADA"/>
-            </TabControl.Effect>-->
+            </TabControl.Effect>
 
             <TabItem Header="Project">
                 <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>

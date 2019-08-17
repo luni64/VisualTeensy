@@ -12,7 +12,7 @@ namespace vtCore
 
         // gnu make
         public CheckedPath makeExeBase { get; } = new CheckedPath("make.exe");
-       
+
         // uploaders
         public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
         public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
@@ -100,31 +100,33 @@ namespace vtCore
         public Color colorLink { get; set; }
         public Color colorErr { get; set; }
         public Color colorOk { get; set; }
-        
+
         public static SetupData getDefault()
         {
             var sd = new SetupData();
-            
-            sd.arduinoBase = Helpers.findArduinoFolder().Trim();
-            Helpers.arduinoPath = sd.arduinoBase;
+
+            //sd.arduinoBase = Helpers.findArduinoFolder().Trim();
+            //Helpers.arduinoPath = sd.arduinoBase;
 
             sd.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
 
-            sd.uplPjrcBase.path = sd.arduinoTools;
-            sd.uplTyBase.path = Helpers.findTyToolsFolder();
-            sd.uplCLIBase.path = Helpers.findCLIFolder();
-            sd.uplJLinkBase.path = Helpers.findJLinkFolder();
-            
+            //sd.uplPjrcBase.path = sd.arduinoTools;
+            //sd.uplTyBase.path = Helpers.findTyToolsFolder();
+            //sd.uplCLIBase.path = Helpers.findCLIFolder();
+            //sd.uplJLinkBase.path = Helpers.findJLinkFolder();
+
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
+            
 
-            sd.isColoredOutput = true;
-            sd.colorCore = Color.BlueViolet;
-            sd.colorUserLib = Color.CadetBlue;
-            sd.colorUserSrc = Color.CornflowerBlue;
-            sd.colorOk = Color.DarkGreen;
-            sd.colorLink = Color.Yellow;
-            sd.colorErr = Color.Red;
+            sd.colorCore = Color.FromArgb(255, 187, 206, 251);
+            sd.colorUserLib = Color.FromArgb(255, 206, 244, 253);
+            sd.colorUserSrc = Color.FromArgb(255, 100, 149, 237);
+            sd.colorOk = Color.FromArgb(255, 179, 255, 179);
+            sd.colorLink = Color.FromArgb(255, 255, 255, 202);
+            sd.colorErr = Color.FromArgb(255, 255, 159, 159);
+
+
 
             return sd;
         }

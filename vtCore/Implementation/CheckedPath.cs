@@ -10,7 +10,7 @@ namespace vtCore
             this.checkedFile = checkedFile;
             this.optional = optional;
             this._path = path;
-            error = null;
+            error = check();
         }
         public string path
         {

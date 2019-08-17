@@ -10,52 +10,97 @@ namespace vtCore
 {
     public class Configuration : IConfiguration
     {
+        public bool isOk
+        {
+            get
+            {
+                if (selectedBoard == null || String.IsNullOrWhiteSpace(name)) return false;
+
+                if (setupType == SetupTypes.expert)
+                {
+                    return
+                        coreBase.isOk &&
+                        compilerBase.isOk;
+                }
+                else
+                {
+                    return
+                        !String.IsNullOrWhiteSpace(name) &&
+                        setup.arduinoBaseError == null;
+                }
+            }
+        }
+
         public SetupTypes setupType { get; set; }
 
         public string name { get; set; }
         public string guid { get; set; }
-             
-        // boards.txt --------------------------------
-     //   public string boardTxtPath { get; set; }
-        //public string boardTxtPathError => (!String.IsNullOrWhiteSpace(boardTxtPath) && File.Exists(boardTxtPath)) ? null : "Error";
-        //public bool copyBoardTxt { get; set; }
 
 
         // compilerBase ------------------------------
-        public CheckedPath compilerBase { get; } = new CheckedPath("bin\\arm-none-eabi-gcc.exe");
+        public CheckedPath compilerBase { get; } = new CheckedPath("bin\\arm-none-eabi-gcc.exe", optional: false);
+        public string compiler
+        {
+            get
+            {
+                if (!isOk) return null;
+
+                string path;
+                if (setupType == SetupTypes.expert)
+                    path = Path.Combine(compilerBase.path, "bin");
+                else
+                    path = Path.Combine(setup.arduinoCompiler, "bin");
+
+                return Helpers.getShortPath(path);
+            }
+        }
 
         // core --------------------------------------
-        public CheckedPath coreBase { get; } = new CheckedPath("Arduino.h");     
+        public CheckedPath coreBase { get; } = new CheckedPath("boards.txt", optional: false);
         public bool copyCore { get; set; }
         public bool localCore { get; set; }
-        public string core => Path.Combine(coreBase.path, "cores", selectedBoard.core);
+        public string core
+        {
+            get
+            {
+                if (!isOk) return null;
+
+                if (setupType == SetupTypes.expert)
+                    return Path.Combine(coreBase.path, "cores", selectedBoard.core);
+                else
+                    return Path.Combine(setup.arduinoCoreBase, "cores", selectedBoard.core);
+            }
+        }
+
+
 
         // makefile  ------------------------
         public string makefile { get; set; }
         public string makefileExtension { get; set; }
-        
+
         // libraries ---------------------------------
         public List<IProjectLibrary> sharedLibs { get; set; }
         public List<IProjectLibrary> localLibs { get; set; }
-        
+
         // boards
         public List<IBoard> boards { get; private set; }
         public IBoard selectedBoard { get; set; }
 
-        public Configuration(SetupData settings = null)
+        public Configuration()
         {
-          //  this.setup = settings;
             boards = new List<IBoard>();
             sharedLibs = new List<IProjectLibrary>();
             localLibs = new List<IProjectLibrary>();
             guid = Guid.NewGuid().ToString();
         }
-   
+
+        public SetupData setup { get; set; }
+
         public void logProject()
         {
             var sb = new StringBuilder();
             sb.Append("Data:\n");
-            sb.Append($"setupType:\t{setupType}\n");           
+            sb.Append($"setupType:\t{setupType}\n");
             //sb.Append($"boardTxtPath:\t{boardTxtPath}\n");
             sb.Append($"compilerBase:\t{compilerBase}\n");
             sb.Append($"coreBase:\t{coreBase}\n");
@@ -66,16 +111,17 @@ namespace vtCore
         public static IConfiguration getDefault(SetupData setupData)
         {
             //log.Info("enter");
-            var pd = new Configuration(setupData)
+            var pd = new Configuration()
             {
+                setup = setupData,
                 setupType = SetupTypes.quick,
-                name = "default",                      
+                name = "default",
             };
 
             pd.boards = new List<IBoard>();
             pd.coreBase.path = setupData.arduinoCoreBase;
             pd.compilerBase.path = setupData.arduinoCompiler;
-            pd.parseBoardsTxt(setupData.arduinoBoardsTxt);
+            pd.parseBoardsTxt(/*setupData.arduinoBoardsTxt*/null);
             pd.logProject();
 
             return pd;
@@ -83,12 +129,29 @@ namespace vtCore
 
         public void parseBoardsTxt(string bt)
         {
-            //log.Info("enter");
+            string btp = bt;
 
-            string btp = bt ?? Path.Combine(coreBase.path, "boards.txt");
-                       
+            boards.Clear();
+
+            if (bt == null)
+            {
+                if (setupType == SetupTypes.expert)
+                {
+                    if (!coreBase.isOk) return;
+                    btp = Path.Combine(coreBase.path, "boards.txt");
+
+                }
+                else
+                {
+                    if (setup?.arduinoBaseError != null) return;
+                    btp = setup?.arduinoBoardsTxt;
+                }
+            }
+
+
+
             //  var vboards = BoardsTxt.parse(bt ?? boardTxtPath);
-            var vboards = BoardsTxt.parse(btp);
+            //var vboards = BoardsTxt.parse(btp);
 
             ProjectTransferData.vtBoard tmp = new ProjectTransferData.vtBoard(selectedBoard);
             //  boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
@@ -112,9 +175,9 @@ namespace vtCore
                         }
                     }
                 }
-            }            
+            }
         }
-                     
+
 
         //private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }

@@ -31,7 +31,9 @@ namespace vtCore
             public vtBoard(IBoard board)
             {
                 name = board?.name;
-                options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name);
+                options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name ?? o.options.FirstOrDefault()?.name);
+               
+                
             }
             public string name { get; set; }
             public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();

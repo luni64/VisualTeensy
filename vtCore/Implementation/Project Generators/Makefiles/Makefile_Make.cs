@@ -13,8 +13,12 @@ namespace vtCore
         static public string generate(IProject project, LibManager libManager, SetupData setup)
         {
             var cfg = project.selectedConfiguration;
+            if (!cfg.isOk) return "ERROR";
+            //if (cfg.setupType == SetupTypes.quick && (setup.arduinoBaseError != null)) return "Error: Arduino path not set!\n\nPlease switch to expert setup or define a \nvalid Arduino path in the Settings tab.";
+            //if (cfg.setupType == SetupTypes.expert && !cfg.compilerBase.isOk) return "Error: Compiler path not set!";
+            //if (cfg.setupType == SetupTypes.expert && !cfg.coreBase.isOk) return "Error: Hardware folder (folder containing boards.txt and the cores subfolder) is not set";
             var board = cfg.selectedBoard;
-            if (board == null) return "";
+            //if (board == null) return "Error: No board selected";
 
             var options = board.getAllOptions();
 
@@ -53,21 +57,24 @@ namespace vtCore
             }
             mf.Append("\n\n");
 
+            //mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase ?? "Error", "cores", cfg.selectedBoard.core))}\n");
+
             if (cfg.setupType == SetupTypes.quick)
             {
-                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase, "cores", cfg.selectedBoard.core))}\n");
-                mf.Append($"GCC_BASE         := {Helpers.getShortPath(setup.arduinoCompiler)}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
+                mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase ?? "Error", "cores", cfg.selectedBoard.core))}\n");
+                mf.Append($"GCC_BASE         := {cfg.compiler}\n");
+                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");             
             }
             else
             {
                 mf.Append($"CORE_BASE        := {((cfg.copyCore || (Path.GetDirectoryName(cfg.coreBase.path) == project.path)) ? "core" : Helpers.getShortPath(cfg.core))}\n");
-                mf.Append($"GCC_BASE         := {cfg.compilerBase.shortPath}\n");
-                mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
+                mf.Append($"GCC_BASE         := {cfg.compiler}\n");
+                if (!String.IsNullOrWhiteSpace(setup.uplPjrcBase.path)) mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
+                //mf.Append($"UPL_PJRC_B       := {setup.uplPjrcBase.shortPath}\n");
             }
             if (!String.IsNullOrWhiteSpace(setup.uplTyBase.path)) mf.Append($"UPL_TYCMD_B      := {setup.uplTyBase.shortPath}\n");
             if (!String.IsNullOrWhiteSpace(setup.uplJLinkBase.path)) mf.Append($"UPL_JLINK_B      := {setup.uplJLinkBase.shortPath}\n");
-            if (!String.IsNullOrWhiteSpace(setup.uplCLIBase.path)) mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n");
+            if (project.debugSupport != DebugSupport.none && !String.IsNullOrWhiteSpace(setup.uplCLIBase.path)) mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n");
 
 
             mf.Append("\n#******************************************************************************\n");

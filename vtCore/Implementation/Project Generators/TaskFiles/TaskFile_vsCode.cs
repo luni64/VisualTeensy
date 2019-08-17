@@ -18,7 +18,7 @@ namespace vtCore
 
         static public string generate(IProject project, SetupData setup)
         {
-            string make = Path.Combine(setup.makeExeBase.path, "make.exe").Replace('\\', '/');
+            string make = Path.Combine(setup.makeExeBase.path ?? "Error", "make.exe").Replace('\\', '/');
             string j = project.buildSystem == BuildSystem.makefile ? "-j" : "";
             string O = project.buildSystem == BuildSystem.makefile ? "-Otarget" : "";
 

@@ -12,9 +12,23 @@ namespace vtCore
         public LibManager(SetupData setup)
         {   
             repositories = new List<IRepository>();
-            repositories.Add(new RepositoryIndexJson("Arduino Repository", Path.Combine(Helpers.arduinoAppPath, "library_index.json")));
-            repositories.Add(new RepositoryLocal("Installed Teensyduino Libraries", setup.tdLibBase));            
-            repositories.Add(new RepositoryLocal("Shared Libraries", Path.Combine(Helpers.getSketchbookFolder(), "libraries"), shared: true));
+            update(setup);
+        }
+
+        public void update(SetupData setup /*IProject project */)
+        {
+            repositories.Clear();
+
+            IRepository rvm;
+
+            rvm = new RepositoryLocal("Teensyduino Libraries", setup.tdLibBase);
+            if (rvm.libraries != null) repositories.Add(rvm);
+
+            rvm = new RepositoryLocal("Installed, shared Libraries", Path.Combine(Helpers.getSketchbookFolder(), "libraries"), shared: true);
+            if (rvm.libraries != null) repositories.Add(rvm);
+
+            rvm = new RepositoryIndexJson("Arduino Repository", Path.Combine(Helpers.arduinoAppPath, "library_index.json"));
+            if (rvm.libraries != null) repositories.Add(rvm);
         }
     }
 }

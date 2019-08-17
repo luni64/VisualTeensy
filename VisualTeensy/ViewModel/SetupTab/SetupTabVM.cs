@@ -17,6 +17,10 @@ namespace ViewModel
 
                 switch (columnName)
                 {
+                    case "arduinoBase":
+                        error = project.selectedConfiguration.setupType == SetupTypes.quick ? setup.arduinoBaseError : null;
+                        break;
+
                     case "projectPathDefault":
                         error = project.pathError;
                         break;

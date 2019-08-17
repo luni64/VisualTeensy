@@ -34,33 +34,54 @@ namespace VisualTeensy
                 Settings.Default.Reload();
             }
 
-            var setupData = new SetupData();
-
-            //var setupData = SetupData.getDefault();
+            SetupData setupData = new SetupData();
 
 
-            setupData.arduinoBase = String.IsNullOrWhiteSpace(Settings.Default.arduinoBase) ? Helpers.findArduinoFolder()?.Trim() : Settings.Default.arduinoBase;
-            Helpers.arduinoPath = setupData.arduinoBase;
+            if (Settings.Default.FirstStart)
+            {
+                var vm = new StartupSettingsView(new StartupSettingsVM(setupData)).ShowDialog();
 
-            setupData.projectBaseDefault = String.IsNullOrWhiteSpace(Settings.Default.projectBaseDefault) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source") : Settings.Default.projectBaseDefault;
-            // setupData.uplPjrcBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplPjrcBase) ? setupData.arduinoTools : Settings.Default.uplPjrcBase;
-            setupData.uplTyBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplTyBase) ? Helpers.findTyToolsFolder() : Settings.Default.uplTyBase;
-            setupData.uplCLIBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplCLIBase) ? Helpers.findCLIFolder() : Settings.Default.uplCLIBase;
-            setupData.uplJLinkBase.path = String.IsNullOrWhiteSpace(Settings.Default.uplJLinkBase) ? Helpers.findJLinkFolder() : Settings.Default.uplJLinkBase;
-            setupData.makeExeBase.path = String.IsNullOrWhiteSpace(Settings.Default.makeExePath) ? Directory.GetCurrentDirectory() : Settings.Default.makeExePath;
-            setupData.tdLibBase = String.IsNullOrWhiteSpace(Settings.Default.libBase) ? Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries") : Settings.Default.libBase;
-            setupData.debugSupportDefault = Settings.Default.debugSupport;
+                setupData.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
+                setupData.uplPjrcBase.path = Helpers.findTyToolsFolder();
+                setupData.uplTyBase.path = setupData.arduinoTools;
+                setupData.uplCLIBase.path = Helpers.findCLIFolder();
+                setupData.uplJLinkBase.path = Helpers.findJLinkFolder();
+                setupData.makeExeBase.path = Directory.GetCurrentDirectory();
+                //setupData.tdLibBase = Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries");
+                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase??"","libraries");
 
 
+                setupData.isColoredOutput = true;
+                setupData.colorCore = Color.FromArgb(255, 187, 206, 251);
+                setupData.colorUserLib = Color.FromArgb(255, 206, 244, 253);
+                setupData.colorUserSrc = Color.FromArgb(255, 100, 149, 237);
+                setupData.colorOk = Color.FromArgb(255, 179, 255, 179);
+                setupData.colorLink = Color.FromArgb(255, 255, 255, 202);
+                setupData.colorErr = Color.FromArgb(255, 255, 159, 159);
 
-            setupData.isColoredOutput = Settings.Default.ColorEnabled;
-            setupData.colorCore = Settings.Default.ColCore.IsEmpty ? Color.FromArgb(255, 187, 206, 251) : Settings.Default.ColCore;
-            setupData.colorUserLib = Settings.Default.ColLib.IsEmpty ? Color.FromArgb(255, 206, 244, 253) : Settings.Default.ColLib;
-            setupData.colorUserSrc = Settings.Default.ColSrc.IsEmpty ? Color.FromArgb(255, 100, 149, 237) : Settings.Default.ColSrc;
-            setupData.colorOk = Settings.Default.ColOk.IsEmpty ? Color.FromArgb(255, 179, 255, 179) : Settings.Default.ColOk;
-            setupData.colorLink = Settings.Default.ColLink.IsEmpty ? Color.FromArgb(255, 255, 255, 202) : Settings.Default.ColLink;
-            setupData.colorErr = Settings.Default.ColErr.IsEmpty ? Color.FromArgb(255, 255, 159, 159) : Settings.Default.ColErr;
+                Settings.Default.FirstStart = false;
+            }
+            else
+            {
+                setupData.arduinoBase = Settings.Default.arduinoBase;
 
+                setupData.projectBaseDefault = Settings.Default.projectBaseDefault;
+                setupData.uplPjrcBase.path = Settings.Default.uplPjrcBase;
+                setupData.uplTyBase.path = Settings.Default.uplTyBase;
+                setupData.uplCLIBase.path = Settings.Default.uplCLIBase;
+                setupData.uplJLinkBase.path = Settings.Default.uplJLinkBase;
+                setupData.makeExeBase.path = Settings.Default.makeExePath;
+                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase??"", "libraries");
+
+                setupData.isColoredOutput = Settings.Default.ColorEnabled;
+                setupData.colorCore = Settings.Default.ColCore;
+                setupData.colorUserLib = Settings.Default.ColLib;
+                setupData.colorUserSrc = Settings.Default.ColSrc;
+                setupData.colorOk = Settings.Default.ColOk;
+                setupData.colorLink = Settings.Default.ColLink;
+                setupData.colorErr = Settings.Default.ColErr;
+            }
+            Helpers.arduinoPath = setupData.arduinoBase;                       
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
@@ -70,7 +91,6 @@ namespace VisualTeensy
             {
                 setupData.makefile_builder = reader.ReadToEnd();
             }
-            //  Helpers.arduinoPath = setupData.arduinoBase;
 
             return setupData;
         }
@@ -93,6 +113,11 @@ namespace VisualTeensy
             Settings.Default.ColOk = setupData.colorOk;
             Settings.Default.ColLink = setupData.colorLink;
             Settings.Default.ColErr = setupData.colorErr;
+            
+            Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
+        
+            Settings.Default.Save();
+
         }
 
         static public MainWindow mainWin { get; private set; }
@@ -100,6 +125,8 @@ namespace VisualTeensy
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -119,6 +146,7 @@ namespace VisualTeensy
 
             base.OnStartup(e);
 
+            
             // overwrite local lib index if  older than 7 days 
             string libIndexTarget = appData + "/VisualTeensy/library_index.json";
             bool overwrite = !File.Exists(libIndexTarget);
@@ -134,7 +162,8 @@ namespace VisualTeensy
             try
             {
                 var setup = loadSetup();
-                setup.tdLibBase = setup.arduinoBoardsTxt != null ? Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
+              
+                //    //setup.tdLibBase = setup.arduinoBoardsTxt != null ? Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
 
                 var libManager = Factory.makeLibManager(setup);
                 var project = Factory.makeProject(setup, libManager);
@@ -161,15 +190,12 @@ namespace VisualTeensy
 
                 mainWin.ShowDialog();
 
-
-
+                Settings.Default.lastProject = project.path;
                 saveSetup(setup);
 
-                Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
-                Settings.Default.lastProject = project.path;
-                Settings.Default.Save();
-
                 log.Info("Closed");
+
+                Shutdown();
             }
             catch (Exception ex)
             {

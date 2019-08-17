@@ -12,8 +12,10 @@ namespace vtCore
         public static string generate(IProject project, SetupData setup, LibManager libManager)
         {
             var cfg = project.selectedConfiguration;
-            var brd = cfg.selectedBoard;
-            if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
+            if (!cfg.isOk) return "ERROR";
+
+;            var brd = cfg.selectedBoard;
+           // if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
 
             var props = new PropertiesJson()
             {
@@ -22,7 +24,7 @@ namespace vtCore
                     new ConfigurationJson()
                     {
                         name = "VisualTeensy",
-                        compilerPath =  Path.Combine(cfg.setupType == SetupTypes.expert ? cfg.compilerBase.path : setup.arduinoCompiler ,"bin","arm-none-eabi-gcc.exe").Replace('\\','/'),
+                        compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
                         includePath = new List<string>(),                        
                         defines = new List<string>()
@@ -35,14 +37,8 @@ namespace vtCore
 
             // include path -------------------------------------------------------------
             cfgp.includePath.Add("src/**");
-            if(cfg.setupType == SetupTypes.quick)
-            {
-                cfgp.includePath.Add(Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**");
-            }
-            else
-            {
-                cfgp.includePath.Add((cfg.copyCore ? "core" : cfg.core).Replace('\\', '/') + "/**");
-            }
+            cfgp.includePath.Add(cfg.core);
+           
             foreach (var lib in cfg.sharedLibs)
             {
                 cfgp.includePath.Add(Path.Combine(lib.sourceUri.AbsolutePath, "**").Replace('\\', '/'));

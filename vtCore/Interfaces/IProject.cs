@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using vtCore.Interfaces;
 
+
+
+
 namespace vtCore.Interfaces
 {
     public enum Target
@@ -23,8 +26,16 @@ namespace vtCore.Interfaces
         cortex_debug
     }
 
-    public interface IProject
+    public interface IFolders
     {
+        CheckedPath compiler { get;  }
+        //CheckedPath coreBase { get; }
+        //CheckedPath sharedLibs { get; }
+    }
+
+
+    public interface IProject
+    {     
         string name { get; }
         string cleanName { get; }
 

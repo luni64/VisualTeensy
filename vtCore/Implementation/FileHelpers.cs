@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -13,9 +14,11 @@ namespace vtCore
 {
     public static class Helpers
     {
+
+
         static readonly HttpClient client = new HttpClient();
 
-      
+
         public static string arduinoPath { set; get; }
 
 
@@ -100,7 +103,7 @@ namespace vtCore
             folder = checkFolder(@"C:\Program Files (x86)", f => isJLinkFolder(f));
             if (folder != null)
             {
-                return Path.Combine(folder, "JLINK64");
+                return Path.Combine(folder, "JLink_V646j");
             }
 
             return null;
@@ -115,7 +118,7 @@ namespace vtCore
             {
                 return folder;
             }
-                        
+
             return null;
         }
 
@@ -135,11 +138,11 @@ namespace vtCore
                 return false;
             }
 
-            var boardsTxt = Path.Combine(folder, "hardware", "teensy", "avr", "boards.txt");
-            if (!File.Exists(boardsTxt))
-            {
-                return false;
-            }
+            //var boardsTxt = Path.Combine(folder, "hardware", "teensy", "avr", "boards.txt");
+            //if (!File.Exists(boardsTxt))
+            //{
+            //    return false;
+            //}
 
             return true;
         }
@@ -197,7 +200,7 @@ namespace vtCore
         }
 
         public static void copyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {            
+        {
             foreach (DirectoryInfo dir in source.GetDirectories())
             {
                 copyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
@@ -255,7 +258,7 @@ namespace vtCore
 
             var libDir = new DirectoryInfo(lib.targetUri.LocalPath);
             if (libDir.Exists) libDir.Delete(true);
-            
+
             // we will save the *.zip in a temp file and unzip into %temp%/vslib            
             var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "vslib"));
             if (tempFolder.Exists) tempFolder.Delete(true);
@@ -273,7 +276,7 @@ namespace vtCore
                         using (var archive = new ZipArchive(s))
                         {
                             archive.ExtractToDirectory(tempFolder.FullName);
-                        }                        
+                        }
                     }
                 }
 
@@ -286,20 +289,17 @@ namespace vtCore
             catch (Exception)
             {
                 throw;
-            }            
+            }
         }
 
-     
+
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int getShortPathName(string longPath, StringBuilder shortPath, int bufSize);
         public static string getShortPath(string longPath)
         {
-
-            if (longPath == null || !longPath.Contains(' '))
-            {
-                return longPath;
-            }
-
+            if (String.IsNullOrWhiteSpace(longPath)) return "";
+            if (!longPath.Contains(' ')) return longPath;
+            
             const int maxPath = 255;
             StringBuilder shortPath = new StringBuilder(maxPath);
             int i = getShortPathName(longPath, shortPath, maxPath);

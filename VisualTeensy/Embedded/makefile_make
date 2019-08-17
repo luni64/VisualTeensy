@@ -17,12 +17,12 @@ TARGET_LST  := $(BIN)/$(TARGET_NAME).lst
 #******************************************************************************
 # BINARIES
 #******************************************************************************
-CC          := $(GCC_BASE)/bin/arm-none-eabi-gcc
-CXX         := $(GCC_BASE)/bin/arm-none-eabi-g++
-AR          := $(GCC_BASE)/bin/arm-none-eabi-gcc-ar
-OBJCOPY     := $(GCC_BASE)/bin/arm-none-eabi-objcopy
-SIZE        := $(GCC_BASE)/bin/arm-none-eabi-size
-OBJDUMP     := $(GCC_BASE)/bin/arm-none-eabi-objdump
+CC          := $(GCC_BASE)/arm-none-eabi-gcc
+CXX         := $(GCC_BASE)/arm-none-eabi-g++
+AR          := $(GCC_BASE)/arm-none-eabi-gcc-ar
+OBJCOPY     := $(GCC_BASE)/arm-none-eabi-objcopy
+SIZE        := $(GCC_BASE)/arm-none-eabi-size
+OBJDUMP     := $(GCC_BASE)/arm-none-eabi-objdump
 UPL_PJRC    := "$(UPL_PJRC_B)/teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
 UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
 UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)

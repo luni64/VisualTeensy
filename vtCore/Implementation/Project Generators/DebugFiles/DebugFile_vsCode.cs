@@ -9,8 +9,11 @@ namespace vtCore
         static public string generate(IProject project, SetupData setup)
         {
             IConfiguration cfg = project.selectedConfiguration;
+            if (cfg.selectedBoard == null) return "ERROR, no board selected";
+
             (string target, string svd) = DebugFile.seggerDebugTargets.TryGetValue(cfg.selectedBoard.id, out (string, string) value) ? value : ("unknown", "unknown");
-            string compilerBase = (cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase.shortPath).Replace('\\', '/');
+            ////string compilerBase = (cfg.setupType == SetupTypes.quick ? setup.arduinoCompiler : cfg.compilerBase.shortPath)??"Error".Replace('\\', '/');
+            string compilerBase = cfg.compiler;
 
             var launchJson = new
             {
@@ -26,8 +29,8 @@ namespace vtCore
                       type = "cortex-debug",
                       servertype = "jlink",
                       device = target,
-                      svdFile= svd,
-                      armToolchainPath= compilerBase + "/bin",
+                      svdFile = svd,
+                      armToolchainPath = cfg.compiler,
                   },
                   new
                   {
@@ -39,7 +42,7 @@ namespace vtCore
                       servertype = "jlink",
                       device = target,
                       svdFile= svd,
-                      armToolchainPath= compilerBase + "/bin",
+                      armToolchainPath= cfg.compiler,
                   },
                 }
             };

@@ -20,7 +20,7 @@ namespace vtCore
     }
 
     internal class Project : IProject
-    {
+    {    
         public IEnumerable<IConfiguration> configurations => _configurations;
         public IConfiguration selectedConfiguration => _selectedConfiguration;
 
@@ -48,7 +48,7 @@ namespace vtCore
         public string libBase => Path.Combine(path, "lib");
         public string name => Path.GetFileName(path ?? "ERROR");
         public string cleanName => name.Replace(" ", "_");
-        public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName, ".ino");
+        public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName + ".ino");
 
         public void newProject()
         {
@@ -127,6 +127,8 @@ namespace vtCore
                     foreach (var cfg in fileContent.configurations)
                     {
                         var configuration = (Configuration)cfg;
+                        configuration.setup = this.setup;       /// hack, look for better solution
+                        
 
                         // add shared libraries ---------------------
                         if (cfg.sharedLibraries != null)
@@ -158,7 +160,7 @@ namespace vtCore
                         }
 
                         // initialize boards list and options
-                        configuration.parseBoardsTxt(configuration.setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : null);
+                        configuration.parseBoardsTxt(/*configuration.setupType == SetupTypes.quick ? setup.arduinoBoardsTxt : null*/ null);
                         configuration.selectedBoard = configuration.boards?.FirstOrDefault(b => b.name == cfg.board.name);
                         if (configuration.selectedBoard != null)
                         {
