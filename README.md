@@ -2,9 +2,9 @@
 [vsCode](https://code.visualstudio.com/) is a modern, open source code editor which can easily be used to compile and upload sketches for the [PJRC Teensy Boards](https://www.pjrc.com/). **VisualTeensy** is a light weight Windows utility which fully automates the generation of Teensy projects for VisualCode. Precompiled binaries of VisualTeensy can be downloaded from here: [https://github.com/luni64/VisualTeensy/releases](https://github.com/luni64/VisualTeensy/releases).
 
 Here a quick video showing how to use VisualTeensy:
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=8oTSou1I3IM
-" target="_blank"><img src="http://img.youtube.com/vi/v=8oTSou1I3IM/0.jpg" 
-alt="Usage Video" width="480" height="360" border="10" /></a>
+
+[![Watch the video](https://user-images.githubusercontent.com/12611497/63101306-170a2680-bf79-11e9-9e8e-38b3f9a8d6be.png)](https://youtu.be/g5YXzBwtecg)
+
 
 ## Prerequisites
 - Obviously you'll need **vsCode** installed. If you want to take advantage of intellisense (which I strongly suggest) you should also install the ["C/C++ IntelliSense, debugging, and code browsing](https://code.visualstudio.com/docs/languages/cpp) extension from Microsoft.
