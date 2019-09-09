@@ -37,6 +37,21 @@ VisualTeensy does not touch any global or user settings in vsCode and does not i
    
 ![Build](/media/build.PNG)
 
+
+## Using Libraries
+
+VisualTeensy doesn't attempt to be smarter than you and does not do any 
+library dependency analysis. This means that you have to specify which libraries
+(and possibly which dependent libraries) you want to use in your project. If you
+are used to the Arduino IDE this may sound inconvenient but usually this is done
+in a few seconds and gives you full control over the used libraries. 
+
+Here a quick video showing how to use the library manager of VisualTeensy by
+compiling an example sketch from the [NXPMotionSense](https://github.com/PaulStoffregen/NXPMotionSense) library 
+
+[![Watch the video](https://img.youtube.com/vi/8oTSou1I3IM/0.jpg)](https://youtu.be/8oTSou1I3IM)
+
+
 ### Expert Settings
 TBD
 
