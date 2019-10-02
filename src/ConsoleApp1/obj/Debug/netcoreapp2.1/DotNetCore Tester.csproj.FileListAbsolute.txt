@@ -1,0 +1,28 @@
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.deps.json
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.runtimeconfig.json
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.runtimeconfig.dev.json
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.dll
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.pdb
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\vtCore.dll
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\vtCore.pdb
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csprojAssemblyReference.cache
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csproj.CoreCompileInputs.cache
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.AssemblyInfoInputs.cache
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.AssemblyInfo.cs
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csproj.CopyComplete
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.dll
+C:\Users\lutz\source\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.pdb
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.deps.json
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.runtimeconfig.json
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.runtimeconfig.dev.json
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.dll
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\DotNetCore Tester.pdb
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\vtCore.dll
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\bin\Debug\netcoreapp2.1\vtCore.pdb
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csprojAssemblyReference.cache
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csproj.CoreCompileInputs.cache
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.AssemblyInfoInputs.cache
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.AssemblyInfo.cs
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.csproj.CopyComplete
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.dll
+C:\Users\lutz\source\Teensy\VisualTeensy\ConsoleApp1\obj\Debug\netcoreapp2.1\DotNetCore Tester.pdb

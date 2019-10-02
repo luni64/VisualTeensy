@@ -1,0 +1,10 @@
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\bin\Debug\FileWriter.exe.config
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\bin\Debug\FileWriter.exe
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\bin\Debug\FileWriter.pdb
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\bin\Debug\HidLibrary.dll
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\bin\Debug\HidLibrary.pdb
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\obj\Debug\FileWriter.csprojAssemblyReference.cache
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\obj\Debug\FileWriter.csproj.CoreCompileInputs.cache
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\obj\Debug\FileWriter.csproj.CopyComplete
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\obj\Debug\FileWriter.exe
+C:\Users\lutz\source\Teensy\VisualTeensy\FileWriter\obj\Debug\FileWriter.pdb
