@@ -181,7 +181,7 @@ $(TARGET_ELF): $(CORE_LIB) $(LIB_OBJ) $(USR_OBJ)
 
 %.hex: %.elf
 	@echo $(COL_LINK)[HEX] $@ 
-	@$(SIZE) "$<"
+#	@$(SIZE) "$<"
 	@$(OBJCOPY) -O ihex -R.eeprom "$<" "$@"
 	
 	

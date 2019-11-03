@@ -59,6 +59,10 @@ namespace vtCore
                 string oldVal = ldFlagOpt.Value.Replace("\"", "");
                 string newVal;
 
+                if(oldVal.Contains("-Wl,"))
+                {
+                    oldVal = oldVal.Replace("-Wl,","-Wl,--print-memory-usage,");
+                }
                 if (oldVal.Contains("--defsym=__rtc_localtime"))
                 {
                     newVal = oldVal.Replace("{extra.time.local}", "$(shell powershell [int](Get-Date -UFormat +%s)[0])");
