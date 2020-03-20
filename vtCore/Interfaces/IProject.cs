@@ -54,5 +54,7 @@ namespace vtCore.Interfaces
         Target target { get; set; }
         BuildSystem buildSystem { get; set; }
         DebugSupport debugSupport { get; set; }
+
+        bool useInoFiles { get; set; }
     }
 }

@@ -14,8 +14,8 @@ namespace vtCore
             var cfg = project.selectedConfiguration;
             if (!cfg.isOk) return "ERROR";
 
-;            var brd = cfg.selectedBoard;
-           // if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
+            ; var brd = cfg.selectedBoard;
+            // if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
 
             var props = new PropertiesJson()
             {
@@ -26,7 +26,7 @@ namespace vtCore
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-x64",
-                        includePath = new List<string>(),                        
+                        includePath = new List<string>(),
                         defines = new List<string>()
                     }
                 }
@@ -38,7 +38,7 @@ namespace vtCore
             // include path -------------------------------------------------------------
             cfgp.includePath.Add("src/**");
             cfgp.includePath.Add(cfg.core);
-           
+
             foreach (var lib in cfg.sharedLibs)
             {
                 cfgp.includePath.Add(Path.Combine(lib.sourceUri.AbsolutePath, "**").Replace('\\', '/'));
@@ -46,7 +46,7 @@ namespace vtCore
 
             foreach (var lib in cfg.localLibs)
             {
-                cfgp.includePath.Add(Path.Combine("lib",lib.targetFolderName, "**").Replace('\\', '/'));
+                cfgp.includePath.Add(Path.Combine("lib", lib.targetFolderName, "**").Replace('\\', '/'));
             }
 
             // Compiler switches ----------------------------------------------------------
@@ -60,14 +60,17 @@ namespace vtCore
                 {
                     props.configurations[0].defines.Add(define.Trim());
                 }
+
             }
-                        
+            var boardDef = "ARDUINO_" + options.FirstOrDefault(o => o.Key == "build.board").Value;
+            props.configurations[0].defines.Add(boardDef);
+
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
             props.configurations[0].defines.Add("ARDUINO");
 
-          
+
             return JsonConvert.SerializeObject(props, Formatting.Indented);
         }
 

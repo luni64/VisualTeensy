@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
-using System.Linq;
 using vtCore.Interfaces;
-using System.Drawing;
 
 namespace vtCore
 {
@@ -13,12 +12,8 @@ namespace vtCore
         static public string generate(IProject project, LibManager libManager, SetupData setup)
         {
             var cfg = project.selectedConfiguration;
-            if (!cfg.isOk) return "ERROR";
-            //if (cfg.setupType == SetupTypes.quick && (setup.arduinoBaseError != null)) return "Error: Arduino path not set!\n\nPlease switch to expert setup or define a \nvalid Arduino path in the Settings tab.";
-            //if (cfg.setupType == SetupTypes.expert && !cfg.compilerBase.isOk) return "Error: Compiler path not set!";
-            //if (cfg.setupType == SetupTypes.expert && !cfg.coreBase.isOk) return "Error: Hardware folder (folder containing boards.txt and the cores subfolder) is not set";
-            var board = cfg.selectedBoard;
-            //if (board == null) return "Error: No board selected";
+            if (!cfg.isOk) return "ERROR";           
+            var board = cfg.selectedBoard;           
 
             var options = board.getAllOptions();
 
@@ -63,7 +58,7 @@ namespace vtCore
             {
                 mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase ?? "Error", "cores", cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {cfg.compiler}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");             
+                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
@@ -90,13 +85,11 @@ namespace vtCore
             mf.Append(makeEntry("FLAGS_CPP   := ", "build.flags.cpp", options) + "\n");
             mf.Append(makeEntry("FLAGS_C     := ", "build.flags.c", options) + "\n");
             mf.Append(makeEntry("FLAGS_S     := ", "build.flags.S", options) + "\n");
-
             mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options).Replace("{build.core.path}", "$(CORE_BASE)") + "\n");
 
             mf.Append("\n");
             mf.Append(makeEntry("LIBS        := ", "build.flags.libs", options) + "\n");
-            //mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
-
+            
             mf.Append("\n");
             mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + makeEntry(" -DARDUINO_", "build.board", options) + " -DARDUINO=10807\n");
             mf.Append("DEFINES     += ");
@@ -141,6 +134,45 @@ namespace vtCore
             }
 
             mf.Append("\n");
+            mf.Append("\n#******************************************************************************\n");
+            mf.Append("# Folders and Files\n");
+            mf.Append("#******************************************************************************\n");
+            if(cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles )
+            {
+                mf.Append("USR_SRC     := .\n");
+            }
+            else
+            {
+                mf.Append("USR_SRC     := src\n");
+            }
+            mf.Append("LIB_SRC     := lib\n");
+            mf.Append("CORE_SRC    := $(CORE_BASE)\n\n");
+            
+            mf.Append("BIN         := .vsteensy/build\n");
+            mf.Append("USR_BIN     := $(BIN)/src\n");
+            mf.Append("CORE_BIN    := $(BIN)/core\n");
+            mf.Append("LIB_BIN     := $(BIN)/lib\n");
+            mf.Append("CORE_LIB    := $(BIN)/core.a\n");
+            mf.Append("TARGET_HEX  := $(BIN)/$(TARGET_NAME).hex\n");
+            mf.Append("TARGET_ELF  := $(BIN)/$(TARGET_NAME).elf\n");
+            mf.Append("TARGET_LST  := $(BIN)/$(TARGET_NAME).lst\n");
+
+            mf.Append("\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# BINARIES\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("CC          := $(GCC_BASE)/arm-none-eabi-gcc\n");
+            mf.Append("CXX         := $(GCC_BASE)/arm-none-eabi-g++\n");
+            mf.Append("AR          := $(GCC_BASE)/arm-none-eabi-gcc-ar\n");
+            mf.Append("SIZE        := $(GCC_BASE)/arm-none-eabi-size\n");
+            mf.Append("OBJDUMP     := $(GCC_BASE)/arm-none-eabi-objdump\n");
+            mf.Append("UPL_PJRC    := \"$(UPL_PJRC_B)/teensy_post_compile\" -test -file=$(TARGET_NAME) -path=$(BIN) -tools=\"$(UPL_PJRC_B)\" -board=$(BOARD_ID) -reboot\n");
+            mf.Append("UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi\n");
+            mf.Append("UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)\n");
+            mf.Append("UPL_JLINK   := $(UPL_JLINK_B)/jlink -commanderscript .vsteensy/flash.jlink\n");
+                       
+
+            mf.Append("\n");
             mf.Append(setup.makefile_fixed);
 
             return mf.ToString();
@@ -152,7 +184,7 @@ namespace vtCore
         }
 
         private static string colEsc(Color c)
-        {            
+        {
             return $"{(char)27}[38;2;{c.R};{c.G};{c.B}m";
         }
 

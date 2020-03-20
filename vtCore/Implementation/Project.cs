@@ -29,9 +29,8 @@ namespace vtCore
         public Target target { get; set; } = Target.vsCode;
         public BuildSystem buildSystem { get; set; } = BuildSystem.makefile;
         public DebugSupport debugSupport { get; set; } = DebugSupport.none;
-
-        // public bool isMakefileBuild { get; set; } = true;
-
+        public bool useInoFiles { get; set; } = false;
+        
         public string path { get; set; }
         public string pathError
         {

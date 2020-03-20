@@ -178,6 +178,7 @@ namespace ViewModel
                 OnPropertyChanged();
             }
         }
+       
 
         // Debugging
         public bool hasDebugSupport

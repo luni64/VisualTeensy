@@ -106,7 +106,17 @@ namespace ViewModel
         //    }
         //}
 
-                    
+        public bool useInoFiles
+        {
+            get => project.useInoFiles;
+            set
+            {
+                project.useInoFiles = value;
+                updateAll();
+                OnPropertyChanged("");
+            }
+        }
+
         public bool quickSetup
         {
             get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;

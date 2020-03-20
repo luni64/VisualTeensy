@@ -1,32 +1,4 @@
-#******************************************************************************
-# Folders and Files
-#******************************************************************************
-USR_SRC     := src
-LIB_SRC     := lib
-CORE_SRC    := $(CORE_BASE)
 
-BIN         := .vsteensy/build
-USR_BIN     := $(BIN)/src
-CORE_BIN    := $(BIN)/core
-LIB_BIN     := $(BIN)/lib
-CORE_LIB    := $(BIN)/core.a
-TARGET_HEX  := $(BIN)/$(TARGET_NAME).hex
-TARGET_ELF  := $(BIN)/$(TARGET_NAME).elf
-TARGET_LST  := $(BIN)/$(TARGET_NAME).lst
-
-#******************************************************************************
-# BINARIES
-#******************************************************************************
-CC          := $(GCC_BASE)/arm-none-eabi-gcc
-CXX         := $(GCC_BASE)/arm-none-eabi-g++
-AR          := $(GCC_BASE)/arm-none-eabi-gcc-ar
-OBJCOPY     := $(GCC_BASE)/arm-none-eabi-objcopy
-SIZE        := $(GCC_BASE)/arm-none-eabi-size
-OBJDUMP     := $(GCC_BASE)/arm-none-eabi-objdump
-UPL_PJRC    := "$(UPL_PJRC_B)/teensy_post_compile" -test -file=$(TARGET_NAME) -path=$(BIN) -tools="$(UPL_PJRC_B)" -board=$(BOARD_ID) -reboot
-UPL_TYCMD   := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi
-UPL_CLICMD  := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)
-UPL_JLINK   := $(UPL_JLINK_B)/jlink -commanderscript .vsteensy/flash.jlink
 
 #******************************************************************************
 # Source and Include Files

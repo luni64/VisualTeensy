@@ -45,7 +45,6 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/> 
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -65,6 +64,7 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                 </RadioButton>
                 <Label Content="Debug Support" Margin="0,0,10,0" VerticalAlignment="Center" Padding="0"/>
                 <ToggleButton HorizontalAlignment="Left"   Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding hasDebugSupport}" Height="18" VerticalAlignment="Top" />
+
             </StackPanel>
 
             <!--<Button Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right"  Click="openOutputClick" Height="45" Width="45"
@@ -93,11 +93,19 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 
             <!--Expert Setup ____________________________________-->
             <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Width="auto" Margin="0,1,0,0"   Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
-                <!--<Label   Content="boards.txt " FontSize="12" FontWeight="SemiBold" Padding="0" />
-                <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
-                <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>-->
+                <Label   Content="Sketch file type" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,25,0,0" />
+                <CheckBox HorizontalAlignment="Left" IsEnabled="{Binding isMakefileBuild}"  IsChecked="{Binding useInoFiles}" Height="18" Margin="0,0,0,0" Padding="4,0,0,0">
+                    <CheckBox.ToolTip>
+                        <TextBlock >
+                            Check to use Arduino *.ino sketches located in the root folder instead of standard *.cpp sources in the /src folder. <LineBreak/>                             
+                            Note: Standard c++ compliance required anyway. <LineBreak />
+                        </TextBlock>
+                    </CheckBox.ToolTip>
+                    <TextBlock Text="Use *.ino files instead of *.cpp files" VerticalAlignment="Center"/>
+                </CheckBox>
 
-                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,25,0,0" />
+
+                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,20,0,0" />
                 <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
 
                 <Label   Content="Hardware folder (containing ./boards.txt and ./cores/)" FontSize="12" FontWeight="SemiBold" Padding="0" Margin="0,20,0,0"  />
@@ -106,8 +114,8 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 
 
                 <Label   Content="Additional entries to makefile:" FontWeight="SemiBold" FontSize="12" Padding="0" Margin="0,25,0,0" />
+                <TextBox MinHeight="100" Grid.ColumnSpan="2" VerticalContentAlignment="Stretch" BorderThickness="1" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="13"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" Text="{Binding makefileExtension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100}"/>                
             </StackPanel>
-            <TextBox Grid.Row="5" Grid.ColumnSpan="2" VerticalContentAlignment="Stretch" BorderThickness="1" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="13"  Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" Text="{Binding makefileExtension, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100}"/>
         </Grid>
         <Grid Grid.Column="2"  >
             <Grid.RowDefinitions>
@@ -134,13 +142,13 @@ xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                 <StackPanel Margin="20,0,0,0" >
                     <RadioButton Tag="debugFile" Content="launch.json"  Margin="0,0,0,0" GroupName="files" IsEnabled="{Binding hasDebugSupport}">
                         <RadioButton.ToolTip>
-                             Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
+                            Expert Setup allows to choose the compiler and used core libraries independently of your Arduino installation.
                         </RadioButton.ToolTip>
                     </RadioButton>
                     <RadioButton Tag="propFile" Content="_c_cpp_properties.json"  Margin="0,0,0,0" GroupName="files"/>
                 </StackPanel>
                 <StackPanel Margin="20,0,0,0" >
-                    <RadioButton Tag="settFile" Content="vsteensy.json" Margin="0,3,0,0" GroupName="files"/>                    
+                    <RadioButton Tag="settFile" Content="vsteensy.json" Margin="0,3,0,0" GroupName="files"/>
                 </StackPanel>
             </StackPanel>
 
