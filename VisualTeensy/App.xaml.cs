@@ -83,10 +83,10 @@ namespace VisualTeensy
             }
             Helpers.arduinoPath = setupData.arduinoBase;                       
 
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
-            {
-                setupData.makefile_fixed = reader.ReadToEnd();
-            }
+            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
+            //{
+            //    setupData.makefile_fixed = reader.ReadToEnd();
+            //}
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
             {
                 setupData.makefile_builder = reader.ReadToEnd();

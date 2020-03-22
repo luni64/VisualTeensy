@@ -271,9 +271,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embedded\makefile_make" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="img\rubbish-bin.png" />
   </ItemGroup>
   <ItemGroup>
