@@ -32,8 +32,6 @@ namespace vtCore
             {
                 name = board?.name;
                 options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name ?? o.options.FirstOrDefault()?.name);
-               
-                
             }
             public string name { get; set; }
             public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
@@ -85,7 +83,7 @@ namespace vtCore
 
             [JsonProperty(Order = 12)]
             public vtBoard board { get; set; }
-            
+
             public vtConfiguration(IConfiguration configuration)
             {
                 if (configuration == null)
@@ -142,11 +140,14 @@ namespace vtCore
         [JsonConverter(typeof(StringEnumConverter))]
         public BuildSystem buildSystem { get; set; }
 
-        [JsonProperty(Order = 4)]
+        [JsonProperty(Order = 4)]        
+        public bool useInoFile { get; set; } = false;
+
+        [JsonProperty(Order = 5)]
         [JsonConverter(typeof(StringEnumConverter))]
         public DebugSupport debugSupport { get; set; }
 
-        [JsonProperty(Order = 5)]
+        [JsonProperty(Order = 6)]
         public List<vtConfiguration> configurations;
 
         internal ProjectTransferData(IProject project)
@@ -155,6 +156,7 @@ namespace vtCore
             version = "1";
             target = project.target;
             buildSystem = project.buildSystem;
+            useInoFile = project.useInoFiles;
             debugSupport = project.debugSupport;
 
             configurations = project.configurations.Select(c => new vtConfiguration(c)).ToList();
@@ -162,7 +164,7 @@ namespace vtCore
 
         public ProjectTransferData() { }
 
-       
+
 
         private IProject model;
     }

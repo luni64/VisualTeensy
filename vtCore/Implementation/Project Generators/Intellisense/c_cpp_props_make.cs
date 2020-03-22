@@ -35,6 +35,12 @@ namespace vtCore
 
             var cfgp = props.configurations[0];
 
+            // forced include -----------------------------------------------------------
+            if(project.buildSystem == BuildSystem.makefile && project.useInoFiles)
+            {
+                cfgp.forcedInclude.Add(Path.Combine(cfg.core, "Arduino.h"));
+            }
+
             // include path -------------------------------------------------------------
             cfgp.includePath.Add("src/**");
             cfgp.includePath.Add(cfg.core);

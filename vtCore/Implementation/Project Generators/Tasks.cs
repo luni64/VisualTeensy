@@ -21,8 +21,9 @@ namespace vtCore
         {
             vsCodeFolder = new DirectoryInfo(Path.Combine(project.path, ".vscode"));
             vsTeensyFolder = new DirectoryInfo(Path.Combine(project.path, ".vsteensy"));
-            srcFolder = project.buildSystem == BuildSystem.makefile ? new DirectoryInfo(Path.Combine(project.path, "src")) : null;
-
+            
+            srcFolder = (project.buildSystem == BuildSystem.makefile && !project.useInoFiles) ? new DirectoryInfo(Path.Combine(project.path, "src")) : null;
+            
             done = vsCodeFolder.Exists && vsTeensyFolder.Exists && srcFolder != null && srcFolder.Exists;
         }
 
@@ -230,7 +231,7 @@ namespace vtCore
         public GenerateSketch(IProject project)
         {
             mainSketch = new FileInfo(project.mainSketchPath);
-            if (project.buildSystem == BuildSystem.makefile)
+            if (project.buildSystem == BuildSystem.makefile && !project.useInoFiles)
             {
                 fileContent = Strings.mainCpp;
             }

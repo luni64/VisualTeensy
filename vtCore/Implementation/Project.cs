@@ -47,7 +47,7 @@ namespace vtCore
         public string libBase => Path.Combine(path, "lib");
         public string name => Path.GetFileName(path ?? "ERROR");
         public string cleanName => name.Replace(" ", "_");
-        public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName + ".ino");
+        public string mainSketchPath => (buildSystem == BuildSystem.makefile && !useInoFiles)  ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName + ".ino");
 
         public void newProject()
         {
@@ -122,6 +122,7 @@ namespace vtCore
                     buildSystem = fileContent.buildSystem;
                     target = fileContent.target;
                     debugSupport = fileContent.debugSupport;
+                    useInoFiles = fileContent.useInoFile;
 
                     foreach (var cfg in fileContent.configurations)
                     {

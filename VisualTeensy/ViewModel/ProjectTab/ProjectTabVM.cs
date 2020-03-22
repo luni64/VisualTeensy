@@ -305,8 +305,6 @@ namespace ViewModel
             settFile = ProjectSettings.generate(project);
             debugFile = DebugFile.generate(project, setup);
 
-
-
             cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
 
