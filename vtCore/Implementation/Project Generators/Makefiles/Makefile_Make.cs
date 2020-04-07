@@ -63,7 +63,7 @@ namespace vtCore
             {
                 mf.Append($"CORE_BASE        := {Helpers.getShortPath(Path.Combine(setup.arduinoCoreBase ?? "Error", "cores", cfg.selectedBoard.core))}\n");
                 mf.Append($"GCC_BASE         := {cfg.compiler}\n");
-                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");             
+                mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             }
             else
             {
@@ -108,6 +108,7 @@ namespace vtCore
             mf.Append("S_FLAGS     := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_COM) $(DEFINES) $(FLAGS_S)\n");
             mf.Append("LD_FLAGS    := $(FLAGS_CPU) $(FLAGS_OPT) $(FLAGS_LSP) $(FLAGS_LD)\n");
             mf.Append("AR_FLAGS    := rcs\n");
+            mf.Append("NM_FLAGS    := --numeric-sort --defined-only --demangle --print-size\n");
 
             if (cfg.setupType == SetupTypes.expert && !String.IsNullOrWhiteSpace(cfg.makefileExtension))
             {
@@ -141,7 +142,271 @@ namespace vtCore
             }
 
             mf.Append("\n");
-            mf.Append(setup.makefile_fixed);
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# Folders and Files\n");
+            mf.Append("#******************************************************************************\n");
+            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
+            {
+                mf.Append("USR_SRC         := .\n");
+            }
+            else
+            {
+                mf.Append("USR_SRC         := src\n");
+            }
+            mf.Append("LIB_SRC         := lib\n");
+            mf.Append("CORE_SRC        := $(CORE_BASE)\n\n");
+
+            mf.Append("BIN             := .vsteensy/build\n");
+            mf.Append("USR_BIN         := $(BIN)/src\n");
+            mf.Append("CORE_BIN        := $(BIN)/core\n");
+            mf.Append("LIB_BIN         := $(BIN)/lib\n");
+            mf.Append("CORE_LIB        := $(BIN)/core.a\n");
+            mf.Append("TARGET_HEX      := $(BIN)/$(TARGET_NAME).hex\n");
+            mf.Append("TARGET_ELF      := $(BIN)/$(TARGET_NAME).elf\n");
+            mf.Append("TARGET_LST      := $(BIN)/$(TARGET_NAME).lst\n");
+            mf.Append("TARGET_SYM      := $(BIN)/$(TARGET_NAME).sym\n");
+
+            mf.Append("\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# BINARIES\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("CC              := $(GCC_BASE)/arm-none-eabi-gcc\n");
+            mf.Append("CXX             := $(GCC_BASE)/arm-none-eabi-g++\n");
+            mf.Append("AR              := $(GCC_BASE)/arm-none-eabi-gcc-ar\n");
+            mf.Append("NM              := $(GCC_BASE)/arm-none-eabi-gcc-nm\n");
+            mf.Append("SIZE            := $(GCC_BASE)/arm-none-eabi-size\n");
+            mf.Append("OBJDUMP         := $(GCC_BASE)/arm-none-eabi-objdump\n");
+            mf.Append("OBJCOPY         := $(GCC_BASE)/arm-none-eabi-objcopy\n");
+            mf.Append("UPL_PJRC        := \"$(UPL_PJRC_B)/teensy_post_compile\" -test -file=$(TARGET_NAME) -path=$(BIN) -tools=\"$(UPL_PJRC_B)\" -board=$(BOARD_ID) -reboot\n");
+            mf.Append("UPL_TYCMD       := $(UPL_TYCMD_B)/tyCommanderC upload $(TARGET_HEX) --autostart --wait --multi\n");
+            mf.Append("UPL_CLICMD      := $(UPL_CLICMD_B)/teensy_loader_cli -mmcu=$(MCU) -v $(TARGET_HEX)\n");
+            mf.Append("UPL_JLINK       := $(UPL_JLINK_B)/jlink -commanderscript .vsteensy/flash.jlink\n");
+
+            mf.Append("\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# Source and Include Files\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# Recursively create list of source and object files in USR_SRC and CORE_SRC\n");
+            mf.Append("# and corresponding subdirectories.\n");
+            mf.Append("# The function rwildcard is taken from http://stackoverflow.com/a/12959694)\n");
+
+            mf.Append("\n");
+            mf.Append("rwildcard =$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))\n");
+
+            mf.Append("\n");
+            mf.Append("#User Sources -----------------------------------------------------------------\n");
+            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_INO_FILE    := $(USR_SRC)/$(TARGET_NAME).ino\n");
+            mf.Append("USR_C_FILES     := $(call rwildcard,$(USR_SRC)/,*.c)\n");
+            mf.Append("USR_CPP_FILES   := $(call rwildcard,$(USR_SRC)/,*.cpp)\n");
+            mf.Append("USR_S_FILES     := $(call rwildcard,$(USR_SRC)/,*.S)\n");
+            mf.Append("USR_OBJ         := $(USR_S_FILES:$(USR_SRC)/%.S=$(USR_BIN)/%.o) $(USR_C_FILES:$(USR_SRC)/%.c=$(USR_BIN)/%.o) $(USR_CPP_FILES:$(USR_SRC)/%.cpp=$(USR_BIN)/%.o)\n");
+            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
+
+            mf.Append("\n");
+            mf.Append("# Core library sources --------------------------------------------------------\n");
+            mf.Append("CORE_CPP_FILES  := $(call rwildcard,$(CORE_SRC)/,*.cpp)\n");
+            mf.Append("CORE_C_FILES    := $(call rwildcard,$(CORE_SRC)/,*.c)\n");
+            mf.Append("CORE_S_FILES    := $(call rwildcard,$(CORE_SRC)/,*.S)\n");
+            mf.Append("CORE_OBJ        := $(CORE_S_FILES:$(CORE_SRC)/%.S=$(CORE_BIN)/%.o) $(CORE_C_FILES:$(CORE_SRC)/%.c=$(CORE_BIN)/%.o) $(CORE_CPP_FILES:$(CORE_SRC)/%.cpp=$(CORE_BIN)/%.o)\n");
+
+            mf.Append("\n");
+            mf.Append("# User library sources (see https://github.com/arduino/arduino/wiki/arduino-ide-1.5:-library-specification)\n");
+            mf.Append("LIB_DIRS_SHARED := $(foreach d, $(LIBS_SHARED), $(LIBS_SHARED_BASE)/$d/ $(LIBS_SHARED_BASE)/$d/utility/)      # base and /utility\n");
+            mf.Append("LIB_DIRS_SHARED += $(foreach d, $(LIBS_SHARED), $(LIBS_SHARED_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_SHARED_BASE)/$d/src/,*/.)))                          # src and all subdirs of base\n");
+
+            mf.Append("\n");
+            mf.Append("LIB_DIRS_LOCAL  := $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/ $(LIBS_LOCAL_BASE)/$d/utility/ )        # base and /utility\n");
+            mf.Append("LIB_DIRS_LOCAL  += $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_LOCAL_BASE)/$d/src/,*/.)))                          # src and all subdirs of base\n");
+
+            mf.Append("\n");
+            mf.Append("LIB_CPP_SHARED  := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.cpp))\n");
+            mf.Append("LIB_C_SHARED    := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.c))\n");
+            mf.Append("LIB_S_SHARED    := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.S))\n");
+
+            mf.Append("\n");
+            mf.Append("LIB_CPP_LOCAL   := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.cpp))\n");
+            mf.Append("LIB_C_LOCAL     := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.c))\n");
+            mf.Append("LIB_S_LOCAL     := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.S))\n");
+
+            mf.Append("\n");
+            mf.Append("LIB_OBJ         := $(LIB_CPP_SHARED:$(LIBS_SHARED_BASE)/%.cpp=$(LIB_BIN)/%.o)  $(LIB_CPP_LOCAL:$(LIBS_LOCAL_BASE)/%.cpp=$(LIB_BIN)/%.o)\n");
+            mf.Append("LIB_OBJ         += $(LIB_C_SHARED:$(LIBS_SHARED_BASE)/%.c=$(LIB_BIN)/%.o)  $(LIB_C_LOCAL:$(LIBS_LOCAL_BASE)/%.c=$(LIB_BIN)/%.o)\n");
+            mf.Append("LIB_OBJ         += $(LIB_S_SHARED:$(LIBS_SHARED_BASE)/%.S=$(LIB_BIN)/%.o)  $(LIB_S_LOCAL:$(LIBS_LOCAL_BASE)/%.S=$(LIB_BIN)/%.o)\n");
+
+            mf.Append("\n");
+            mf.Append("# Includes -------------------------------------------------------------\n");
+            mf.Append("INCLUDE         := -I./$(USR_SRC) -I$(CORE_SRC)\n");
+            mf.Append("INCLUDE         += $(foreach d, $(LIB_DIRS_SHARED), -I$d)\n");
+            mf.Append("INCLUDE         += $(foreach d, $(LIB_DIRS_LOCAL), -I$d)\n");
+
+            mf.Append("\n");
+            mf.Append("# Generate directories --------------------------------------------------------\n");
+            mf.Append("DIRECTORIES     :=  $(sort $(dir $(CORE_OBJ) $(USR_OBJ) $(LIB_OBJ)))\n");
+            mf.Append("generateDirs    := $(foreach d, $(DIRECTORIES), $(shell if not exist \"$d\" mkdir \"$d\"))\n");
+
+            mf.Append("\n");
+            mf.Append("#$(info dirs: $(DIRECTORIES))\n");
+            //mf.Append("$(info$(COL_RESET))\n");
+
+            mf.Append("\n");
+            mf.Append("#******************************************************************************\n");
+            mf.Append("# Rules:\n");
+            mf.Append("#******************************************************************************\n");
+
+            mf.Append("\n");
+            mf.Append(".PHONY: directories all rebuild upload uploadTy uploadCLI clean cleanUser cleanCore\n");
+
+            mf.Append("\n");
+            mf.Append("all:  $(TARGET_LST) $(TARGET_SYM) $(TARGET_HEX)\n");
+
+            mf.Append("\n");
+            mf.Append("rebuild: cleanUser all\n");
+
+            mf.Append("\n");
+            mf.Append("clean: cleanUser cleanCore cleanLib\n");
+            mf.Append("\t@echo $(COL_OK)cleaning done$(COL_RESET)\n");
+
+            mf.Append("\n");
+            mf.Append("upload: all\n");
+            mf.Append("\t@$(UPL_PJRC)\n");
+
+            mf.Append("\n");
+            mf.Append("uploadTy: all\n");
+            mf.Append("\t@$(UPL_TYCMD)\n");
+
+            mf.Append("\n");
+            mf.Append("uploadCLI: all\n");
+            mf.Append("\t@$(UPL_CLICMD)\n");
+
+            mf.Append("\n");
+            mf.Append("uploadJLink: all\n");
+            mf.Append("\t@$(UPL_JLINK)\n");
+
+            mf.Append("\n");
+            mf.Append("# Core library ----------------------------------------------------------------\n");
+            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.S\n");
+            mf.Append("\t@echo $(COL_CORE)CORE [ASM] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.c\n");
+            mf.Append("\t@echo $(COL_CORE)CORE [CC]  $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.cpp\n");
+            mf.Append("\t@echo $(COL_CORE)CORE [CPP] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(CORE_LIB) : $(CORE_OBJ)\n");
+            mf.Append("\t@echo $(COL_LINK)CORE [AR] $@ $(COL_ERR)\n");
+            mf.Append("\t@$(AR) $(AR_FLAGS) $@ $^\n");
+            mf.Append("\t@echo $(COL_OK)Teensy core built successfully &&echo.\n");
+
+            mf.Append("\n");
+            mf.Append("# Shared Libraries ------------------------------------------------------------\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.S\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [ASM] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.cpp\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [CPP] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.c\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("# Local Libraries -------------------------------------------------------------\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.S\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [ASM] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.cpp\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [CPP] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.c\n");
+            mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("# Handle user sources ---------------------------------------------------------\n");
+            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
+            {
+                mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.ino\n");
+                mf.Append("\t@echo $(COL_SRC)USER [INO] $< $(COL_ERR)\n");
+                mf.Append("\t@\"$(CC)\" $(CPP_FLAGS) $(INCLUDE) -include $(CORE_BASE)/Arduino.h -x c++ -o \"$@\" -c $< -x none\n");
+                mf.Append("\n");
+            }
+
+            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.S\n");
+            mf.Append("\t@echo $(COL_SRC)USER [ASM] $< $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.c\n");
+            mf.Append("\t@echo $(COL_SRC)USER [CC]  $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.cpp\n");
+            mf.Append("\t@echo $(COL_SRC)USER [CPP] $(notdir $<) $(COL_ERR)\n");
+            mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
+
+            mf.Append("\n");
+            mf.Append("# Linking ---------------------------------------------------------------------\n");
+            mf.Append("$(TARGET_ELF): $(CORE_LIB) $(LIB_OBJ) $(USR_OBJ)\n");
+            mf.Append("\t@echo $(COL_LINK)\n");
+            mf.Append("\t@echo [LD]  $@ $(COL_ERR)\n");
+            mf.Append("\t@$(CC) $(LD_FLAGS) -o \"$@\" $(USR_OBJ) $(LIB_OBJ) $(CORE_LIB) $(LIBS)\n");
+            mf.Append("\t@echo $(COL_OK)User code built and linked to libraries &&echo.\n");
+
+            mf.Append("\n");
+            mf.Append("%.lst: %.elf\n");
+            mf.Append("\t@echo [LST] $@\n");
+            mf.Append("\t@$(OBJDUMP) -d -S --demangle --no-show-raw-insn \"$<\" > \"$@\"\n");
+            mf.Append("\t@echo $(COL_OK)Sucessfully built project$(COL_RESET) &&echo.\n");
+
+            mf.Append("\n");
+            mf.Append("%.sym: %.elf\n");
+            mf.Append("\t@echo [SYM] $@\n");
+            mf.Append("\t@$(NM) $(NM_FLAGS) \"$<\" > \"$@\"\n");
+
+            mf.Append("\n");
+            mf.Append("%.hex: %.elf\n");
+            mf.Append("\t@echo $(COL_LINK)[HEX] $@\n");
+            mf.Append("\t@$(OBJCOPY) -O ihex -R.eeprom \"$<\" \"$@\"\n");
+
+            mf.Append("\n");
+            mf.Append("# Cleaning --------------------------------------------------------------------\n");
+            mf.Append("cleanUser:\n");
+            mf.Append("\t@echo $(COL_LINK)Cleaning user binaries...$(COL_RESET)\n");
+            mf.Append("\t@if exist $(USR_BIN) rd /s/q \"$(USR_BIN)\"\n");
+            mf.Append("\t@if exist \"$(TARGET_LST)\" del $(subst /,\\,$(TARGET_LST))\n");
+
+            mf.Append("\n");
+            mf.Append("cleanCore:\n");
+            mf.Append("\t@echo $(COL_LINK)Cleaning core binaries...$(COL_RESET)\n");
+            mf.Append("\t@if exist $(CORE_BIN) rd /s/q \"$(CORE_BIN)\"\n");
+            mf.Append("\t@if exist $(CORE_LIB) del  $(subst /,\\,$(CORE_LIB))\n");
+
+            mf.Append("\n");
+            mf.Append("cleanLib:\n");
+            mf.Append("\t@echo $(COL_LINK)Cleaning user library binaries...$(COL_RESET)\n");
+            mf.Append("\t@if exist $(LIB_BIN) rd /s/q \"$(LIB_BIN)\"\n");
+
+            mf.Append("\n");
+            mf.Append("# compiler generated dependency info ------------------------------------------\n");
+            mf.Append("-include $(CORE_OBJ:.o=.d)\n");
+            mf.Append("-include $(USR_OBJ:.o=.d)\n");
+            mf.Append("-include $(LIB_OBJ:.o=.d)");
 
             return mf.ToString();
         }
@@ -152,7 +417,7 @@ namespace vtCore
         }
 
         private static string colEsc(Color c)
-        {            
+        {
             return $"{(char)27}[38;2;{c.R};{c.G};{c.B}m";
         }
 
