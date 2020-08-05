@@ -41,7 +41,7 @@ namespace vtCore
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n\n");
             mf.Append(makeEntry("MCU              := ", "build.mcu", options) + "\n\n");
 
-            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepository.repoPath)}\n");
+            mf.Append($"LIBS_SHARED_BASE := {Helpers.getShortPath(libManager.sharedRepository?.repoPath)}\n");
             mf.Append($"LIBS_SHARED      := ");
             foreach (var lib in cfg.sharedLibs)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 
@@ -12,6 +13,9 @@ namespace vtCore
 
         // gnu make
         public CheckedPath makeExeBase { get; } = new CheckedPath("make.exe");
+
+        // app folder
+        static public string vtAppFolder { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "lunOptics", "VisualTeensy");
 
         // uploaders
         public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
@@ -43,12 +47,22 @@ namespace vtCore
                         arduinoCompiler = Directory.Exists(path) ? path : null;
 
                         uplPjrcBase.path = arduinoTools;
-                    }
 
-                }
-                else
-                {
-                    arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                        var sketchBookFolder = Helpers.getSketchbookFolder();
+                        if (sketchBookFolder != null)
+                        {
+                            if (!File.Exists(Helpers.preferencesPath))
+                            {
+                                errors.Add($"\n{Helpers.preferencesPath} not found. Please check your Arduino installation. In case of a fresh installation, run Arduino at least once to generate the file");
+                            }
+                            sharedLibrariesFolder = Path.Combine(Helpers.getSketchbookFolder(), "libraries");
+                        }
+                    }
+                    else
+                    {
+                        arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                        errors.Add($"Error checking Arduino folder: {arduinoBaseError}");
+                    }
                 }
             }
         }
@@ -59,13 +73,13 @@ namespace vtCore
             {
                 if (String.IsNullOrEmpty(arduinoBase) || !Directory.Exists(arduinoBase))
                 {
-                    return "Folder doesn't exist";
+                    return $"Folder empty or doesn't exist ({arduinoBase})";
                 }
 
                 string arduinoExe = Path.Combine(arduinoBase, "arduino.exe");
                 if (!File.Exists(arduinoExe))
                 {
-                    return "Folder doesn't contain arduino.exe. Not a valid arduino folder";
+                    return "Arduino folder doesn't contain arduino.exe. Not a valid arduino folder";
                 }
 
                 string teensyduino = Path.Combine(arduinoBase, "hardware", "teensy");
@@ -79,7 +93,10 @@ namespace vtCore
         }
 
         // libraries
+        public string sharedLibrariesFolder { get; private set; }
         public string tdLibBase { get; set; }
+        public string libIndex_json { get; } = Path.Combine(vtAppFolder, "library_index.json");
+        public Uri libIndexSource { get; } = new Uri("https://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute);
 
         // settings for quick setup
         public string arduinoCoreBase { get; private set; }
@@ -91,6 +108,10 @@ namespace vtCore
         public string makefile_fixed { get; set; }
         public string makefile_builder { get; set; }
         public bool debugSupportDefault { get; set; }
+
+        public string preferencesPath { get; private set; }
+
+
 
         //makefile output colors ---------------
         public bool isColoredOutput { get; set; }
@@ -117,7 +138,7 @@ namespace vtCore
 
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
-            
+
 
             sd.colorCore = Color.FromArgb(255, 187, 206, 251);
             sd.colorUserLib = Color.FromArgb(255, 206, 244, 253);
@@ -126,10 +147,10 @@ namespace vtCore
             sd.colorLink = Color.FromArgb(255, 255, 255, 202);
             sd.colorErr = Color.FromArgb(255, 255, 159, 159);
 
-
-
             return sd;
         }
+
+        public List<string> errors { get; } = new List<string>();
     }
 }
 

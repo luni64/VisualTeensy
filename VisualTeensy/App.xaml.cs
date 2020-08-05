@@ -36,9 +36,9 @@ namespace VisualTeensy
 
             SetupData setupData = new SetupData();
 
-
             if (Settings.Default.FirstStart)
             {
+                log.Info("First startup");
                 var vm = new StartupSettingsView(new StartupSettingsVM(setupData)).ShowDialog();
 
                 setupData.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
@@ -48,7 +48,7 @@ namespace VisualTeensy
                 setupData.uplJLinkBase.path = Helpers.findJLinkFolder();
                 setupData.makeExeBase.path = Directory.GetCurrentDirectory();
                 //setupData.tdLibBase = Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries");
-                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase??"","libraries");
+                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase ?? "", "libraries");
 
 
                 setupData.isColoredOutput = true;
@@ -71,7 +71,7 @@ namespace VisualTeensy
                 setupData.uplCLIBase.path = Settings.Default.uplCLIBase;
                 setupData.uplJLinkBase.path = Settings.Default.uplJLinkBase;
                 setupData.makeExeBase.path = Settings.Default.makeExePath;
-                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase??"", "libraries");
+                setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase ?? "", "libraries");
 
                 setupData.isColoredOutput = Settings.Default.ColorEnabled;
                 setupData.colorCore = Settings.Default.ColCore;
@@ -81,7 +81,7 @@ namespace VisualTeensy
                 setupData.colorLink = Settings.Default.ColLink;
                 setupData.colorErr = Settings.Default.ColErr;
             }
-            Helpers.arduinoPath = setupData.arduinoBase;                       
+            Helpers.arduinoPath = setupData.arduinoBase;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
             {
@@ -91,6 +91,8 @@ namespace VisualTeensy
             {
                 setupData.makefile_builder = reader.ReadToEnd();
             }
+
+
 
             return setupData;
         }
@@ -113,9 +115,9 @@ namespace VisualTeensy
             Settings.Default.ColOk = setupData.colorOk;
             Settings.Default.ColLink = setupData.colorLink;
             Settings.Default.ColErr = setupData.colorErr;
-            
+
             Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
-        
+
             Settings.Default.Save();
 
         }
@@ -129,15 +131,15 @@ namespace VisualTeensy
 
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            Directory.CreateDirectory(appData);
+            // create applicaton folder <user>\AppData\Local\VisualTeensy (if not yet existing)
+            Directory.CreateDirectory(SetupData.vtAppFolder);
 
-
+            // setup logger, log into application folder
             log4net.Config.XmlConfigurator.Configure();
             var repository = (Hierarchy)LogManager.GetRepository();
             repository.Threshold = Level.All;
             var fa = repository.Root.Appenders.OfType<FileAppender>().FirstOrDefault();
-            fa.File = Path.Combine(Path.GetTempPath(), "VisualTeensy.log");
+            fa.File = Path.Combine(SetupData.vtAppFolder, "VisualTeensy.log");
             fa.ActivateOptions();
 
             var v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -146,25 +148,31 @@ namespace VisualTeensy
 
             base.OnStartup(e);
 
-            
-            // overwrite local lib index if  older than 7 days 
-            string libIndexTarget = appData + "/VisualTeensy/library_index.json";
-            bool overwrite = !File.Exists(libIndexTarget);
-            overwrite |= (DateTime.Now - File.GetLastWriteTime(libIndexTarget)) > TimeSpan.FromDays(7);
-            overwrite &= Uri.TryCreate("http://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute, out var libIndexSource);
-            if (overwrite)
-            {
-                log.Info($"Download {libIndexSource} to {libIndexTarget}");
-                Task.Run(() => Helpers.downloadFile(libIndexSource, libIndexTarget, TimeSpan.FromDays(7)));
-                log.Info($"Download done");
-            }
-
             try
             {
                 var setup = loadSetup();
-              
-                //    //setup.tdLibBase = setup.arduinoBoardsTxt != null ? Path.Combine(Path.GetDirectoryName(setup.arduinoBoardsTxt), "libraries") : null;
+                if (setup.errors.Count > 0)
+                {
+                    string errors = "";
+                    setup.errors.ForEach(err => errors += (err + '\n'));
+                    log.Error(errors);
 
+                    MessageBox.Show($"Setting errors found!\n{errors}", caption: "VisualTeensy",MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                //// download list of arduino libraries if outdated   
+                //if (!File.Exists(setup.libIndex_json))
+                //{
+                //    var libIndexSource = new Uri("https://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute);
+                    
+                //    if (MessageBoxResult.Yes == MessageBox.Show(
+                //        $"The Arduino library index was not found!\nDownload from {libIndexSource}? \n\nThis may take some time...", caption: "VisualTeensy, Information", 
+                //        MessageBoxButton.YesNo, MessageBoxImage.Information))
+                //    {
+                //        await Helpers.downloadFileAsync(libIndexSource, setup.libIndex_json);
+                //    }
+                //}
+                                
                 var libManager = Factory.makeLibManager(setup);
                 var project = Factory.makeProject(setup, libManager);
 
@@ -200,7 +208,7 @@ namespace VisualTeensy
             catch (Exception ex)
             {
                 log.Fatal("Unhandled exception", ex);
-                MessageBox.Show(ex.Message + "\n" + ex.ToString());
+                MessageBox.Show(ex.Message + "\n" + ex.ToString(), "VisualTeensy, unhandled Exception");
             }
         }
 

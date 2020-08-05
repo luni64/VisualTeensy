@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 using vtCore;
 using vtCore.Interfaces;
@@ -13,6 +14,7 @@ namespace ViewModel
 {
     class LibrariesTabVM : BaseViewModel, IDropTarget
     {
+        #region commands --------------------------------------------
         public RelayCommand cmdDel { get; }
         void doDel(object o)
         {
@@ -20,21 +22,65 @@ namespace ViewModel
             projectLibraries.Remove(lib);
         }
 
+        public AsyncCommand cmdUpdateIndex { get; }
+        async Task doUpdateIndex()
+        {
+            isUpdating = true;
+
+            await libManager.updateArduinoIndex();
+            repos.CurrentChanged -= repoChanged;
+            repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
+            repos.CurrentChanged += repoChanged;
+            repos.MoveCurrentToLast();
+            OnPropertyChanged("repos");
+
+            isUpdating = false;
+        }
+        #endregion
+
+        public bool isUpdating
+        {
+            get => _isUpdating;
+            set => SetProperty(ref _isUpdating, value);
+        }
+        private bool _isUpdating = false;
+
+        public bool isArduinoIndexRepo
+        {
+            get => _isArduinoIndexRepo;
+            set => SetProperty(ref _isArduinoIndexRepo, value);
+        }
+        private bool _isArduinoIndexRepo;
+
 
         public ObservableCollection<IProjectLibrary> projectLibraries { get; }
-        public ListCollectionView repos { get; }
+        public ListCollectionView repos { get; private set; }
 
-        public LibrariesTabVM(IProject project, LibManager libManager)
+
+        public LibrariesTabVM(IProject project, LibManager libManager, SetupData setup)
         {
             this.project = project;
+            this.setup = setup;
+            this.libManager = libManager;
 
             cmdDel = new RelayCommand(doDel);
+            cmdUpdateIndex = new AsyncCommand(doUpdateIndex);
 
             repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
-            repos.CurrentChanged += (s, e) => searchString = searchString; // trigger a filter event on new repo
+            repos.CurrentChanged += repoChanged;
+            
+            
 
             projectLibraries = new ObservableCollection<IProjectLibrary>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
+        }
+
+        public void repoChanged(object s, EventArgs e)
+        {
+            searchString = searchString; // trigger a filter event on new repo
+
+            var repo = ((RepositoryVM)repos.CurrentItem);
+            isArduinoIndexRepo = repo.name == "Arduino Repository";
         }
 
 
@@ -130,5 +176,7 @@ namespace ViewModel
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
         IProject project;
+        SetupData setup;
+        LibManager libManager;
     }
 }

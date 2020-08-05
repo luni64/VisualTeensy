@@ -1,10 +1,12 @@
 ﻿//using log4net;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using vtCore.Interfaces;
 
 namespace vtCore
@@ -62,12 +64,23 @@ namespace vtCore
 
                 return ret;
             }
-            catch 
+            catch (Exception ex)
             {
-                //log.Warn($"Parsing of {library_indexJson} failed", ex);
-                return null;
+                log.Warn($"Parsing of {library_indexJson} failed", ex);
+
+                var dummyRepo = new List<ILibrary>()
+                {
+                    //new Library()
+                    //{
+                    //    name = "Please update index"
+                    //}
+                };
+
+                return dummyRepo.ToLookup(k => k.name);
             }
         }
+
+
 
         //public static ILookup<string, Library> parseLocalRepository(string repoBase)
         //{
@@ -127,9 +140,11 @@ namespace vtCore
         //}
 
         public static string getValueOrDefault(this IDictionary<string, string> dictionary, string key)
-        {            
+        {
             return dictionary.TryGetValue(key, out string value) ? value.Trim() : null;
         }
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     }
 }

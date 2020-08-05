@@ -133,11 +133,11 @@ namespace vtCore
                         // add shared libraries ---------------------
                         if (cfg.sharedLibraries != null)
                         {
-                            var sharedLibraries = libManager.sharedRepository.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
+                            var sharedLibraries = libManager.sharedRepository?.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
                             
                             foreach (var cfgSharedLib in cfg.sharedLibraries)
                             {
-                                var library = sharedLibraries.FirstOrDefault(lib => lib.sourceFolderName == cfgSharedLib); // find the corresponding lib
+                                var library = sharedLibraries?.FirstOrDefault(lib => lib.sourceFolderName == cfgSharedLib); // find the corresponding lib
                                 if (library != null)
                                 {
                                     configuration.sharedLibs.Add(ProjectLibrary.cloneFromLib(library));

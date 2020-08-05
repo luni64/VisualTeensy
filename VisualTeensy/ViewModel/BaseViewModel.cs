@@ -81,9 +81,6 @@ namespace ViewModel
             #endregion // ICommand Members
         }
 
-
-
-
         public class AsyncCommand : ICommand
         {
             private readonly Func<Task> _execute;

@@ -60,7 +60,7 @@ namespace ViewModel
 
             projecTabVM = new ProjectTabVM(project, libManager, setup);
             setupTabVM = new SetupTabVM(project, setup);
-            librariesTabVM = new LibrariesTabVM(project, libManager);
+            librariesTabVM = new LibrariesTabVM(project, libManager, setup);
 
             cmdFileOpen = new RelayCommand(doFileOpen);
             cmdFileNew = new RelayCommand(doFileNew);

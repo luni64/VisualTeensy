@@ -17,28 +17,43 @@
              xmlns:vm="clr-namespace:ViewModel"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance vm:LibrariesTabVM, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800"        >
+             d:DesignHeight="450" d:DesignWidth="800"
+             >
 
     <UserControl.Resources>
         <Style TargetType="{x:Type Button}" x:Key="autoHide">
             <Setter Property="Visibility" Value="Collapsed" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsMouseOver}" Value="True">
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}" Value="True">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="TextBlock" x:Key="autoLink">
+        <Style TargetType="{x:Type TextBlock}" x:Key="autoLink">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsMouseOver}" Value="True">
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}" Value="True">
                     <Setter Property="TextDecorations" Value="Underline" />
                     <Setter Property="Foreground" Value="#FF1A83D6"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+
+
     </UserControl.Resources>
+
+    <UserControl.Style>
+        <Style TargetType="UserControl" >
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding isUpdating}" Value="True">
+                    <Setter Property="Cursor" Value="Wait" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
@@ -129,10 +144,15 @@
         </ListBox>
 
         <DockPanel  Margin="0,10,0,0" Grid.Row="3" Grid.Column="2">
-            <TextBlock   Text="Search:" Margin="0,0,10,0"  VerticalAlignment="Center" TextElement.FontSize="15" TextElement.Foreground="{DynamicResource PrimaryHueDarkBrush}" />
-            <TextBox  Text="{Binding searchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100, ValidatesOnNotifyDataErrors=False}" VerticalAlignment="Center" />
+            <TextBlock   Text="Search:" Margin="0,0,10,0"  VerticalAlignment="Center" TextElement.FontSize="15" TextElement.Foreground="{DynamicResource PrimaryHueDarkBrush}" DockPanel.Dock="Left" />
+            <Button DockPanel.Dock="Right" Content=" Get &#xa;Index" VerticalContentAlignment="Center"
+                    Style="{StaticResource MaterialDesignFloatingActionMiniButton}"                  
+                    FontSize="11"                    
+                    ToolTip="Download new library_index.json from Arduino.cc" Command="{Binding cmdUpdateIndex, Mode=OneWay}"                 
+                    Visibility="{Binding isArduinoIndexRepo, Converter={StaticResource BooleanToVisibilityConverter}}"
+                />
+            <TextBox  Text="{Binding searchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=100, ValidatesOnNotifyDataErrors=False}" VerticalAlignment="Center" Margin="0,0,15,0"  />
         </DockPanel>
-
-        <!--</Grid>-->
     </Grid>
 </UserControl>
+

@@ -137,7 +137,8 @@
     <Compile Include="ViewModel\SaveWin\TaskVM.cs" />
     <Compile Include="ViewModel\SetupTab\SetupTabVM.cs" />
     <Compile Include="ViewModel\StartupSettingsVM.cs" />
-    <Compile Include="Views\ColorBrushConverter.cs" />
+    <Compile Include="Views\Converters\VisibilityConverter.cs" />
+    <Compile Include="Views\Converters\ColorBrushConverter.cs" />
     <Compile Include="Views\FileDisplayWindow.xaml.cs">
       <DependentUpon>FileDisplayWindow.xaml</DependentUpon>
     </Compile>
@@ -146,6 +147,9 @@
     </Compile>
     <Compile Include="Views\LibrariesTab.xaml.cs">
       <DependentUpon>LibrariesTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DownloadLibIndex.xaml.cs">
+      <DependentUpon>DownloadLibIndex.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StartupSettingsView.xaml.cs">
       <DependentUpon>StartupSettingsView.xaml</DependentUpon>
@@ -174,6 +178,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Compile Include="Views\Converters\WaitCursorConverter.cs" />
     <Page Include="Views\FileDisplayWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -189,6 +194,10 @@
     <Page Include="Views\MiscRessources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DownloadLibIndex.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\StartupSettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>

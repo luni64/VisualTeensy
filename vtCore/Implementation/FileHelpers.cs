@@ -1,10 +1,12 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,22 +16,16 @@ namespace vtCore
 {
     public static class Helpers
     {
-
-
         static readonly HttpClient client = new HttpClient();
 
-
         public static string arduinoPath { set; get; }
-
 
         //Folders ----------------------------------------
 
         public static string arduinoAppPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
-
+        public static string preferencesPath => Path.Combine(arduinoAppPath, "preferences.txt");
         public static string getSketchbookFolder()
         {
-            var preferencesPath = Path.Combine(arduinoAppPath, "preferences.txt");
-
             string sketchbookPath = "";
 
             if (File.Exists(preferencesPath))
@@ -37,7 +33,6 @@ namespace vtCore
                 using (TextReader reader = new StreamReader(preferencesPath))
                 {
                     string line;
-
                     while ((line = reader.ReadLine()) != null)
                     {
                         var parts = line.Split('=');
@@ -53,24 +48,24 @@ namespace vtCore
             return sketchbookPath;
         }
 
-        public static string findArduinoFolder()
-        {
-            string folder;
+        //public static string findArduinoFolder()
+        //{
+        //    string folder;
 
-            folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
-            if (folder != null)
-            {
-                return folder;
-            }
+        //    folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
+        //    if (folder != null)
+        //    {
+        //        return folder;
+        //    }
 
-            folder = checkFolder(@"C:\Program Files (x86)", f => isArduinoFolder(f));
-            if (folder != null)
-            {
-                return folder;
-            }
+        //    folder = checkFolder(@"C:\Program Files (x86)", f => isArduinoFolder(f));
+        //    if (folder != null)
+        //    {
+        //        return folder;
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
         public static string findTyToolsFolder()
         {
             string folder;
@@ -123,7 +118,6 @@ namespace vtCore
         }
 
         // Download libraries ----------------------------
-
 
         private static bool isArduinoFolder(string folder)
         {
@@ -216,7 +210,6 @@ namespace vtCore
             }
         }
 
-
         public static void copyFilesRecursively(Uri s, Uri t)
         {
             if (s == t) return;
@@ -229,25 +222,66 @@ namespace vtCore
         }
 
 
-
-        public static async Task downloadFile(Uri source, string target, TimeSpan expiry)
+        public static async Task downloadFileAsync(Uri source, string target, TimeSpan expiry = default(TimeSpan))
         {
             if (File.Exists(target))
             {
-                if ((DateTime.Now - File.GetLastWriteTime(target)) < expiry) return;
+                var exp = DateTime.Now - File.GetLastWriteTime(target);
+
+                if ((DateTime.Now - File.GetLastWriteTime(target)) < expiry)
+                {
+                    log.Info($"Skip downloading {source} to {target}, {target} is newer than {expiry.Days} days");
+                    return;
+                }
             }
 
-            using (var response = await client.GetAsync(source))
+            log.Info($"Try downloading {source} to {target}");
+            try
             {
-                response.EnsureSuccessStatusCode();
-
-                using (var webStream = await response.Content.ReadAsStreamAsync())
+                try
                 {
-                    using (var fileStream = new FileStream(target, FileMode.Create))
-                    {
-                        await webStream.CopyToAsync(fileStream);
-                    }
+                    WebClient client = new WebClient();
+                    await client.DownloadFileTaskAsync(source, target);
                 }
+                catch
+                {
+                    log.Error($"Error downloading index file {source}");
+                }
+
+
+                //Stream stream = await client.OpenReadTaskAsync(source);
+
+                //using (var fileStream = new FileStream(target, FileMode.Create))
+                //{
+                //    await stream.CopyToAsync(fileStream);
+                //}
+
+               
+
+
+                //var response = await client.GetAsync(source);
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    log.Info($"Http response: {response}");
+
+                //    using (var webStream = await response.Content.ReadAsStreamAsync())
+                //    {
+                //        using (var fileStream = new FileStream(target, FileMode.Create))
+                //        {
+                //            await webStream.CopyToAsync(fileStream);
+                //        }
+                //    }
+                //    log.Info($"Download done");
+                //}
+                //else
+                //{
+                //    log.Error($"Http response: {response}");
+                //}
+                //response.Dispose();
+            }
+            catch
+            {
+                log.Error($"Error downloading {target}");
             }
         }
 
@@ -299,7 +333,7 @@ namespace vtCore
         {
             if (String.IsNullOrWhiteSpace(longPath)) return "";
             if (!longPath.Contains(' ')) return longPath;
-            
+
             const int maxPath = 255;
             StringBuilder shortPath = new StringBuilder(maxPath);
             int i = getShortPathName(longPath, shortPath, maxPath);
@@ -308,5 +342,7 @@ namespace vtCore
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int getLongPathName(string path, StringBuilder longPath, int longPathLength);
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
