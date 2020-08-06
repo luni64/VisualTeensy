@@ -61,7 +61,10 @@ namespace vtCore
                     props.configurations[0].defines.Add(define.Trim());
                 }
             }
-                        
+
+            var boardDef = "ARDUINO_" + options.FirstOrDefault(o => o.Key == "build.board").Value;
+            props.configurations[0].defines.Add(boardDef);
+
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
