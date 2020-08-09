@@ -25,7 +25,7 @@ namespace vtCore
                     {
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
-                        intelliSenseMode = "gcc-x64",
+                        intelliSenseMode = "gcc-x64", 
                         includePath = new List<string>(),                        
                         defines = new List<string>()
                     }
@@ -37,11 +37,11 @@ namespace vtCore
 
             // include path -------------------------------------------------------------
             cfgp.includePath.Add("src/**");
-            cfgp.includePath.Add(cfg.core);
+            cfgp.includePath.Add(cfg.core.Replace('\\', '/'));
            
             foreach (var lib in cfg.sharedLibs)
-            {
-                cfgp.includePath.Add(Path.Combine(lib.sourceUri.AbsolutePath, "**").Replace('\\', '/'));
+            {                
+                cfgp.includePath.Add(Path.Combine(lib.sourceUri.LocalPath, "**").Replace('\\', '/'));
             }
 
             foreach (var lib in cfg.localLibs)
