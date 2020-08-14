@@ -39,7 +39,7 @@ namespace VisualTeensy
             if (Settings.Default.FirstStart)
             {
                 log.Info("First startup");
-                var vm = new StartupSettingsView(new StartupSettingsVM(setupData)).ShowDialog();
+                new StartupSettingsView(new StartupSettingsVM(setupData)).ShowDialog();
 
                 setupData.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
                 setupData.uplPjrcBase.path = Helpers.findTyToolsFolder();
@@ -49,7 +49,6 @@ namespace VisualTeensy
                 setupData.makeExeBase.path = Directory.GetCurrentDirectory();
                 //setupData.tdLibBase = Path.Combine(Helpers.getSketchbookFolder() ?? "", "libraries");
                 setupData.tdLibBase = Path.Combine(setupData.arduinoCoreBase ?? "", "libraries");
-
 
                 setupData.isColoredOutput = true;
                 setupData.colorCore = Color.FromArgb(255, 187, 206, 251);
@@ -80,6 +79,8 @@ namespace VisualTeensy
                 setupData.colorOk = Settings.Default.ColOk;
                 setupData.colorLink = Settings.Default.ColLink;
                 setupData.colorErr = Settings.Default.ColErr;
+
+                setupData.mru.load(Settings.Default.mruString);
             }
             Helpers.arduinoPath = setupData.arduinoBase;
 
@@ -115,6 +116,7 @@ namespace VisualTeensy
             Settings.Default.ColOk = setupData.colorOk;
             Settings.Default.ColLink = setupData.colorLink;
             Settings.Default.ColErr = setupData.colorErr;
+            Settings.Default.mruString = setupData.mru.ToString();
 
             Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
 
@@ -150,6 +152,9 @@ namespace VisualTeensy
 
             try
             {
+               
+
+
                 var setup = loadSetup();
                 if (setup.errors.Count > 0)
                 {
@@ -160,19 +165,8 @@ namespace VisualTeensy
                     MessageBox.Show($"Setting errors found!\n{errors}", caption: "VisualTeensy",MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
-                //// download list of arduino libraries if outdated   
-                //if (!File.Exists(setup.libIndex_json))
-                //{
-                //    var libIndexSource = new Uri("https://downloads.arduino.cc/libraries/library_index.json", UriKind.Absolute);
-                    
-                //    if (MessageBoxResult.Yes == MessageBox.Show(
-                //        $"The Arduino library index was not found!\nDownload from {libIndexSource}? \n\nThis may take some time...", caption: "VisualTeensy, Information", 
-                //        MessageBoxButton.YesNo, MessageBoxImage.Information))
-                //    {
-                //        await Helpers.downloadFileAsync(libIndexSource, setup.libIndex_json);
-                //    }
-                //}
-                                
+                setup.mru.AddProject("asf");
+                
                 var libManager = Factory.makeLibManager(setup);
                 var project = Factory.makeProject(setup, libManager);
 

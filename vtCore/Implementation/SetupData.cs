@@ -108,10 +108,8 @@ namespace vtCore
         public string makefile_fixed { get; set; }
         public string makefile_builder { get; set; }
         public bool debugSupportDefault { get; set; }
-
         public string preferencesPath { get; private set; }
-
-
+        public MRU mru { get; } = new MRU(5);
 
         //makefile output colors ---------------
         public bool isColoredOutput { get; set; }
@@ -139,13 +137,12 @@ namespace vtCore
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
 
-
             sd.colorCore = Color.FromArgb(255, 187, 206, 251);
             sd.colorUserLib = Color.FromArgb(255, 206, 244, 253);
             sd.colorUserSrc = Color.FromArgb(255, 100, 149, 237);
             sd.colorOk = Color.FromArgb(255, 179, 255, 179);
             sd.colorLink = Color.FromArgb(255, 255, 255, 202);
-            sd.colorErr = Color.FromArgb(255, 255, 159, 159);
+            sd.colorErr = Color.FromArgb(255, 255, 159, 159);            
 
             return sd;
         }
