@@ -48,6 +48,30 @@
                     <MenuItem.Icon>
                         <md:PackIcon Kind="ContentSaveSettings" />
                     </MenuItem.Icon>
+                </MenuItem>                
+                <MenuItem Header="Recent Projects" ItemsSource="{Binding mruList, Mode=OneWay}" >                   
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Path=projectName}" />
+                            <Setter Property="ToolTip" Value="{Binding Path=projectFolder}" />
+                            <Setter Property="Command" Value="{Binding Path=parent.cmdFileOpen}" />
+                            <Setter Property="CommandParameter" Value="{Binding Path=projectFolder}" />
+                            <!--<Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSeparator}" Value="true">
+                                    <Setter Property="MenuItem.Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                <Separator Style="{DynamicResource {x:Static MenuItem.SeparatorStyleKey}}"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>-->
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                    <MenuItem.Icon>
+                        <md:PackIcon Kind="FolderOpen" />
+                    </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Exit" Command="{Binding cmdClose}">
@@ -60,7 +84,7 @@
                 <MenuItem Header="TBD"/>
             </MenuItem>
         </Menu>
-        
+
         <StackPanel VerticalAlignment="Center" Grid.Row="1"  Margin="20,5,0,10" Orientation="Horizontal"  HorizontalAlignment="Left" >
             <TextBlock Text="Project: " Foreground="{DynamicResource PrimaryHueMidBrush}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
             <TextBlock   FontWeight="SemiBold" FontSize="20" Foreground="{DynamicResource PrimaryHueMidBrush}" Text="{Binding projectName, Mode=OneWay}" />
