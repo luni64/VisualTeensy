@@ -99,8 +99,14 @@ namespace ViewModel
                 projecTabVM.OnPropertyChanged("");
             };
 
-            mruList = new ObservableCollection<MruItemVM>(setup.mru.projects.Select(p => new MruItemVM(p, this)));
-        }
+            mruList = new ObservableCollection<MruItemVM>();
+            foreach (var prj in setup.mru.projects)
+            {
+                mruList.Add(new MruItemVM(prj, this));
+            }
+            //var mruList = setup.mru.projects?.Select(p => new MruItemVM(p, this));
+            //if(mruList != null)  mruList = new ObservableCollection<MruItemVM>(mruList);
+          }
 
         public LibManager libManager { get; }
         public SetupData setup { get; }

@@ -55,18 +55,7 @@
                             <Setter Property="Header" Value="{Binding Path=projectName}" />
                             <Setter Property="ToolTip" Value="{Binding Path=projectFolder}" />
                             <Setter Property="Command" Value="{Binding Path=parent.cmdFileOpen}" />
-                            <Setter Property="CommandParameter" Value="{Binding Path=projectFolder}" />
-                            <!--<Style.Triggers>
-                                <DataTrigger Binding="{Binding Path=IsSeparator}" Value="true">
-                                    <Setter Property="MenuItem.Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                <Separator Style="{DynamicResource {x:Static MenuItem.SeparatorStyleKey}}"/>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>-->
+                            <Setter Property="CommandParameter" Value="{Binding Path=projectFolder}" />                           
                         </Style>
                     </MenuItem.ItemContainerStyle>
                     <MenuItem.Icon>

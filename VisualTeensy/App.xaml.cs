@@ -79,9 +79,9 @@ namespace VisualTeensy
                 setupData.colorOk = Settings.Default.ColOk;
                 setupData.colorLink = Settings.Default.ColLink;
                 setupData.colorErr = Settings.Default.ColErr;
-
-                setupData.mru.load(Settings.Default.mruString);
             }
+
+            setupData.mru.load(Settings.Default.mruString);
             Helpers.arduinoPath = setupData.arduinoBase;
 
             using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
@@ -162,7 +162,7 @@ namespace VisualTeensy
                     setup.errors.ForEach(err => errors += (err + '\n'));
                     log.Error(errors);
 
-                    MessageBox.Show($"Setting errors found!\n{errors}", caption: "VisualTeensy",MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Setting errors found!\n{errors}", caption: "VisualTeensy", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
                 var libManager = Factory.makeLibManager(setup);
