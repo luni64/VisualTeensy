@@ -69,7 +69,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="mruString" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\lutz\source\Teensy\inotest|C:\Users\lutz\source\Teensy\inotest\MultiSerial</Value>
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

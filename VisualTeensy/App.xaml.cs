@@ -152,6 +152,9 @@ namespace VisualTeensy
 
             try
             {
+
+
+
                 var setup = loadSetup();
                 if (setup.errors.Count > 0)
                 {
@@ -161,7 +164,7 @@ namespace VisualTeensy
 
                     MessageBox.Show($"Setting errors found!\n{errors}", caption: "VisualTeensy",MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                                                
+
                 var libManager = Factory.makeLibManager(setup);
                 var project = Factory.makeProject(setup, libManager);
 

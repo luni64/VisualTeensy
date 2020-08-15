@@ -18,10 +18,10 @@ namespace vtCore
         static public string vtAppFolder { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "lunOptics", "VisualTeensy");
 
         // uploaders
-        public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
-        public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
+        public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC
+        public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools
         public CheckedPath uplJLinkBase { get; } = new CheckedPath("JLink.exe");             // upload JLink
-        public CheckedPath uplCLIBase { get; } = new CheckedPath("teensy_loader_cli.exe");   // upload PJRC      
+        public CheckedPath uplCLIBase { get; } = new CheckedPath("teensy_loader_cli.exe");   // upload PJRC
 
         public string arduinoBase
         {
@@ -142,7 +142,7 @@ namespace vtCore
             sd.colorUserSrc = Color.FromArgb(255, 100, 149, 237);
             sd.colorOk = Color.FromArgb(255, 179, 255, 179);
             sd.colorLink = Color.FromArgb(255, 255, 255, 202);
-            sd.colorErr = Color.FromArgb(255, 255, 159, 159);            
+            sd.colorErr = Color.FromArgb(255, 255, 159, 159);
 
             return sd;
         }
