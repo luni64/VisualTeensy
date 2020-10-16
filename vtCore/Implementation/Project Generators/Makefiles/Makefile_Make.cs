@@ -145,14 +145,14 @@ namespace vtCore
             mf.Append("#******************************************************************************\n");
             mf.Append("# Folders and Files\n");
             mf.Append("#******************************************************************************\n");
-            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
-            {
-                mf.Append("USR_SRC         := .\n");
-            }
-            else
-            {
+            //if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
+            //{
+            //    mf.Append("USR_SRC         := .\n");
+            //}
+            //else
+            //{
                 mf.Append("USR_SRC         := src\n");
-            }
+            //}
             mf.Append("LIB_SRC         := lib\n");
             mf.Append("CORE_SRC        := $(CORE_BASE)\n\n");
 
@@ -195,12 +195,12 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append("#User Sources -----------------------------------------------------------------\n");
-            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_INO_FILE    := $(USR_SRC)/$(TARGET_NAME).ino\n");
+  //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_INO_FILE    := $(USR_SRC)/$(TARGET_NAME).ino\n");
             mf.Append("USR_C_FILES     := $(call rwildcard,$(USR_SRC)/,*.c)\n");
             mf.Append("USR_CPP_FILES   := $(call rwildcard,$(USR_SRC)/,*.cpp)\n");
             mf.Append("USR_S_FILES     := $(call rwildcard,$(USR_SRC)/,*.S)\n");
             mf.Append("USR_OBJ         := $(USR_S_FILES:$(USR_SRC)/%.S=$(USR_BIN)/%.o) $(USR_C_FILES:$(USR_SRC)/%.c=$(USR_BIN)/%.o) $(USR_CPP_FILES:$(USR_SRC)/%.cpp=$(USR_BIN)/%.o)\n");
-            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
+  //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
 
             mf.Append("\n");
             mf.Append("# Core library sources --------------------------------------------------------\n");
@@ -334,17 +334,17 @@ namespace vtCore
             mf.Append("\n");
             mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.c\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
-            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n") ;
 
             mf.Append("\n");
             mf.Append("# Handle user sources ---------------------------------------------------------\n");
-            if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
-            {
-                mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.ino\n");
-                mf.Append("\t@echo $(COL_SRC)USER [INO] $< $(COL_ERR)\n");
-                mf.Append("\t@\"$(CC)\" $(CPP_FLAGS) $(INCLUDE) -include $(CORE_BASE)/Arduino.h -x c++ -o \"$@\" -c $< -x none\n");
-                mf.Append("\n");
-            }
+            //if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles)
+            //{
+            //    mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.ino\n");
+            //    mf.Append("\t@echo $(COL_SRC)USER [INO] $< $(COL_ERR)\n");
+            //    mf.Append("\t@\"$(CC)\" $(CPP_FLAGS) $(INCLUDE) -include $(CORE_BASE)/Arduino.h -x c++ -o \"$@\" -c $< -x none\n");
+            //    mf.Append("\n");
+            //}
 
             mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.S\n");
             mf.Append("\t@echo $(COL_SRC)USER [ASM] $< $(COL_ERR)\n");
