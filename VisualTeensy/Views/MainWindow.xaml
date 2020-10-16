@@ -28,44 +28,48 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" DockPanel.Dock="Top" IsMainMenu="True" HorizontalAlignment="Left">
+            <Menu.Resources>
+                <md:PackIcon Kind="Visualstudio" x:Key="vscIcon" x:Shared="false" Foreground="DarkBlue" />
+            </Menu.Resources>
             <MenuItem Header="File">
                 <MenuItem Header="New Project" Command="{Binding cmdFileNew}">
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="NewBox" />
+                        <md:PackIcon Kind="NewBox" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem  Header="Open Project" Click="FileOpenClick" >
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="FolderOpen" />
+                        <md:PackIcon Kind="FolderOpen" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Save..." Click="openOutputClick">
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="ContentSave" />
+                        <md:PackIcon Kind="ContentSave" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="Save as..." Click="saveAs">
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="ContentSaveSettings" />
+                        <md:PackIcon Kind="ContentSaveSettings" Foreground="DarkBlue" />
                     </MenuItem.Icon>
-                </MenuItem>                
-                <MenuItem Header="Recent Projects" ItemsSource="{Binding mruList, Mode=OneWay}" >                   
+                </MenuItem>
+                <MenuItem Header="Recent Projects" ItemsSource="{Binding mruList, Mode=OneWay}" >
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="Header" Value="{Binding Path=projectName}" />
                             <Setter Property="ToolTip" Value="{Binding Path=projectFolder}" />
                             <Setter Property="Command" Value="{Binding Path=parent.cmdFileOpen}" />
-                            <Setter Property="CommandParameter" Value="{Binding Path=projectFolder}" />                           
+                            <Setter Property="CommandParameter" Value="{Binding Path=projectFolder}" />
+                            <Setter Property="Icon" Value="{StaticResource vscIcon}"/>
                         </Style>
                     </MenuItem.ItemContainerStyle>
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="FolderOpen" />
+                        <md:PackIcon Kind="Restore" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Exit" Command="{Binding cmdClose}">
                     <MenuItem.Icon>
-                        <md:PackIcon Kind="WindowClose" />
+                        <md:PackIcon Kind="WindowClose" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -115,20 +119,38 @@
 
 
 
-        <TabControl Grid.Row="2" Margin="20,0,20,20" >
+        <TabControl Grid.Row="2" Margin="20,0,20,20" FontSize="14" >
             <TabControl.Effect>
                 <DropShadowEffect BlurRadius="15" Direction="314" Color="#FFDADADA"/>
             </TabControl.Effect>
 
-            <TabItem Header="Project">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <md:PackIcon Kind="Visualstudio" Margin="0,0,5,0" Foreground= "#FF464646"/>
+                        <TextBlock Text="Project"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <local:ProjectTab DataContext="{Binding  projecTabVM, Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Libraries" Selector.IsSelected="False" Visibility="{Binding setupTabVM.isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TabItem  Selector.IsSelected="False" Visibility="{Binding setupTabVM.isMakefileBuild, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <md:PackIcon Kind="Library" Margin="0,0,5,0" Foreground= "#FF464646"/>
+                        <TextBlock Text="Libraries" />
+                    </StackPanel>
+                </TabItem.Header>
                 <local:LibrariesTab DataContext="{Binding librariesTabVM , Mode=OneWay}"/>
             </TabItem>
 
-            <TabItem Header="Settings">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" >
+                        <md:PackIcon Kind="Settings" Margin="0,0,5,0" Foreground= "#FF464646"/>
+                        <TextBlock Text="Settings" />
+                    </StackPanel>
+                </TabItem.Header>
                 <local:SetupTab DataContext="{Binding setupTabVM, Mode=OneWay}"/>
             </TabItem>
         </TabControl>
