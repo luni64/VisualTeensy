@@ -12,7 +12,7 @@ using vtCore.Interfaces;
 
 namespace ViewModel
 {
-    class LibrariesTabVM : BaseViewModel, IDropTarget
+    public  class LibrariesTabVM : BaseViewModel, IDropTarget
     {
         #region commands --------------------------------------------
         public RelayCommand cmdDel { get; }

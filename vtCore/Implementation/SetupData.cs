@@ -18,10 +18,10 @@ namespace vtCore
         static public string vtAppFolder { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "lunOptics", "VisualTeensy");
 
         // uploaders
-        public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC 
-        public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools        
+        public CheckedPath uplPjrcBase { get; } = new CheckedPath("teensy.exe");             // upload PJRC
+        public CheckedPath uplTyBase { get; } = new CheckedPath("TyCommanderC.exe");         // upload TyTools
         public CheckedPath uplJLinkBase { get; } = new CheckedPath("JLink.exe");             // upload JLink
-        public CheckedPath uplCLIBase { get; } = new CheckedPath("teensy_loader_cli.exe");   // upload PJRC      
+        public CheckedPath uplCLIBase { get; } = new CheckedPath("teensy_loader_cli.exe");   // upload PJRC
 
         public string arduinoBase
         {
@@ -108,10 +108,8 @@ namespace vtCore
         public string makefile_fixed { get; set; }
         public string makefile_builder { get; set; }
         public bool debugSupportDefault { get; set; }
-
         public string preferencesPath { get; private set; }
-
-
+        public MruList mru { get; } = new MruList(10);
 
         //makefile output colors ---------------
         public bool isColoredOutput { get; set; }
@@ -138,7 +136,6 @@ namespace vtCore
 
             sd.makeExeBase.path = Directory.GetCurrentDirectory();
             sd.debugSupportDefault = false;
-
 
             sd.colorCore = Color.FromArgb(255, 187, 206, 251);
             sd.colorUserLib = Color.FromArgb(255, 206, 244, 253);

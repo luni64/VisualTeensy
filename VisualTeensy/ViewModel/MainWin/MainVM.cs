@@ -1,24 +1,51 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using vtCore;
 using vtCore.Interfaces;
 
 namespace ViewModel
 {
-    class MainVM : BaseViewModel
+    public class MruItemVM
+    {
+        internal MruItemVM(string projectFolder, MainVM parent)
+        {
+            this.projectFolder = projectFolder;
+            this.projectName = Path.GetFileName(projectFolder);
+            this.parent = parent;
+        }
+
+        public string projectFolder { get; }
+        public string projectName { get; }
+        public MainVM parent { get; }
+    }
+
+    public class MainVM : BaseViewModel
     {
         public SetupTabVM setupTabVM { get; }
         public ProjectTabVM projecTabVM { get; }
         public LibrariesTabVM librariesTabVM { get; }
 
         public RelayCommand cmdFileOpen { get; set; }
+
+        public ObservableCollection<MruItemVM> mruList { get; } = new ObservableCollection<MruItemVM>();
+
         void doFileOpen(object path)
         {
-            project.openProject(path as string);
-            projecTabVM.update();
-            librariesTabVM.update();
-            ActionText = Directory.Exists(projectPath) ? "Update Project" : "Generate Project";
-            OnPropertyChanged("");
+            string prj = path as string;
+            if (prj != null)
+            {
+                project.openProject(prj);
+                setup.mru.AddProject(prj);
+                mruList.Clear();
+                setup.mru.projects.ForEach(p => mruList.Add(new MruItemVM(p, this)));
+                
+                projecTabVM.update();
+                librariesTabVM.update();
+                ActionText = Directory.Exists(projectPath) ? "Update Project" : "Generate Project";
+                OnPropertyChanged("");
+            }
         }
 
         public RelayCommand cmdFileNew { get; set; }
@@ -68,10 +95,18 @@ namespace ViewModel
 
             setupTabVM.PropertyChanged += (s, e) =>
             {
-               projecTabVM.updateAll();
+                projecTabVM.updateAll();
                 projecTabVM.OnPropertyChanged("");
             };
-        }
+
+            mruList = new ObservableCollection<MruItemVM>();
+            foreach (var prj in setup.mru.projects)
+            {
+                mruList.Add(new MruItemVM(prj, this));
+            }
+            //var mruList = setup.mru.projects?.Select(p => new MruItemVM(p, this));
+            //if(mruList != null)  mruList = new ObservableCollection<MruItemVM>(mruList);
+          }
 
         public LibManager libManager { get; }
         public SetupData setup { get; }

@@ -25,7 +25,8 @@ namespace vtCore
                     {
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
-                        intelliSenseMode = "gcc-x64", 
+                        intelliSenseMode = "gcc-arm", 
+                        cppStandard = "gnu++14", // hack: might be better to extract from boards.txt
                         includePath = new List<string>(),                        
                         defines = new List<string>()
                     }
