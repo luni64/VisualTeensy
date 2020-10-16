@@ -10,6 +10,7 @@ namespace vtCore
         public List<string> defines { get; set; } = new List<string>();
         public string compilerPath { get; set; }
         public string intelliSenseMode { get; set; }
+        public string cppStandard { get; set; }
     }
 
     class PropertiesJson
