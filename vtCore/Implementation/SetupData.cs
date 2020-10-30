@@ -48,14 +48,13 @@ namespace vtCore
 
                         uplPjrcBase.path = arduinoTools;
 
-                        var sketchBookFolder = Helpers.getSketchbookFolder();
+                        preferencesPath = Helpers.getPreferencesPath(arduinoBase);
+                        isPortable = Path.GetDirectoryName(preferencesPath).EndsWith("portable");
+                        
+                        var sketchBookFolder = Helpers.getSketchbookFolder(arduinoBase);
                         if (sketchBookFolder != null)
-                        {
-                            if (!File.Exists(Helpers.preferencesPath))
-                            {
-                                errors.Add($"\n{Helpers.preferencesPath} not found. Please check your Arduino installation. In case of a fresh installation, run Arduino at least once to generate the file");
-                            }
-                            sharedLibrariesFolder = Path.Combine(Helpers.getSketchbookFolder(), "libraries");
+                        {                           
+                            sharedLibrariesFolder = Path.Combine(sketchBookFolder, "libraries");
                         }
                     }
                     else
@@ -111,6 +110,7 @@ namespace vtCore
         public string preferencesPath { get; private set; }
         public MruList mru { get; } = new MruList(10);
 
+        public bool isPortable { get; private set; }
         //makefile output colors ---------------
         public bool isColoredOutput { get; set; }
         public Color colorCore { get; set; }

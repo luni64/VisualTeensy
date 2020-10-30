@@ -21,13 +21,14 @@ namespace vtCore
                     {
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler ,"arm-none-eabi-gcc.exe").Replace('\\','/'),
-                        intelliSenseMode = "gcc-x64",
+                        intelliSenseMode = "gcc-arm",
+                        cppStandard = "gnu++14", // hack: might be better to extract from boards.txt
                         includePath = new List<string>()
                         {
-                            $"{Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**"}",                            
+                            $"{Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**"}",
                             $"{Path.Combine(setup.arduinoBase, "hardware", "teensy", "avr", "libraries/**")}".Replace('\\','/'),
                             $"{Path.Combine(setup.arduinoBase ,"libraries/**")}".Replace('\\','/'),
-                            $"{Path.Combine(Helpers.getSketchbookFolder() ,"libraries/**")}".Replace('\\','/'),
+                            $"{setup.sharedLibrariesFolder}/**".Replace('\\','/'),
                         },
 
                         forcedInclude = new List<string>()

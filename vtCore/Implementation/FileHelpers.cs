@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,11 +24,16 @@ namespace vtCore
         //Folders ----------------------------------------
 
         public static string arduinoAppPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
-        public static string preferencesPath => Path.Combine(arduinoAppPath, "preferences.txt");
-        public static string getSketchbookFolder()
+        public static string getPreferencesPath(string arduinoPath)
+        {
+            String prefPath = Path.Combine(arduinoPath, "portable", "preferences.txt");
+            return File.Exists(prefPath) ? prefPath : Path.Combine(arduinoAppPath, "preferences.txt");
+        }
+        public static string getSketchbookFolder(string arduinoBase = "")
         {
             string sketchbookPath = "";
 
+            string preferencesPath = getPreferencesPath(arduinoBase);
             if (File.Exists(preferencesPath))
             {
                 using (TextReader reader = new StreamReader(preferencesPath))
@@ -40,32 +46,20 @@ namespace vtCore
                         if (parts.Length == 2 && parts[0] == "sketchbook.path")
                         {
                             sketchbookPath = parts[1];
+                            if (Path.GetDirectoryName(preferencesPath).EndsWith("portable"))
+                            {
+                                sketchbookPath = Path.Combine(arduinoBase, "portable", sketchbookPath);
+                            }
                             break;
                         }
                     }
                 }
             }
+
             return sketchbookPath;
         }
 
-        //public static string findArduinoFolder()
-        //{
-        //    string folder;
 
-        //    folder = checkFolder(@"C:\Program Files", f => isArduinoFolder(f));
-        //    if (folder != null)
-        //    {
-        //        return folder;
-        //    }
-
-        //    folder = checkFolder(@"C:\Program Files (x86)", f => isArduinoFolder(f));
-        //    if (folder != null)
-        //    {
-        //        return folder;
-        //    }
-
-        //    return null;
-        //}
         public static string findTyToolsFolder()
         {
             string folder;
@@ -222,7 +216,7 @@ namespace vtCore
         }
 
 
-        public static async Task downloadFileAsync(Uri source, string target, TimeSpan expiry = default(TimeSpan))
+        public static async Task downloadFileAsync(Uri source, string target, TimeSpan expiry = default)
         {
             if (File.Exists(target))
             {
@@ -247,37 +241,6 @@ namespace vtCore
                 {
                     log.Error($"Error downloading index file {source}");
                 }
-
-
-                //Stream stream = await client.OpenReadTaskAsync(source);
-
-                //using (var fileStream = new FileStream(target, FileMode.Create))
-                //{
-                //    await stream.CopyToAsync(fileStream);
-                //}
-
-               
-
-
-                //var response = await client.GetAsync(source);
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    log.Info($"Http response: {response}");
-
-                //    using (var webStream = await response.Content.ReadAsStreamAsync())
-                //    {
-                //        using (var fileStream = new FileStream(target, FileMode.Create))
-                //        {
-                //            await webStream.CopyToAsync(fileStream);
-                //        }
-                //    }
-                //    log.Info($"Download done");
-                //}
-                //else
-                //{
-                //    log.Error($"Http response: {response}");
-                //}
-                //response.Dispose();
             }
             catch
             {

@@ -151,10 +151,7 @@ namespace VisualTeensy
             base.OnStartup(e);
 
             try
-            {
-
-
-
+            {                               
                 var setup = loadSetup();
                 if (setup.errors.Count > 0)
                 {

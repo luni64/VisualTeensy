@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using vtCore.Interfaces;
 
@@ -43,9 +45,8 @@ namespace vtCore
            // mf.Append($"TOOLS            := \"{Helpers.getShortPath(setup.arduinoBase+"\\tools-builder")}\"\n\n");
             mf.Append($"TOOLS            := -tools=\"{(setup.arduinoBase + "\\tools-builder")}\"\n\n");
 
-            mf.Append($"LIBRARIES        := -libraries=\"{Helpers.getSketchbookFolder()}/libraries\"\n");
-            mf.Append($"LIBRARIES        += -libraries=\"{setup.arduinoBase}/hardware/teensy/avr/libraries\"\n");
-            mf.Append($"LIBRARIES        += -libraries=\"{setup.arduinoBase}/libraries\"\n\n");
+            mf.Append($"LIBRARIES        := -built-in-libraries=\"{setup.arduinoBase}/libraries\"\n");            
+            mf.Append($"LIBRARIES        := -libraries=\"{setup.sharedLibrariesFolder}\"\n");             
 
             mf.Append($"UPL_PJRC_B       := {Helpers.getShortPath(setup.arduinoTools)}\n");
             mf.Append($"UPL_TYCMD_B      := {setup.uplTyBase.shortPath}\n");
