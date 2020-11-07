@@ -35,14 +35,14 @@ namespace vtCore
             mf.Append(makeEntry("BOARD_ID         := ", "build.board", options) + "\n");
             mf.Append(makeEntry("MCU              := ", "build.mcu", options) + "\n\n");
 
-            mf.Append($"BUILDER_BASE     := {setup.arduinoBase}\n");
+            mf.Append($"BUILDER_BASE     := \"{setup.arduinoBase}\"\n");
             mf.Append($"FLAGS            := -verbose=1 -warnings=all\n");
 
-            mf.Append($"FQBN             := {cfg.selectedBoard.fqbn}\n");
-            mf.Append($"BUILD_PATH       := $(abspath .vsTeensy/build)\n");
+            mf.Append($"FQBN             := {cfg.selectedBoard.fqbn}\n");           
+            mf.Append($"BUILD_PATH       := \"{Path.Combine(project.path,".vsteensy/build")}\"\n").Replace("/","\\");
+            mf.Append($"BUILD_CACHE      := \"{Path.Combine(project.path,".vsteensy/cache")}\"\n").Replace("/", "\\");
 
-            mf.Append($"HARDWARE         := -hardware=\"{setup.arduinoBase}/hardware\"\n");
-           // mf.Append($"TOOLS            := \"{Helpers.getShortPath(setup.arduinoBase+"\\tools-builder")}\"\n\n");
+            mf.Append($"HARDWARE         := -hardware=\"{setup.arduinoBase}/hardware\"\n");           
             mf.Append($"TOOLS            := -tools=\"{(setup.arduinoBase + "\\tools-builder")}\"\n\n");
 
             mf.Append($"LIBRARIES        := -built-in-libraries=\"{setup.arduinoBase}/libraries\"\n");            

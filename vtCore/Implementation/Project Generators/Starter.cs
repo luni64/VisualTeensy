@@ -8,7 +8,7 @@ namespace vtCore
         {
             var vsCode = new Process();
             vsCode.StartInfo.FileName = "cmd";
-            vsCode.StartInfo.Arguments = $"/c code \"{folder}\" {file}";
+            vsCode.StartInfo.Arguments = $"/c code \"{folder}\" \"{file}\"";
             vsCode.StartInfo.WorkingDirectory = folder;
             vsCode.StartInfo.UseShellExecute = false;
             vsCode.StartInfo.CreateNoWindow = true;
