@@ -98,7 +98,7 @@ namespace vtCore
             //mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
 
             mf.Append("\n");
-            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + makeEntry(" -DARDUINO_", "build.board", options) + " -DARDUINO=10807\n");
+            mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + makeEntry(" -DARDUINO_", "build.board", options) + " -DARDUINO=10813\n");
             mf.Append("DEFINES     += ");
             mf.Append(makeEntry("-DF_CPU=", "build.fcpu", options) + " " + makeEntry("-D", "build.usbtype", options) + " " + makeEntry("-DLAYOUT_", "build.keylayout", options) + "\n");
 

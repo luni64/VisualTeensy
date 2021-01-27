@@ -54,7 +54,7 @@ namespace vtCore
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
-            props.configurations[0].defines.Add("ARDUINO=18013");
+            props.configurations[0].defines.Add("ARDUINO=10813");
 
             return JsonConvert.SerializeObject(props, Formatting.Indented);
         }
