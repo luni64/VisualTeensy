@@ -278,7 +278,7 @@ namespace vtCore
                 }
 
                 var sourceFolder = tempFolder.GetDirectories().FirstOrDefault();
-                sourceFolder.MoveTo(libDir.FullName);
+                copyFilesRecursively(sourceFolder, libDir);            
                 tempFolder.Delete(true);
 
                 Console.WriteLine("done");
