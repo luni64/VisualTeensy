@@ -21,6 +21,7 @@ namespace vtCore.Interfaces
         Uri sourceUri { get; }
         List<string> types { get;  }
         string version { get;  }
+        Version v { get; }
         string website { get; }
         string ToString();
     }

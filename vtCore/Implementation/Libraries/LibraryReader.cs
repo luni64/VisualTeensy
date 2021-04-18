@@ -46,7 +46,7 @@ namespace vtCore
                 var ret = jsonLibs.Select(t => new Library()
                 {
                     name = t.name,
-                    version = t.version,
+                    version = t.version,                 
                     author = t.author,
                     maintainer = t.maintainer,
                     sentence = t.sentence,

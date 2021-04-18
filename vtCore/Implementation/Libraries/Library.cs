@@ -7,9 +7,21 @@ using vtCore.Interfaces;
 namespace vtCore
 {
     public class Library : ILibrary
-    {        
+    {
         public string name { get; set; }                // name, can contain spaces
         public string version { get; set; }             // more than one version of the lib can be found in repos
+        public Version v // experimental, replace version string by version if this works out
+        {
+            get
+            {
+                if(Version.TryParse(version, out Version ver))
+                {
+                    return ver;
+                }
+                return new Version();
+            }
+        }
+
         public string author { get; set; }              // no format requirements
         public string maintainer { get; set; }          // no format requirements
         public string sentence { get; set; }            // short description
@@ -30,8 +42,8 @@ namespace vtCore
 
         protected Library(ILibrary copyMe)
         {
-            Type t = copyMe.GetType();            
-            foreach (PropertyInfo propInf in t.GetProperties().Where(p=>p.SetMethod != null))
+            Type t = copyMe.GetType();
+            foreach (PropertyInfo propInf in t.GetProperties().Where(p => p.SetMethod != null))
             {
                 propInf.SetValue(this, propInf.GetValue(copyMe));
             }
