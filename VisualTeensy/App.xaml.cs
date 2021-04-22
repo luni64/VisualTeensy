@@ -4,6 +4,7 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -58,6 +59,9 @@ namespace VisualTeensy
                 setupData.colorLink = Color.FromArgb(255, 255, 255, 202);
                 setupData.colorErr = Color.FromArgb(255, 255, 159, 159);
 
+                setupData.additionalFiles = new System.Collections.Generic.List<string>() { ".clang-format" };
+                setupData.additionalFiles = new System.Collections.Generic.List<string>() { ".gitignore" };
+
                 Settings.Default.FirstStart = false;
             }
             else
@@ -79,6 +83,8 @@ namespace VisualTeensy
                 setupData.colorOk = Settings.Default.ColOk;
                 setupData.colorLink = Settings.Default.ColLink;
                 setupData.colorErr = Settings.Default.ColErr;
+                                
+                setupData.additionalFiles = Settings.Default.additionalFiles;
             }
 
             setupData.mru.load(Settings.Default.mruString);
@@ -117,11 +123,10 @@ namespace VisualTeensy
             Settings.Default.ColLink = setupData.colorLink;
             Settings.Default.ColErr = setupData.colorErr;
             Settings.Default.mruString = setupData.mru.ToString();
-
-            Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);
+            Settings.Default.mainWinBounds = new Rect(mainWin.Left, mainWin.Top, mainWin.Width, mainWin.Height);          
+            Settings.Default.additionalFiles = setupData.additionalFiles;    
 
             Settings.Default.Save();
-
         }
 
         static public MainWindow mainWin { get; private set; }

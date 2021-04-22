@@ -9,20 +9,20 @@
 //------------------------------------------------------------------------------
 
 namespace VisualTeensy.Properties {
-
-
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
+        
         public static Settings Default {
             get {
                 return defaultInstance;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -34,7 +34,7 @@ namespace VisualTeensy.Properties {
                 this["updateNeeded"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100,100,800,1000")]
@@ -46,7 +46,7 @@ namespace VisualTeensy.Properties {
                 this["fileWinBounds"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100,100,1000,800")]
@@ -58,7 +58,7 @@ namespace VisualTeensy.Properties {
                 this["mainWinBounds"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -70,7 +70,7 @@ namespace VisualTeensy.Properties {
                 this["defaultProjectBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -82,7 +82,7 @@ namespace VisualTeensy.Properties {
                 this["lastProject"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -94,7 +94,7 @@ namespace VisualTeensy.Properties {
                 this["arduinoBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -106,7 +106,7 @@ namespace VisualTeensy.Properties {
                 this["uplPjrcBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -118,7 +118,7 @@ namespace VisualTeensy.Properties {
                 this["uplTyBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -130,7 +130,7 @@ namespace VisualTeensy.Properties {
                 this["makeExePath"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -142,7 +142,7 @@ namespace VisualTeensy.Properties {
                 this["projectBaseDefault"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -154,7 +154,7 @@ namespace VisualTeensy.Properties {
                 this["libBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -166,7 +166,7 @@ namespace VisualTeensy.Properties {
                 this["uplCLIBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -178,7 +178,7 @@ namespace VisualTeensy.Properties {
                 this["uplJLinkBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
@@ -190,7 +190,7 @@ namespace VisualTeensy.Properties {
                 this["debugSupport"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColCore {
@@ -201,7 +201,7 @@ namespace VisualTeensy.Properties {
                 this["ColCore"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColLib {
@@ -212,7 +212,7 @@ namespace VisualTeensy.Properties {
                 this["ColLib"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColSrc {
@@ -223,7 +223,7 @@ namespace VisualTeensy.Properties {
                 this["ColSrc"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColLink {
@@ -234,7 +234,7 @@ namespace VisualTeensy.Properties {
                 this["ColLink"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColErr {
@@ -245,7 +245,7 @@ namespace VisualTeensy.Properties {
                 this["ColErr"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Drawing.Color ColOk {
@@ -256,7 +256,7 @@ namespace VisualTeensy.Properties {
                 this["ColOk"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -268,7 +268,7 @@ namespace VisualTeensy.Properties {
                 this["ColorEnabled"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
@@ -280,7 +280,7 @@ namespace VisualTeensy.Properties {
                 this["FirstStart"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -290,6 +290,18 @@ namespace VisualTeensy.Properties {
             }
             set {
                 this["mruString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("asdf\r\ntest\r\nnoch ein test")]
+        public global::System.Collections.Generic.List<System.String> additionalFiles {
+            get {
+                return ((global::System.Collections.Generic.List<System.String>)(this["additionalFiles"]));
+            }
+            set {
+                this["additionalFiles"] = value;
             }
         }
     }
