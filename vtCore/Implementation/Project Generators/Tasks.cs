@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using vtCore.Interfaces;
@@ -332,6 +333,69 @@ namespace vtCore
         bool done = false;
 
         private readonly DirectoryInfo libBase;
+        private readonly IProject project;
+    }
+
+    //--------------------------------------------------------------------------------------------
+    // Copy addtional files
+    //--------------------------------------------------------------------------------------------
+    class CopyAdditionalFiles : ITask
+    {
+        public string title => $"Copy additional files";
+        public string description =>fileList;
+
+        public string status => done ? "OK" : "Copy";
+
+        public CopyAdditionalFiles(IProject project, SetupData setup)
+        {
+            this.setup = setup;
+            this.project = project;
+
+            setup.additionalFiles.ForEach(f => fileList += Path.GetFileName(f) + " | ");
+            fileList = fileList.Trim(new char[] { ' ', '|' });
+            if (fileList.Length > 80) fileList = fileList.Substring(0, 80) + "...";
+
+            done = false;
+        }
+
+        string fileList;
+
+
+        public Func<Task> action => async () =>
+        {
+            foreach(var sourceFile in setup.additionalFiles)
+            {
+                if(File.Exists(sourceFile))
+                {
+                    string destFile = Path.Combine(project.path, Path.GetFileName(sourceFile));
+                    if (!File.Exists(destFile))
+                    {
+                        File.Copy(sourceFile, destFile, false);
+                        await (Task.Delay(10));
+                    }
+                }
+            }
+            done = true;
+
+            //var baseUri = new Uri(libBase.FullName);
+
+            //foreach (IProjectLibrary library in project.selectedConfiguration.localLibs)
+            //{
+            //    if (library.isLocalSource)
+            //    {
+            //        Helpers.copyFilesRecursively(library.sourceUri, library.targetUri);
+            //    }
+            //    else if (library.isWebSource)
+            //    {
+            //        await Helpers.downloadLibrary(library, libBase);
+            //    }
+            //};
+            //done = true;
+        };
+
+        bool done = false;
+
+        private readonly SetupData setup;
         private readonly IProject project;
     }
 

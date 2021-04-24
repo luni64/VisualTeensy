@@ -120,6 +120,8 @@ namespace vtCore
         public Color colorErr { get; set; }
         public Color colorOk { get; set; }
 
+        public List<string> additionalFiles { get; set; } = new List<string>();
+
         public static SetupData getDefault()
         {
             var sd = new SetupData();
@@ -143,6 +145,8 @@ namespace vtCore
             sd.colorOk = Color.FromArgb(255, 179, 255, 179);
             sd.colorLink = Color.FromArgb(255, 255, 255, 202);
             sd.colorErr = Color.FromArgb(255, 255, 159, 159);
+
+            sd.additionalFiles = new List<string>() { ".format" };
 
             return sd;
         }

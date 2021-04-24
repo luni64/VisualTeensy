@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using vtCore.Interfaces;
 
 namespace vtCore
@@ -28,6 +29,10 @@ namespace vtCore
                     if(project.debugSupport == DebugSupport.cortex_debug)
                     {
                         tasks.Add(new GenerateDebugSupport(project, setup));                            
+                    }
+                    if(setup.additionalFiles.Any())
+                    {
+                        tasks.Add(new CopyAdditionalFiles(project, setup));
                     }
                     tasks.Add(new CleanBinaries(project));
                     tasks.Add(new GenerateSketch(project));

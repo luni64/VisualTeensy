@@ -43,5 +43,18 @@ namespace VisualTeensy
             var c = colorDialog.Color;
             x.Fill = new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
         }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var dlg = new System.Windows.Forms.OpenFileDialog();
+            if(dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var vm = DataContext as ViewModel.SetupTabVM;
+                // vm.additionalFiles.Add(dlg.FileName);
+
+                vm.cmdAddFile.Execute(dlg.FileName);
+
+            }
+        }
     }
 }

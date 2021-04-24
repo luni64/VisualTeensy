@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Data;
 using vtCore;
 using vtCore.Interfaces;
 
 namespace ViewModel
 {
     public class SetupTabVM : BaseViewModel, IDataErrorInfo
-    {     
+    {
         public string Error => "ERROR";
         public string this[string columnName]
         {
@@ -266,11 +268,47 @@ namespace ViewModel
                 OnPropertyChanged();
             }
         }
-        
+
+        // Additional files       
+        public ICollectionView additionalFilesView { get; }
+
+        public int selectedFile
+        {
+            get => _selectedFile;
+            set => SetProperty(ref _selectedFile, value);
+        }
+        int _selectedFile=0;
+
+        public RelayCommand cmdAddFile { get; private set; }
+        void doAddFile(object f)
+        {
+            string filename = f as String;
+            setup.additionalFiles.Add(filename);
+            additionalFilesView.Refresh();
+        }
+
+        public RelayCommand cmdDelFile { get; private set; }
+        void doDelFile(object o)
+        {
+            if (selectedFile >= 0)
+            {
+                setup.additionalFiles.RemoveAt(selectedFile);
+                additionalFilesView.Refresh();
+            }
+        }
+
+
         public SetupTabVM(IProject project, SetupData setup)
         {
             this.project = project;
             this.setup = setup;
+
+            cmdAddFile = new RelayCommand(doAddFile);
+            cmdDelFile = new RelayCommand(doDelFile);
+
+            // additionalFiles = new ObservableCollection<string>(setup.additionalFiles);
+
+            additionalFilesView = CollectionViewSource.GetDefaultView(setup.additionalFiles);
         }
 
         private readonly SetupData setup;

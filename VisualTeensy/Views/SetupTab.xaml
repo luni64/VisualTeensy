@@ -14,7 +14,7 @@
              xmlns:local="clr-namespace:VisualTeensy"
              xmlns:vm ="clr-namespace:ViewModel"           
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="556.667" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:SetupTabVM, IsDesignTimeCreatable=False}" >
 
     <UserControl.Resources>
@@ -110,8 +110,29 @@
                     <Rectangle Grid.Row="2" Grid.Column="1" Tag="{Binding colorErr}" Fill="{Binding colorErr, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
                     <TextBlock Grid.Row="2" Grid.Column="3" Text ="Passed results" VerticalAlignment="Center"/>
                     <Rectangle  Grid.Row="2" Grid.Column="4" Tag="{Binding colorOk}" Fill="{Binding colorOk, Converter={StaticResource stbc}, Mode=TwoWay}" Stroke="DarkGray" Height="20" Width="20" MouseDown="Rectangle_MouseDown"/>
-
                 </Grid>
+
+                <TextBlock Text="Additional files (copied to project folder)"  FontSize="14"  Foreground="{DynamicResource PrimaryHueDarkBrush}" Margin="0,35,0,10"/>
+                <ListBox Height="100" Width="350" ItemsSource="{Binding additionalFilesView}" BorderBrush="DarkGray" BorderThickness="1" HorizontalAlignment="Left" SelectedIndex="{Binding selectedFile}" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <!--<Setter Property="Margin" Value="0,0,0,0"/>-->
+                            <Setter Property="Padding" Value="3"/>
+                            <!--<Setter Property="Height" Value="75"/>-->
+                            <!-- For setting height of control-->
+                            
+                            <!-- For setting widthof control-->
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <StackPanel Orientation="Horizontal" Margin="3,10,0,0">
+                    <Button HorizontalAlignment="Center"   Style="{StaticResource MaterialDesignFloatingActionLightButton}" Height="30" Width="30" Click="Button_Click"  >
+                        <md:PackIcon Kind="PlusBox" Width="20" Height="20" Foreground="DarkBlue" HorizontalAlignment="Center"/>
+                    </Button>
+                    <Button HorizontalAlignment="Center"   Style="{StaticResource MaterialDesignFloatingActionLightButton}" Height="30" Width="30"  Margin="20,0,0,0" Command="{Binding cmdDelFile, Mode=OneWay}">
+                        <md:PackIcon Kind="DeleteForever" Width="20" Height="20" Foreground="DarkBlue" HorizontalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </Grid>
 
