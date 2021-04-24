@@ -59,8 +59,8 @@ namespace VisualTeensy
                 setupData.colorLink = Color.FromArgb(255, 255, 255, 202);
                 setupData.colorErr = Color.FromArgb(255, 255, 159, 159);
 
-                setupData.additionalFiles = new System.Collections.Generic.List<string>() { ".clang-format" };
-                setupData.additionalFiles = new System.Collections.Generic.List<string>() { ".gitignore" };
+                setupData.additionalFiles = new System.Collections.Generic.List<string>() { ".clang-format" ,".gitignore"};
+                
 
                 Settings.Default.FirstStart = false;
             }

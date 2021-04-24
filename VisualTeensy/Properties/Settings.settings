@@ -72,9 +72,8 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="additionalFiles" Type="System.Collections.Generic.List&lt;System.String&gt;" Scope="User">
-      <Value Profile="(Default)">asdf
-test
-noch ein test</Value>
+      <Value Profile="(Default)">.gitignore
+.clang-format</Value>
     </Setting>
   </Settings>
 </SettingsFile>
