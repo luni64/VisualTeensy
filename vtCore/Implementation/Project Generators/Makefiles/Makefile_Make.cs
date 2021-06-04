@@ -77,10 +77,17 @@ namespace vtCore
             if (project.debugSupport != DebugSupport.none && !String.IsNullOrWhiteSpace(setup.uplCLIBase.path)) mf.Append($"UPL_CLICMD_B     := {setup.uplCLIBase.shortPath}\n");
 
 
+
             mf.Append("\n#******************************************************************************\n");
             mf.Append("# Flags and Defines\n");
             mf.Append("#******************************************************************************\n");
 
+            if (makeEntry("dummy", "build.flags.ld", options).Contains("TIME_SYM"))
+            {
+                mf.Append("TIME_SYM    := $(shell powershell [int][double]::Parse((Get-Date -UFormat %s)))" + "\n");
+            }
+
+            mf.Append("\n");
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
             mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
@@ -90,13 +97,11 @@ namespace vtCore
             mf.Append(makeEntry("FLAGS_CPP   := ", "build.flags.cpp", options) + "\n");
             mf.Append(makeEntry("FLAGS_C     := ", "build.flags.c", options) + "\n");
             mf.Append(makeEntry("FLAGS_S     := ", "build.flags.S", options) + "\n");
-
-            mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options).Replace("{build.core.path}", "$(CORE_BASE)") + "\n");
+            mf.Append(makeEntry("FLAGS_LD    := ", "build.flags.ld", options) + "\n");
 
             mf.Append("\n");
             mf.Append(makeEntry("LIBS        := ", "build.flags.libs", options) + "\n");
-            //mf.Append(makeEntry("LD_SCRIPT   := ", "build.mcu", options) + ".ld\n");
-
+            
             mf.Append("\n");
             mf.Append(makeEntry("DEFINES     := ", "build.flags.defs", options) + makeEntry(" -DARDUINO_", "build.board", options) + " -DARDUINO=10813\n");
             mf.Append("DEFINES     += ");
@@ -151,7 +156,7 @@ namespace vtCore
             //}
             //else
             //{
-                mf.Append("USR_SRC         := src\n");
+            mf.Append("USR_SRC         := src\n");
             //}
             mf.Append("LIB_SRC         := lib\n");
             mf.Append("CORE_SRC        := $(CORE_BASE)\n\n");
@@ -195,12 +200,12 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append("#User Sources -----------------------------------------------------------------\n");
-  //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_INO_FILE    := $(USR_SRC)/$(TARGET_NAME).ino\n");
+            //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_INO_FILE    := $(USR_SRC)/$(TARGET_NAME).ino\n");
             mf.Append("USR_C_FILES     := $(call rwildcard,$(USR_SRC)/,*.c)\n");
             mf.Append("USR_CPP_FILES   := $(call rwildcard,$(USR_SRC)/,*.cpp)\n");
             mf.Append("USR_S_FILES     := $(call rwildcard,$(USR_SRC)/,*.S)\n");
             mf.Append("USR_OBJ         := $(USR_S_FILES:$(USR_SRC)/%.S=$(USR_BIN)/%.o) $(USR_C_FILES:$(USR_SRC)/%.c=$(USR_BIN)/%.o) $(USR_CPP_FILES:$(USR_SRC)/%.cpp=$(USR_BIN)/%.o)\n");
-  //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
+            //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
 
             mf.Append("\n");
             mf.Append("# Core library sources --------------------------------------------------------\n");
@@ -334,7 +339,7 @@ namespace vtCore
             mf.Append("\n");
             mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.c\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
-            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n") ;
+            mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
             mf.Append("# Handle user sources ---------------------------------------------------------\n");
