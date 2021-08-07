@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using vtCore.Interfaces;
 
-namespace vtCore
+namespace vtCore 
 {
     class Board : IBoard
     {
@@ -56,17 +56,23 @@ namespace vtCore
 
             if (ldFlagOpt.Key != null)
             {
-                string ldFlags = ldFlagOpt.Value.Replace("\"", "").Replace("{build.core.path}", "$(CORE_BASE)");
-              
-                if (ldFlags.Contains("-Wl,"))
-                {
-                    ldFlags = ldFlags.Replace("-Wl,", "-Wl,--print-memory-usage,");
-                    if (ldFlags.Contains("--defsym=__rtc_localtime"))
-                    {
-                        ldFlags = ldFlags.Replace("{extra.time.local}", "$(TIME_SYM)");
-                    }
-                }
-              
+                string ldFlags = ldFlagOpt.Value
+                    .Replace("\"", "")
+                    .Replace("{build.core.path}", "$(CORE_BASE)")
+                    .Replace("-Wl,", "-Wl,--print-memory-usage,")
+                    .Replace("{extra.time.local}", "$(TIME_SYM)")
+                    .Replace("{extra.time.local}", "$(TIME_SYM)");
+
+
+                //if (ldFlags.Contains("-Wl,"))
+                //{
+                //    ldFlags = ldFlags
+                //    if (ldFlags.Contains("--defsym=__rtc_localtime"))
+                //    {
+                //        ldFlags = ldFlags.Replace("{extra.time.local}", "$(TIME_SYM)");
+                //    }
+                //}
+
                 allOptions.Remove("build.flags.ld");
                 allOptions.Add("build.flags.ld", ldFlags);
             }

@@ -81,10 +81,12 @@ namespace VisualTeensy
                 setupData.colorUserLib = Settings.Default.ColLib;
                 setupData.colorUserSrc = Settings.Default.ColSrc;
                 setupData.colorOk = Settings.Default.ColOk;
-                setupData.colorLink = Settings.Default.ColLink;
+                setupData.colorLink = Settings.Default.ColLink; 
                 setupData.colorErr = Settings.Default.ColErr;
-                                
-                setupData.additionalFiles = Settings.Default.additionalFiles;
+
+                                            
+                setupData.additionalFiles = Settings.Default.additionalFiles ?? new List<string>();
+
             }
 
             setupData.mru.load(Settings.Default.mruString);
