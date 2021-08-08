@@ -204,7 +204,7 @@ namespace vtCore
             mf.Append("USR_C_FILES     := $(call rwildcard,$(USR_SRC)/,*.c)\n");
             mf.Append("USR_CPP_FILES   := $(call rwildcard,$(USR_SRC)/,*.cpp)\n");
             mf.Append("USR_S_FILES     := $(call rwildcard,$(USR_SRC)/,*.S)\n");
-            mf.Append("USR_OBJ         := $(USR_S_FILES:$(USR_SRC)/%.S=$(USR_BIN)/%.o) $(USR_C_FILES:$(USR_SRC)/%.c=$(USR_BIN)/%.o) $(USR_CPP_FILES:$(USR_SRC)/%.cpp=$(USR_BIN)/%.o)\n");
+            mf.Append("USR_OBJ         := $(USR_S_FILES:$(USR_SRC)/%.S=$(USR_BIN)/%.s.o) $(USR_C_FILES:$(USR_SRC)/%.c=$(USR_BIN)/%.c.o) $(USR_CPP_FILES:$(USR_SRC)/%.cpp=$(USR_BIN)/%.cpp.o)\n");
             //          if (cfg.setupType == SetupTypes.expert && project.buildSystem == BuildSystem.makefile && project.useInoFiles) mf.Append("USR_OBJ         += $(USR_INO_FILE:$(USR_SRC)/%.ino=$(USR_BIN)/%.o)\n");
 
             mf.Append("\n");
@@ -212,7 +212,7 @@ namespace vtCore
             mf.Append("CORE_CPP_FILES  := $(call rwildcard,$(CORE_SRC)/,*.cpp)\n");
             mf.Append("CORE_C_FILES    := $(call rwildcard,$(CORE_SRC)/,*.c)\n");
             mf.Append("CORE_S_FILES    := $(call rwildcard,$(CORE_SRC)/,*.S)\n");
-            mf.Append("CORE_OBJ        := $(CORE_S_FILES:$(CORE_SRC)/%.S=$(CORE_BIN)/%.o) $(CORE_C_FILES:$(CORE_SRC)/%.c=$(CORE_BIN)/%.o) $(CORE_CPP_FILES:$(CORE_SRC)/%.cpp=$(CORE_BIN)/%.o)\n");
+            mf.Append("CORE_OBJ        := $(CORE_S_FILES:$(CORE_SRC)/%.S=$(CORE_BIN)/%.s.o) $(CORE_C_FILES:$(CORE_SRC)/%.c=$(CORE_BIN)/%.c.o) $(CORE_CPP_FILES:$(CORE_SRC)/%.cpp=$(CORE_BIN)/%.cpp.o)\n");
 
             mf.Append("\n");
             mf.Append("# User library sources (see https://github.com/arduino/arduino/wiki/arduino-ide-1.5:-library-specification)\n");
@@ -234,9 +234,9 @@ namespace vtCore
             mf.Append("LIB_S_LOCAL     := $(foreach d, $(LIB_DIRS_LOCAL),$(call wildcard,$d/*.S))\n");
 
             mf.Append("\n");
-            mf.Append("LIB_OBJ         := $(LIB_CPP_SHARED:$(LIBS_SHARED_BASE)/%.cpp=$(LIB_BIN)/%.o)  $(LIB_CPP_LOCAL:$(LIBS_LOCAL_BASE)/%.cpp=$(LIB_BIN)/%.o)\n");
-            mf.Append("LIB_OBJ         += $(LIB_C_SHARED:$(LIBS_SHARED_BASE)/%.c=$(LIB_BIN)/%.o)  $(LIB_C_LOCAL:$(LIBS_LOCAL_BASE)/%.c=$(LIB_BIN)/%.o)\n");
-            mf.Append("LIB_OBJ         += $(LIB_S_SHARED:$(LIBS_SHARED_BASE)/%.S=$(LIB_BIN)/%.o)  $(LIB_S_LOCAL:$(LIBS_LOCAL_BASE)/%.S=$(LIB_BIN)/%.o)\n");
+            mf.Append("LIB_OBJ         := $(LIB_CPP_SHARED:$(LIBS_SHARED_BASE)/%.cpp=$(LIB_BIN)/%.cpp.o)  $(LIB_CPP_LOCAL:$(LIBS_LOCAL_BASE)/%.cpp=$(LIB_BIN)/%.cpp.o)\n");
+            mf.Append("LIB_OBJ         += $(LIB_C_SHARED:$(LIBS_SHARED_BASE)/%.c=$(LIB_BIN)/%.c.o)  $(LIB_C_LOCAL:$(LIBS_LOCAL_BASE)/%.c=$(LIB_BIN)/%.c.o)\n");
+            mf.Append("LIB_OBJ         += $(LIB_S_SHARED:$(LIBS_SHARED_BASE)/%.S=$(LIB_BIN)/%.s.o)  $(LIB_S_LOCAL:$(LIBS_LOCAL_BASE)/%.S=$(LIB_BIN)/%.s.o)\n");
 
             mf.Append("\n");
             mf.Append("# Includes -------------------------------------------------------------\n");
@@ -289,17 +289,17 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append("# Core library ----------------------------------------------------------------\n");
-            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.S\n");
+            mf.Append("$(CORE_BIN)/%.s.o: $(CORE_SRC)/%.S\n");
             mf.Append("\t@echo $(COL_CORE)CORE [ASM] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.c\n");
+            mf.Append("$(CORE_BIN)/%.c.o: $(CORE_SRC)/%.c\n");
             mf.Append("\t@echo $(COL_CORE)CORE [CC]  $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(CORE_BIN)/%.o: $(CORE_SRC)/%.cpp\n");
+            mf.Append("$(CORE_BIN)/%.cpp.o: $(CORE_SRC)/%.cpp\n");
             mf.Append("\t@echo $(COL_CORE)CORE [CPP] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
@@ -311,33 +311,33 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append("# Shared Libraries ------------------------------------------------------------\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.S\n");
+            mf.Append("$(LIB_BIN)/%.s.o: $(LIBS_SHARED_BASE)/%.S\n");
             mf.Append("\t@echo $(COL_LIB)LIB [ASM] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.cpp\n");
+            mf.Append("$(LIB_BIN)/%.cpp.o: $(LIBS_SHARED_BASE)/%.cpp\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CPP] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_SHARED_BASE)/%.c\n");
+            mf.Append("$(LIB_BIN)/%.c.o: $(LIBS_SHARED_BASE)/%.c\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
             mf.Append("# Local Libraries -------------------------------------------------------------\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.S\n");
+            mf.Append("$(LIB_BIN)/%.s.o: $(LIBS_LOCAL_BASE)/%.S\n");
             mf.Append("\t@echo $(COL_LIB)LIB [ASM] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.cpp\n");
+            mf.Append("$(LIB_BIN)/%.cpp.o: $(LIBS_LOCAL_BASE)/%.cpp\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CPP] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(LIB_BIN)/%.o: $(LIBS_LOCAL_BASE)/%.c\n");
+            mf.Append("$(LIB_BIN)/%.c.o: $(LIBS_LOCAL_BASE)/%.c\n");
             mf.Append("\t@echo $(COL_LIB)LIB [CC]  $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o $@ -c $<\n");
 
@@ -351,17 +351,17 @@ namespace vtCore
             //    mf.Append("\n");
             //}
 
-            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.S\n");
+            mf.Append("$(USR_BIN)/%.s.o: $(USR_SRC)/%.S\n");
             mf.Append("\t@echo $(COL_SRC)USER [ASM] $< $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(S_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.c\n");
+            mf.Append("$(USR_BIN)/%.c.o: $(USR_SRC)/%.c\n");
             mf.Append("\t@echo $(COL_SRC)USER [CC]  $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CC)\" $(C_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
 
             mf.Append("\n");
-            mf.Append("$(USR_BIN)/%.o: $(USR_SRC)/%.cpp\n");
+            mf.Append("$(USR_BIN)/%.cpp.o: $(USR_SRC)/%.cpp\n");
             mf.Append("\t@echo $(COL_SRC)USER [CPP] $(notdir $<) $(COL_ERR)\n");
             mf.Append("\t@\"$(CXX)\" $(CPP_FLAGS) $(INCLUDE) -o \"$@\" -c $<\n");
 
