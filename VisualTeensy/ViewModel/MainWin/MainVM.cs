@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using vtCore;
 using vtCore.Interfaces;
@@ -40,7 +39,7 @@ namespace ViewModel
                 setup.mru.AddProject(prj);
                 mruList.Clear();
                 setup.mru.projects.ForEach(p => mruList.Add(new MruItemVM(p, this)));
-                
+
                 projecTabVM.update();
                 librariesTabVM.update();
                 ActionText = Directory.Exists(projectPath) ? "Update Project" : "Generate Project";
@@ -67,8 +66,20 @@ namespace ViewModel
         public string ActionText { get; private set; }
 
         public string projectName => project.name;
-        public string projectPath => project.path;
 
+        public string projectPath
+        {
+            get => project.path;
+            set
+            {
+                if (value != project.path)
+                {
+                    project.path = value;
+                    OnPropertyChanged("projectPath");
+                    OnPropertyChanged("projectName");
+                }
+            }
+        }
 
         public string Title
         {
@@ -106,7 +117,7 @@ namespace ViewModel
             }
             //var mruList = setup.mru.projects?.Select(p => new MruItemVM(p, this));
             //if(mruList != null)  mruList = new ObservableCollection<MruItemVM>(mruList);
-          }
+        }
 
         public LibManager libManager { get; }
         public SetupData setup { get; }

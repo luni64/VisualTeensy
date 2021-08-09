@@ -50,7 +50,7 @@ namespace vtCore
             mf.Append($"LIBS_LOCAL       := ");
             foreach (var lib in cfg.localLibs)
             {
-                mf.Append($"{lib.targetFolderName} ");
+                mf.Append($"{lib.targetFolder} ");
             }
             mf.Append("\n\n");
 

@@ -44,6 +44,8 @@ namespace vtCore.Interfaces
 
         void openProject(string path);
         void newProject();
+        
+        bool isNew { get; set; }
 
         string path { get; set; }
         string pathError { get; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using vtCore.Interfaces;
@@ -7,10 +8,9 @@ using vtCore.Interfaces;
 namespace vtCore
 {
     public class ProjectLibrary : Library, IProjectLibrary
-    { 
-        public Uri targetUri { get; set; }
-        public string targetFolderName => targetUri?.Segments.Last();
-
+    {
+        public string targetFolder { get; set; }
+       
         public static IProjectLibrary cloneFromLib(ILibrary lib)
         {
             return new ProjectLibrary(lib);

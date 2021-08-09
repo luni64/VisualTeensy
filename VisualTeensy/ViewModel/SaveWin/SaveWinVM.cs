@@ -1,10 +1,8 @@
 ﻿using log4net;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Threading;
 using vtCore;
 using vtCore.Interfaces;
 
@@ -42,6 +40,7 @@ namespace ViewModel
             }
             catch { log.Error($"vsCode launch failed"); }
 
+            project.isNew = false;
             isReady = false;  // closes the save window
             OnPropertyChanged("isReady");
 
@@ -54,10 +53,9 @@ namespace ViewModel
             var taskList = CodeGenerator.getTasks(project, libManager, setup).Select(t => new TaskVM(t)).ToList();
             taskVMs = new ListCollectionView(taskList);
             this.project = project;
-        }
+        }        
 
         private readonly IProject project;
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
     }
 }

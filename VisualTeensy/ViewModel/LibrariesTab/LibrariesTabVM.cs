@@ -68,9 +68,7 @@ namespace ViewModel
 
             repos = new ListCollectionView(libManager.repositories.Select(r => new RepositoryVM(r)).ToList());
             repos.CurrentChanged += repoChanged;
-            
-            
-
+                     
             projectLibraries = new ObservableCollection<IProjectLibrary>(project.selectedConfiguration.localLibs.Union(project.selectedConfiguration.sharedLibs));
             projectLibraries.CollectionChanged += projectLibrariesChanged;
         }
@@ -82,7 +80,6 @@ namespace ViewModel
             var repo = ((RepositoryVM)repos.CurrentItem);
             isArduinoIndexRepo = repo.name == "Arduino Repository";
         }
-
 
         public string searchString
         {
@@ -114,12 +111,18 @@ namespace ViewModel
                         {
                             if (library.isLocalSource)
                             {
-                                var source = library.sourceUri.LocalPath;
-                                library.targetUri = new Uri(source.Replace(curRepo.repoPath, project.libBase));
+                                string  source = library.sourceUri.LocalPath;                              
+                                library.targetFolder = Path.GetFileName(source);
+
+                                // library.targetUri = Path.Combine("lib", Path.GetFileName(curRepo.repoPath));
                             }
                             else if (library.isWebSource)
                             {
-                                library.targetUri = new Uri(Path.Combine(project.libBase, library.name.Replace(' ', '_')));
+                                string source = library.sourceUri.LocalPath;
+                                library.targetFolder = Path.GetFileNameWithoutExtension(source);
+                                
+                                //library.targetUri = new Uri(Path.Combine(project.libBase, library.name.Replace(' ', '_')));
+                                //library.targetUri = new Uri(Path.Combine("lib", library.name.Replace(' ', '_')),UriKind.Relative);
                             }
                             project.selectedConfiguration.localLibs.Add(library);
                         }
