@@ -253,7 +253,8 @@ namespace vtCore
         {
             if (!libBase.Exists) libBase.Create();
 
-            var libDir = new DirectoryInfo(lib.targetUri.LocalPath);
+
+            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName,lib.targetFolder));
             if (libDir.Exists) libDir.Delete(true);
 
             // we will save the *.zip in a temp file and unzip into %temp%/vslib            
@@ -278,7 +279,7 @@ namespace vtCore
                 }
 
                 var sourceFolder = tempFolder.GetDirectories().FirstOrDefault();
-                copyFilesRecursively(sourceFolder, libDir);            
+                copyFilesRecursively(sourceFolder, libDir);
                 tempFolder.Delete(true);
 
                 Console.WriteLine("done");

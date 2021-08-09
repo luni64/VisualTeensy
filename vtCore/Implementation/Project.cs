@@ -49,9 +49,12 @@ namespace vtCore
         public string name => Path.GetFileName(path ?? "ERROR");
         public string cleanName => name.Replace(" ", "_");
         public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName + ".ino");
-
+        public bool isNew { get; set; }
+       
         public void newProject()
         {
+            isNew = true;
+
             // Project Path -------------------------------------
             int i = 1;
             path = Path.Combine(setup.projectBaseDefault, $"newProject");
@@ -89,6 +92,7 @@ namespace vtCore
             {
                 openExistingFolder(vsTeensyJsonPath);
             }
+            isNew = false; 
         }
 
         public Project(SetupData setup, LibManager libManager)
@@ -153,8 +157,8 @@ namespace vtCore
                         {
                             foreach (var lib in localLibs)
                             {
-                                var pl =  ProjectLibrary.cloneFromLib(lib);
-                                pl.targetUri = lib.sourceUri;
+                                var pl =  ProjectLibrary.cloneFromLib(lib);                                                              
+                                pl.targetFolder = Path.GetFileName(lib.sourceUri.LocalPath);
                                 configuration.localLibs.Add(pl);
                             }
                         }
@@ -194,6 +198,7 @@ namespace vtCore
         private List<IConfiguration> _configurations { get; }
         private IConfiguration _selectedConfiguration { get; set; }
         private readonly SetupData setup;
+        private bool _isNew = true;
     }
 }
 

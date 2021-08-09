@@ -25,52 +25,43 @@ namespace VisualTeensy
 
         SaveProjectWin saveProjectWin;
 
-        private void openOutputClick(object sender, RoutedEventArgs e)
+        private void save(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as MainVM;
-            var svvm = new SaveWinVM(vm.project, vm.libManager, vm.setup);
 
-            svvm.PropertyChanged += Svvm_PropertyChanged;
-
-            saveProjectWin = new SaveProjectWin(svvm);
-
-
-            saveProjectWin.ShowDialog();
-        }
-
-        private void Svvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if(e.PropertyName == "isReady")
+            if (vm.project.isNew)
             {
-                var vm = sender as SaveWinVM;
-                if(vm.isReady == false)
-                {
-                    saveProjectWin.Close();
-                }
+                saveAs(sender, e);
+                vm.project.isNew = false;
             }
-           
+            else
+            {
+                var svvm = new SaveWinVM(vm.project, vm.libManager, vm.setup);
+                saveProjectWin = new SaveProjectWin(svvm);
+                saveProjectWin.ShowDialog();            
+            }
         }
 
+        
         private void saveAs(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as MainVM;
 
             using (var dialog = new CommonSaveFileDialog())
-            {                
+            {
                 try
                 {
                     dialog.InitialDirectory = System.IO.Path.GetDirectoryName(vm.project.path);
-                    dialog.DefaultFileName = System.IO.Path.GetFileName(vm.project.path);                    
+                    dialog.DefaultFileName = System.IO.Path.GetFileName(vm.project.path);
                 }
                 catch { }
 
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     Directory.CreateDirectory(dialog.FileName);
-                    vm.project.path = dialog.FileName;
-                  //  vm.project.generateFiles();
+                    vm.projectPath = dialog.FileName;                   
                     var dlg = new SaveProjectWin(new SaveWinVM(vm.project, vm.libManager, vm.setup));
-                    dlg.ShowDialog();
+                    dlg.ShowDialog();                 
                 }
             }
         }
@@ -109,6 +100,6 @@ namespace VisualTeensy
             else MessageBox.Show($"Path {e.Uri.LocalPath} does not exist", "VisualTeensy", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-       
+
     }
 }

@@ -42,7 +42,7 @@
                         <md:PackIcon Kind="FolderOpen" Foreground="DarkBlue" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save..." Click="openOutputClick">
+                <MenuItem Header="Save..." Click="save">
                     <MenuItem.Icon>
                         <md:PackIcon Kind="ContentSave" Foreground="DarkBlue" />
                     </MenuItem.Icon>

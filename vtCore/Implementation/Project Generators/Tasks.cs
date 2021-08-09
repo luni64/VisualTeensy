@@ -311,7 +311,6 @@ namespace vtCore
             done = false;
         }
 
-
         public Func<Task> action => async () =>
         {
             var baseUri = new Uri(libBase.FullName);
@@ -319,8 +318,10 @@ namespace vtCore
             foreach (IProjectLibrary library in project.selectedConfiguration.localLibs)
             {
                 if (library.isLocalSource)
-                {
-                    Helpers.copyFilesRecursively(library.sourceUri, library.targetUri);
+                {                   
+                    DirectoryInfo tgtFolder = new DirectoryInfo(Path.Combine(project.libBase,library.targetFolder));
+                    DirectoryInfo srcFolder = new DirectoryInfo(library.sourceUri.LocalPath);                 
+                    Helpers.copyFilesRecursively(srcFolder, tgtFolder);
                 }
                 else if (library.isWebSource)
                 {

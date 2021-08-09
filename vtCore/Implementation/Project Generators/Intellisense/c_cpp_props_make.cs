@@ -47,7 +47,7 @@ namespace vtCore
 
             foreach (var lib in cfg.localLibs)
             {
-                cfgp.includePath.Add(Path.Combine("lib",lib.targetFolderName, "**").Replace('\\', '/'));
+                cfgp.includePath.Add(Path.Combine("lib",lib.targetFolder, "**").Replace('\\', '/'));
             }
 
             // Compiler switches ----------------------------------------------------------
