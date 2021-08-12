@@ -76,6 +76,14 @@ namespace ViewModel
         {
             // model.saveSettings();
         }
+
+        public RelayCommand cmdCoreSelected { get; private set; }
+        void doCoreSelected(object o)
+        {
+            project.coreStrategy = (CoreStrategies)o;
+        }
+
+
         #endregion
 
         #region Properties ----------------------------------------------------
@@ -95,7 +103,7 @@ namespace ViewModel
         }
 
 
-        public bool isMakefileBuild =>  project.buildSystem == BuildSystem.makefile;
+        public bool isMakefileBuild => project.buildSystem == BuildSystem.makefile;
         //    set
         //    {
         //        if (value != project.isMakefileBuild)
@@ -106,7 +114,7 @@ namespace ViewModel
         //    }
         //}
 
-                    
+                            
         public bool quickSetup
         {
             get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
@@ -299,6 +307,7 @@ namespace ViewModel
 
             cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
+            cmdCoreSelected = new RelayCommand(doCoreSelected);
 
             updateBoards();
         }

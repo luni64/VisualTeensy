@@ -29,6 +29,7 @@ namespace vtCore
         public Target target { get; set; } = Target.vsCode;
         public BuildSystem buildSystem { get; set; } = BuildSystem.makefile;
         public DebugSupport debugSupport { get; set; } = DebugSupport.none;
+        public CoreStrategies coreStrategy { get; set; } = CoreStrategies.copy;
 
         // public bool isMakefileBuild { get; set; } = true;
 

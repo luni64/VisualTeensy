@@ -1,8 +1,4 @@
 ﻿using System.Collections.Generic;
-using vtCore.Interfaces;
-
-
-
 
 namespace vtCore.Interfaces
 {
@@ -26,16 +22,21 @@ namespace vtCore.Interfaces
         cortex_debug
     }
 
+    public enum CoreStrategies
+    {
+        copy, link, clone
+    }
+
     public interface IFolders
     {
-        CheckedPath compiler { get;  }
+        CheckedPath compiler { get; }
         //CheckedPath coreBase { get; }
         //CheckedPath sharedLibs { get; }
     }
 
 
     public interface IProject
-    {     
+    {
         string name { get; }
         string cleanName { get; }
 
@@ -44,7 +45,7 @@ namespace vtCore.Interfaces
 
         void openProject(string path);
         void newProject();
-        
+
         bool isNew { get; set; }
 
         string path { get; set; }
@@ -56,5 +57,6 @@ namespace vtCore.Interfaces
         Target target { get; set; }
         BuildSystem buildSystem { get; set; }
         DebugSupport debugSupport { get; set; }
+        CoreStrategies coreStrategy { get; set; }
     }
 }
