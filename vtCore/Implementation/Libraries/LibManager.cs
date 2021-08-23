@@ -40,7 +40,7 @@ namespace vtCore
             if (rvm.libraries != null) repositories.Add(rvm);
         }
 
-        private SetupData setup;
+        private readonly SetupData setup;
     }
 }
 

@@ -4,7 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using vtCore.Interfaces;
 using vtCore;
-
+using log4net;
+using System.Reflection;
 
 namespace ViewModel
 {
@@ -94,28 +95,16 @@ namespace ViewModel
             }
         }
 
+        public bool isMakefileBuild => project.buildSystem == BuildSystem.makefile;
 
-        public bool isMakefileBuild =>  project.buildSystem == BuildSystem.makefile;
-        //    set
-        //    {
-        //        if (value != project.isMakefileBuild)
-        //        {
-        //            project.isMakefileBuild = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
-
-                    
-        public bool quickSetup
+        public SetupTypes setupType
         {
-            get => project.selectedConfiguration.setupType == SetupTypes.quick ? true : false;
+            get => project.selectedConfiguration.setupType;
             set
             {
-                SetupTypes newType = value == true ? SetupTypes.quick : SetupTypes.expert;  // hack, valueConverter would be better
-                if (project.selectedConfiguration.setupType != newType)
+                if (project.selectedConfiguration.setupType != value)
                 {
-                    project.selectedConfiguration.setupType = newType;
+                    project.selectedConfiguration.setupType = value;
                     updateAll();
                     OnPropertyChanged("");
                 }
@@ -132,7 +121,21 @@ namespace ViewModel
                 OnPropertyChanged("");
             }
         }
-
+        
+        public LibStrategy coreStragegy
+        {
+            get => project.selectedConfiguration.coreStrategy;
+            set
+            {
+                if (value != project.selectedConfiguration.coreStrategy)
+                {
+                    project.selectedConfiguration.coreStrategy = value;
+                    updateFiles();
+                    OnPropertyChanged("");
+                }
+            }
+        }
+        
         public string makefileExtension
         {
             get => project.selectedConfiguration.makefileExtension;
@@ -202,46 +205,7 @@ namespace ViewModel
                 }
             }
         }
-        //public String boardTxtPath
-        //{
-        //    get => project.selectedConfiguration.boardTxtPath;
-        //    set
-        //    {
-        //        if (value != project.selectedConfiguration.boardTxtPath)
-        //        {
-        //            project.selectedConfiguration.boardTxtPath = value.Trim();
-        //            updateAll();
-        //            OnPropertyChanged("");
-        //        }
-        //    }
-        //}
-        //public bool copyBoardTxt
-        //{
-        //    get => project.selectedConfiguration.copyBoardTxt;
-        //    set
-        //    {
-        //        if (value != project.selectedConfiguration.copyBoardTxt)
-        //        {
-        //            project.selectedConfiguration.copyBoardTxt = value;
-        //            OnPropertyChanged();
-        //            updateFiles();
-        //        }
-        //    }
-        //}
-
-        public bool copyCore
-        {
-            get => project.selectedConfiguration.copyCore;
-            set
-            {
-                if (value != project.selectedConfiguration.copyCore)
-                {
-                    project.selectedConfiguration.copyCore = value;
-                    OnPropertyChanged();
-                    updateFiles();
-                }
-            }
-        }
+               
         public String corePath
         {
             get => project.selectedConfiguration.coreBase.path;
@@ -295,12 +259,13 @@ namespace ViewModel
             settFile = ProjectSettings.generate(project);
             debugFile = DebugFile.generate(project, setup);
 
-
-
             cmdGenerate = new RelayCommand(doGenerate);//, o => project.pathError == null && !String.IsNullOrWhiteSpace(project.selectedConfiguration.makefile) && !String.IsNullOrWhiteSpace(project.tasks_json) && !String.IsNullOrWhiteSpace(project.props_json));
             cmdClose = new RelayCommand(doClose);
-
+          
             updateBoards();
+            OnPropertyChanged("");
+
+            log.Info("constructed");
         }
 
         internal void updateAll()
@@ -311,7 +276,7 @@ namespace ViewModel
         }
         internal void updateFiles()
         {
-           
+            
 
             makefile = Makefile.generate(project, libManager, setup);
             taskFile = TaskFile.generate(project, setup);
@@ -356,6 +321,9 @@ namespace ViewModel
         public IProject project;
         LibManager libManager;
         SetupData setup;
+
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 

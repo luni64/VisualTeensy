@@ -32,8 +32,6 @@ namespace vtCore
             {
                 name = board?.name;
                 options = board?.optionSets?.ToDictionary(o => o.name, o => o.selectedOption?.name ?? o.options.FirstOrDefault()?.name);
-               
-                
             }
             public string name { get; set; }
             public Dictionary<string, string> options { get; set; } = new Dictionary<string, string>();
@@ -71,19 +69,20 @@ namespace vtCore
             [JsonProperty(Order = 7)]
             public string makefileExtension { get; set; }
 
-            //[JsonProperty(Order = 8)]
-            //public bool copyBoardTxt { get; set; }
-
             [JsonProperty(Order = 9)]
-            public bool copyCore { get; set; }
+            public bool copyCore { get; set; } = false;
 
             [JsonProperty(Order = 10)]
-            public IEnumerable<string> sharedLibraries { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public LibStrategy coreStrategy { get; set; }
 
             [JsonProperty(Order = 11)]
-            public IEnumerable<string> projectLibraries { get; set; }
+            public IEnumerable<string> sharedLibraries { get; set; }
 
             [JsonProperty(Order = 12)]
+            public IEnumerable<string> projectLibraries { get; set; }
+
+            [JsonProperty(Order = 13)]
             public vtBoard board { get; set; }
             
             public vtConfiguration(IConfiguration configuration)
@@ -105,7 +104,9 @@ namespace vtCore
                 makefileExtension = configuration.makefileExtension;
                 compilerBase = configuration.compilerBase.path;
                 coreBase = configuration.coreBase.path;
-                copyCore = configuration.copyCore;
+                //copyCore = configuration.copyCore;
+                coreStrategy = configuration.coreStrategy;
+                
                 //  boardTxtPath = configuration.boardTxtPath;
                 //  copyBoardTxt = configuration.copyBoardTxt;
                 board = new vtBoard(configuration.selectedBoard);
@@ -125,10 +126,13 @@ namespace vtCore
                 conf.compilerBase.path = vtConf.compilerBase;
                 conf.coreBase.path = vtConf.coreBase;
                 conf.copyCore = vtConf.copyCore;
+                conf.coreStrategy = vtConf.coreStrategy;
                 conf.makefileExtension = vtConf.makefileExtension;
                 conf.guid = vtConf.guid != null ? vtConf.guid : Guid.NewGuid().ToString();
                 return conf;
             }
+
+            public bool ShouldSerializecopyCore() => false;            
         }
 
         [JsonProperty(Order = 1)]
@@ -152,7 +156,7 @@ namespace vtCore
         internal ProjectTransferData(IProject project)
         {
             this.model = project;
-            version = "1";
+            version = "2";
             target = project.target;
             buildSystem = project.buildSystem;
             debugSupport = project.debugSupport;

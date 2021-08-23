@@ -1,7 +1,9 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Data;
 using vtCore;
 using vtCore.Interfaces;
@@ -277,12 +279,13 @@ namespace ViewModel
             get => _selectedFile;
             set => SetProperty(ref _selectedFile, value);
         }
-        int _selectedFile=0;
+        int _selectedFile = 0;
 
         public RelayCommand cmdAddFile { get; private set; }
         void doAddFile(object f)
         {
             string filename = f as String;
+            log.Info($"add additional file {filename}");
             setup.additionalFiles.Add(filename);
             additionalFilesView.Refresh();
         }
@@ -292,6 +295,7 @@ namespace ViewModel
         {
             if (selectedFile >= 0)
             {
+                log.Info($"delete additional file {setup.additionalFiles[selectedFile]}");
                 setup.additionalFiles.RemoveAt(selectedFile);
                 additionalFilesView.Refresh();
             }
@@ -309,10 +313,14 @@ namespace ViewModel
             // additionalFiles = new ObservableCollection<string>(setup.additionalFiles);
 
             additionalFilesView = CollectionViewSource.GetDefaultView(setup.additionalFiles);
+
+            log.Info("constructed");
         }
 
         private readonly SetupData setup;
         private readonly IProject project;
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
 

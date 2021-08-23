@@ -1,4 +1,6 @@
-﻿using vtCore.Interfaces;
+﻿using log4net;
+using System.Reflection;
+using vtCore.Interfaces;
 
 namespace vtCore
 {
@@ -6,6 +8,8 @@ namespace vtCore
     {
         public static string generate(IProject project, SetupData setup)
         {
+            log.Info($"generate, target: {project.target} ");
+
             switch (project.target)
             {
                 case Target.vsCode:
@@ -24,5 +28,7 @@ namespace vtCore
                     return "Error";
             }
         }
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
+    
 }

@@ -20,7 +20,7 @@ namespace vtCore
             tasks.Add(new GenerateTasks(project, setup));
             tasks.Add(new CopyLibs(project));
 
-            if (project.selectedConfiguration.copyCore)
+            if (project.selectedConfiguration.coreStrategy == LibStrategy.copy)  ///Todo: other settings....
             {
                 tasks.Add(new CopyCore(project));
             }
@@ -102,10 +102,6 @@ namespace vtCore
                 progressHandler.Report("OK");
                 await Task.Delay(1);
             }
-
-            //var bat = project.path + "\\build.bat";
-            //File.WriteAllText(bat, builder_build_bat.generate(project,setup));
-
         }
 
         static public async Task mkGenerator(IProject project, LibManager libManager, SetupData setup, IProgress<string> progressHandler)

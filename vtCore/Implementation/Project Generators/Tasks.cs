@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using vtCore.Interfaces;
@@ -267,15 +266,15 @@ namespace vtCore
     //--------------------------------------------------------------------------------------------
     class CopyCore : ITask
     {
-        public string title => $"Copy core libraries";
-        public string description => $"from: {sourceUri.LocalPath} to: ./core/";
+        public string title => $"Copy teensyduino core";
+        public string description => $"from: {sourceUri.LocalPath} to: ./cores";
 
         public string status => done ? "OK" : Directory.Exists(targetUri.LocalPath) ? "Exists" : "Copy";
 
         public CopyCore(IProject project)
         {
-            sourceUri = new Uri(project.selectedConfiguration.core);
-            targetUri = new Uri(Path.Combine(project.path, "core"));
+            sourceUri = new Uri(Path.Combine(project.selectedConfiguration.coreBase.path, "cores"));
+            targetUri = new Uri(Path.Combine(project.path, "cores"));
             done = false;
         }
 
@@ -293,6 +292,39 @@ namespace vtCore
         private readonly Uri targetUri;
         private readonly Uri sourceUri;
     }
+
+    class CloneCore : ITask
+    {
+        public string title => $"Clone teensyduino core";
+        public string description { get; } 
+        public string status { get; private set; }
+
+        public CloneCore(IProject project)
+        {
+            this.project = project;
+
+            var coreURL = "https://github.com/PaulStoffregen/cores.git";
+            var targetFolder = Path.Combine(project.path, "cores");
+            coreLib = new GitLibrary(coreURL, targetFolder);
+
+            status = coreLib.alreadyCloned ? "Nothing to do (already cloned)" : "Clone";
+            description = $"from: {coreURL} to: ./cores";
+        }
+
+        public Func<Task> action => async () =>
+        {
+            if (!coreLib.alreadyCloned)
+            {
+                await project.gitInitAsync();
+                await coreLib.clone();
+            }            
+            status = "OK";
+        };
+               
+        GitLibrary coreLib;
+        IProject project;
+    }
+
 
     //--------------------------------------------------------------------------------------------
     // Copy local libraries
@@ -318,9 +350,9 @@ namespace vtCore
             foreach (IProjectLibrary library in project.selectedConfiguration.localLibs)
             {
                 if (library.isLocalSource)
-                {                   
-                    DirectoryInfo tgtFolder = new DirectoryInfo(Path.Combine(project.libBase,library.targetFolder));
-                    DirectoryInfo srcFolder = new DirectoryInfo(library.sourceUri.LocalPath);                 
+                {
+                    DirectoryInfo tgtFolder = new DirectoryInfo(Path.Combine(project.libBase, library.targetFolder));
+                    DirectoryInfo srcFolder = new DirectoryInfo(library.sourceUri.LocalPath);
                     Helpers.copyFilesRecursively(srcFolder, tgtFolder);
                 }
                 else if (library.isWebSource)
@@ -343,7 +375,7 @@ namespace vtCore
     class CopyAdditionalFiles : ITask
     {
         public string title => $"Copy additional files";
-        public string description =>fileList;
+        public string description => fileList;
 
         public string status => done ? "OK" : "Copy";
 
@@ -364,9 +396,9 @@ namespace vtCore
 
         public Func<Task> action => async () =>
         {
-            foreach(var sourceFile in setup.additionalFiles)
+            foreach (var sourceFile in setup.additionalFiles)
             {
-                if(File.Exists(sourceFile))
+                if (File.Exists(sourceFile))
                 {
                     string destFile = Path.Combine(project.path, Path.GetFileName(sourceFile));
                     if (!File.Exists(destFile))

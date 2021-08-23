@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using LibGit2Sharp;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
+using System.Threading.Tasks;
 using vtCore.Interfaces;
 
 namespace vtCore
@@ -20,7 +24,7 @@ namespace vtCore
     }
 
     internal class Project : IProject
-    {    
+    {
         public IEnumerable<IConfiguration> configurations => _configurations;
         public IConfiguration selectedConfiguration => _selectedConfiguration;
 
@@ -29,6 +33,7 @@ namespace vtCore
         public Target target { get; set; } = Target.vsCode;
         public BuildSystem buildSystem { get; set; } = BuildSystem.makefile;
         public DebugSupport debugSupport { get; set; } = DebugSupport.none;
+        public LibStrategy coreStrategy { get; set; } = LibStrategy.copy;
 
         // public bool isMakefileBuild { get; set; } = true;
 
@@ -50,7 +55,7 @@ namespace vtCore
         public string cleanName => name.Replace(" ", "_");
         public string mainSketchPath => buildSystem == BuildSystem.makefile ? Path.Combine(path, "src", "main.cpp") : Path.Combine(path, cleanName + ".ino");
         public bool isNew { get; set; }
-       
+
         public void newProject()
         {
             isNew = true;
@@ -69,7 +74,7 @@ namespace vtCore
             var sc = Configuration.getDefault(setup);
 
             _selectedConfiguration = sc;
-            _configurations.Add(sc);           
+            _configurations.Add(sc);
 
             var dummyConfig = Configuration.getDefault(setup);
             dummyConfig.name = "Testdummy";
@@ -92,7 +97,7 @@ namespace vtCore
             {
                 openExistingFolder(vsTeensyJsonPath);
             }
-            isNew = false; 
+            isNew = false;
         }
 
         public Project(SetupData setup, LibManager libManager)
@@ -101,7 +106,7 @@ namespace vtCore
             this.libManager = libManager;
             this._configurations = new List<IConfiguration>();
         }
-                
+
         private void openNewFolder()
         {
             buildSystem = BuildSystem.makefile;
@@ -112,14 +117,17 @@ namespace vtCore
             _configurations.Add(sc);
             _selectedConfiguration = sc;
         }
+
         private void openExistingFolder(string vsTeensyJsonPath)
         {
             try
             {  // read vsTeensy.json
                 var fileContent = JsonConvert.DeserializeObject<ProjectTransferData>(File.ReadAllText(vsTeensyJsonPath));
 
-                if (fileContent == null || fileContent.version != "1" || fileContent.configurations.Count == 0)
+
+                if (fileContent == null || !uint.TryParse(fileContent.version, out uint ver) || ver < 1 || fileContent.configurations.Count == 0)
                 {
+                    
                     openNewFolder();
                 }
                 else
@@ -132,13 +140,19 @@ namespace vtCore
                     {
                         var configuration = (Configuration)cfg;
                         configuration.setup = this.setup;       /// hack, look for better solution
-                        
+
+
+                        if (ver == 1)
+                        {
+                            configuration.coreStrategy = configuration.copyCore ? LibStrategy.copy : LibStrategy.link;
+                        }
+
 
                         // add shared libraries ---------------------
                         if (cfg.sharedLibraries != null)
                         {
                             var sharedLibraries = libManager.sharedRepository?.libraries.Select(version => version.FirstOrDefault()); //flatten out list by selecting first version. Shared libraries  can only have one version
-                            
+
                             foreach (var cfgSharedLib in cfg.sharedLibraries)
                             {
                                 var library = sharedLibraries?.FirstOrDefault(lib => lib.sourceFolderName == cfgSharedLib); // find the corresponding lib
@@ -157,7 +171,7 @@ namespace vtCore
                         {
                             foreach (var lib in localLibs)
                             {
-                                var pl =  ProjectLibrary.cloneFromLib(lib);                                                              
+                                var pl = ProjectLibrary.cloneFromLib(lib);
                                 pl.targetFolder = Path.GetFileName(lib.sourceUri.LocalPath);
                                 configuration.localLibs.Add(pl);
                             }
@@ -195,10 +209,31 @@ namespace vtCore
                 return;
             }
         }
+
+        
+        public async Task<GitError> gitInitAsync()
+        {
+            var projectRepo = Repository.Discover(path);
+
+            if (projectRepo == path + "\\.git\\")  // project is already a git repo -> nothing to do
+            {
+                return GitError.OK;
+            }
+
+            if (String.IsNullOrWhiteSpace(projectRepo))  // project is not a git repo -> initialize
+            {
+                //string newRepo =  Repository.Init(path);
+                string newRepo = await Task.Run(() => Repository.Init(path));
+                if (newRepo == path + "\\.git\\") return GitError.OK;  
+            }
+
+            return GitError.Unexpected;
+        }
+
         private List<IConfiguration> _configurations { get; }
         private IConfiguration _selectedConfiguration { get; set; }
         private readonly SetupData setup;
-        private bool _isNew = true;
+       // private bool _isNew = true;
     }
 }
 

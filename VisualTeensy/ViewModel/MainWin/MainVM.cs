@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using log4net;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using vtCore;
 using vtCore.Interfaces;
@@ -110,17 +112,19 @@ namespace ViewModel
                 projecTabVM.OnPropertyChanged("");
             };
 
-            mruList = new ObservableCollection<MruItemVM>();
+            mruList = new ObservableCollection<MruItemVM>();            
             foreach (var prj in setup.mru.projects)
             {
                 mruList.Add(new MruItemVM(prj, this));
             }
-            //var mruList = setup.mru.projects?.Select(p => new MruItemVM(p, this));
-            //if(mruList != null)  mruList = new ObservableCollection<MruItemVM>(mruList);
+            log.Info($"MRU list loaded ({mruList.Count} entries)");
+            log.Info("constructed");
         }
 
         public LibManager libManager { get; }
         public SetupData setup { get; }
         public IProject project { get; }
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
     }
 }
