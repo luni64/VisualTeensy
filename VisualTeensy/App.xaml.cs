@@ -92,14 +92,14 @@ namespace VisualTeensy
             setupData.mru.load(Settings.Default.mruString);
             Helpers.arduinoPath = setupData.arduinoBase;
 
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
-            {
-                setupData.makefile_fixed = reader.ReadToEnd();
-            }
-            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
-            {
-                setupData.makefile_builder = reader.ReadToEnd();
-            }
+            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_make")))
+            //{
+            //    setupData.makefile_fixed = reader.ReadToEnd();
+            //}
+            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
+            //{
+            //    setupData.makefile_builder = reader.ReadToEnd();
+            //}
 
 
 
@@ -135,10 +135,11 @@ namespace VisualTeensy
 
 
         protected override void OnStartup(StartupEventArgs e)
-        {
+        {          
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+         
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
             // create applicaton folder <user>\AppData\Local\VisualTeensy (if not yet existing)
             Directory.CreateDirectory(SetupData.vtAppFolder);

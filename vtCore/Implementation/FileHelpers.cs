@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using LibGit2Sharp;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,7 +79,6 @@ namespace vtCore
 
             return null;
         }
-
         public static string findJLinkFolder()
         {
             string folder;
@@ -97,7 +97,6 @@ namespace vtCore
 
             return null;
         }
-
         public static string findCLIFolder()
         {
             string folder;
@@ -254,7 +253,7 @@ namespace vtCore
             if (!libBase.Exists) libBase.Create();
 
 
-            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName,lib.targetFolder));
+            var libDir = new DirectoryInfo(Path.Combine(libBase.FullName, lib.targetFolder));
             if (libDir.Exists) libDir.Delete(true);
 
             // we will save the *.zip in a temp file and unzip into %temp%/vslib            
@@ -289,6 +288,8 @@ namespace vtCore
                 throw;
             }
         }
+
+      
 
 
         [DllImport("kernel32", EntryPoint = "GetShortPathName", CharSet = CharSet.Auto, SetLastError = true)]

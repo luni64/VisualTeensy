@@ -23,10 +23,10 @@ namespace ViewModel
             while (!taskVMs.IsCurrentAfterLast)
             {
                 var taskVM = (TaskVM)taskVMs.CurrentItem;
-                log.Info(taskVM.title);
+                log.Info(taskVM.title + " started...");
 
                 await taskVM.action();
-                await Task.Delay(50);
+                await Task.Delay(150);
                 log.Info($"{taskVM.title} done");
 
                 taskVMs.MoveCurrentToNext();

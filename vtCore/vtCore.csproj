@@ -13,8 +13,10 @@
   <ItemGroup>
     <Compile Remove="Implementation\Folders.cs" />
   </ItemGroup>
- 
+
   <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.306" />
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>

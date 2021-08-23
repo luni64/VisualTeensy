@@ -58,6 +58,8 @@ namespace vtCore
         // core --------------------------------------
         public CheckedPath coreBase { get; } = new CheckedPath("boards.txt", optional: false);
         public bool copyCore { get; set; }
+        public LibStrategy coreStrategy { get; set; }
+
         public bool localCore { get; set; }
         public string core
         {

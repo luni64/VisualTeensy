@@ -10,20 +10,16 @@ namespace vtCore.Interfaces
     public interface IConfiguration
     {
         bool isOk { get; }
-
-        //  IFolders folders { get; }
+             
         SetupTypes setupType { get; set; }
         string name { get; set; }
         string guid { get; }
         
-        CheckedPath coreBase { get; }
-        bool localCore { get; set; }
-        bool copyCore { get; set; }
+        CheckedPath coreBase { get; }       
+        LibStrategy coreStrategy { get; set; }
 
         string core { get; }
-
-        //string boardTxtPath { get; set; }
-        //bool copyBoardTxt { get; set; }
+               
 
         string compiler { get; }
         CheckedPath compilerBase { get; }
@@ -31,11 +27,9 @@ namespace vtCore.Interfaces
 
         List<IBoard> boards { get; }
         IBoard selectedBoard { get; set; }
-
         List<IProjectLibrary> sharedLibs { get; }
         List<IProjectLibrary> localLibs { get; }
-        //List<Library> projectLibs { get; }
-
+       
         void parseBoardsTxt(string bt);
 
         string makefile { get; }
