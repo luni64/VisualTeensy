@@ -14,8 +14,8 @@ namespace vtCore
             var cfg = project.selectedConfiguration;
             if (!cfg.isOk) return "ERROR";
 
-;            var brd = cfg.selectedBoard;
-           // if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
+            ; var brd = cfg.selectedBoard;
+            // if (project.selectedConfiguration.compilerBase == null || brd == null) return ""; // hack
 
             var props = new PropertiesJson()
             {
@@ -25,29 +25,50 @@ namespace vtCore
                     {
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
-                        intelliSenseMode = "gcc-arm", 
+                        intelliSenseMode = "gcc-arm",
                         cppStandard = "gnu++14", // hack: might be better to extract from boards.txt
-                        includePath = new List<string>(),                        
+                        includePath = new List<string>(),
                         defines = new List<string>()
                     }
                 }
             };
-
-
             var cfgp = props.configurations[0];
 
             // include path -------------------------------------------------------------
-            cfgp.includePath.Add("src/**");
-            cfgp.includePath.Add(cfg.core.Replace('\\', '/'));
-           
+
+
+            cfgp.includePath.Add("src");
+
+            string coresPath = "cores/" + cfg.selectedBoard.core;
+            if (cfg.coreStrategy == LibStrategy.link)
+            {
+                coresPath = cfg.coreBase.path + "/" + coresPath;
+            }
+            cfgp.includePath.Add(coresPath.Replace('\\', '/'));
+
+
             foreach (var lib in cfg.sharedLibs)
-            {                
-                cfgp.includePath.Add(Path.Combine(lib.sourceUri.LocalPath, "**").Replace('\\', '/'));
+            {
+                string basePath = lib.sourceUri.LocalPath.Replace('\\', '/');                                                
+                cfgp.includePath.Add(basePath);
+
+                var utiliyPath = basePath + "/utility";
+                if (Directory.Exists(utiliyPath)) cfgp.includePath.Add(utiliyPath);
+
+                var srcPath = basePath + "/src";
+                if(Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);                
             }
 
             foreach (var lib in cfg.localLibs)
             {
-                cfgp.includePath.Add(Path.Combine("lib",lib.targetFolder, "**").Replace('\\', '/'));
+                string basePath = "lib/" + lib.targetFolder.Replace('\\', '/');
+                cfgp.includePath.Add(basePath);
+
+                var utiliyPath = basePath + "/utility";
+                if (Directory.Exists(utiliyPath)) cfgp.includePath.Add(utiliyPath);
+
+                var srcPath = basePath + "/src";
+                if (Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);
             }
 
             // Compiler switches ----------------------------------------------------------
@@ -71,7 +92,7 @@ namespace vtCore
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
             props.configurations[0].defines.Add("ARDUINO=10813");
 
-          
+
             return JsonConvert.SerializeObject(props, Formatting.Indented);
         }
 
