@@ -49,14 +49,14 @@ namespace vtCore
 
             foreach (var lib in cfg.sharedLibs)
             {
-                string basePath = lib.sourceUri.LocalPath.Replace('\\', '/');                                                
+                string basePath = lib.sourceUri.LocalPath.Replace('\\', '/');
                 cfgp.includePath.Add(basePath);
 
                 var utiliyPath = basePath + "/utility";
                 if (Directory.Exists(utiliyPath)) cfgp.includePath.Add(utiliyPath);
 
                 var srcPath = basePath + "/src";
-                if(Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);                
+                if (Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);
             }
 
             foreach (var lib in cfg.localLibs)
