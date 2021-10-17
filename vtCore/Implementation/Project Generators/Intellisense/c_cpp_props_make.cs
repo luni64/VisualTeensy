@@ -50,25 +50,14 @@ namespace vtCore
             foreach (var lib in cfg.sharedLibs)
             {
                 string basePath = lib.sourceUri.LocalPath.Replace('\\', '/');
-                cfgp.includePath.Add(basePath);
+                addLib("", basePath, cfgp);
 
-                var utiliyPath = basePath + "/utility";
-                if (Directory.Exists(utiliyPath)) cfgp.includePath.Add(utiliyPath);
 
-                var srcPath = basePath + "/src";
-                if (Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);
             }
-
             foreach (var lib in cfg.localLibs)
             {
                 string basePath = "lib/" + lib.targetFolder.Replace('\\', '/');
-                cfgp.includePath.Add(basePath);
-
-                var utiliyPath = basePath + "/utility";
-                if (Directory.Exists(utiliyPath)) cfgp.includePath.Add(utiliyPath);
-
-                var srcPath = basePath + "/src";
-                if (Directory.Exists(srcPath)) cfgp.includePath.Add(srcPath);
+                addLib(project.path,basePath,cfgp);
             }
 
             // Compiler switches ----------------------------------------------------------
@@ -94,6 +83,22 @@ namespace vtCore
 
 
             return JsonConvert.SerializeObject(props, Formatting.Indented);
+        }
+
+
+        private static void addLib(string basePath, string lib, ConfigurationJson cfgp )
+        {
+            if (Directory.Exists(Path.Combine(basePath,lib, "src")))  // library format 1.5, only src is searched for includes
+            {
+                cfgp.includePath.Add(lib+"/src");
+            }
+            else // old library format, base folder and utility folder are searched for includes
+            {
+                cfgp.includePath.Add(lib);
+
+                var utiliyPath = lib + "/utility";
+                if (Directory.Exists(Path.Combine(basePath,lib,"utility"))) cfgp.includePath.Add(lib+"/utility");
+            }
         }
 
         private static void addConfigOption(Dictionary<string, string> options, PropertiesJson props, string prefix, string key)

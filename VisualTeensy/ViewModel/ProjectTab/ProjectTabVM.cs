@@ -135,7 +135,22 @@ namespace ViewModel
                 }
             }
         }
-        
+
+        public StdLibType stdLib
+        {
+            get => project.selectedConfiguration.stdLib;
+            set
+            {
+                if (value != project.selectedConfiguration.stdLib)
+                {
+                    project.selectedConfiguration.stdLib = value;
+                    updateFiles();
+                    OnPropertyChanged("");
+                }
+            }
+        }
+
+
         public string makefileExtension
         {
             get => project.selectedConfiguration.makefileExtension;

@@ -21,20 +21,25 @@ namespace vtCore
                     if (project.buildSystem == BuildSystem.makefile)
                     {
                         tasks.Add(new CopyLibs(project));
-                        switch(project.selectedConfiguration.coreStrategy)
+                        switch (project.selectedConfiguration.coreStrategy)
                         {
                             case LibStrategy.copy: tasks.Add(new CopyCore(project)); break;
                             case LibStrategy.clone: tasks.Add(new CloneCore(project)); break;
-                        }                      
+                        }
                     }
-                    if(project.debugSupport == DebugSupport.cortex_debug)
+                    if (project.debugSupport == DebugSupport.cortex_debug)
                     {
-                        tasks.Add(new GenerateDebugSupport(project, setup));                            
+                        tasks.Add(new GenerateDebugSupport(project, setup));
                     }
-                    if(setup.additionalFiles.Any())
+                    if (setup.additionalFiles.Any())
                     {
                         tasks.Add(new CopyAdditionalFiles(project, setup));
                     }
+                    if (true) // make this optional
+                    {
+                        tasks.Add(new GenerateSettingsJson(project, libManager, setup));
+                    }
+
                     tasks.Add(new CleanBinaries(project));
                     tasks.Add(new GenerateSketch(project));
                     break;
@@ -46,6 +51,6 @@ namespace vtCore
             }
 
             return tasks;
-        }  
+        }
     }
 }

@@ -147,6 +147,7 @@ namespace vtCore
                             configuration.coreStrategy = configuration.copyCore ? LibStrategy.copy : LibStrategy.link;
                         }
 
+                        configuration.stdLib = cfg.stdLib;
 
                         // add shared libraries ---------------------
                         if (cfg.sharedLibraries != null)

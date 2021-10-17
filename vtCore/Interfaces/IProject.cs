@@ -28,6 +28,12 @@ namespace vtCore.Interfaces
         copy, link, clone
     }
 
+    public enum StdLibType
+    {
+        newlib,
+        nanolib
+    };
+
     public enum GitError
     {
         OK, 

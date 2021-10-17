@@ -103,11 +103,12 @@ d:DesignHeight="800" d:DesignWidth="1000">
 
             <!--Expert Setup ____________________________________-->
             <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Width="auto" Margin="0,1,0,0"   Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=radioButton1}" x:Name="Expert_Settings">
+            <!--<StackPanel Grid.Row="4" Grid.ColumnSpan="2" Width="auto" Margin="0,1,0,0"   Visibility="Visible"  x:Name="Expert_Settings">-->
                 <!--<Label   Content="boards.txt " FontSize="12" FontWeight="SemiBold" Padding="0" />
                 <local:PSelector SelectedPath="{Binding boardTxtPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" />
                 <CheckBox Content="Copy to project folder (recommended)" FontSize="10" IsChecked="{Binding copyBoardTxt}"/>-->
 
-                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12"  Foreground="{DynamicResource PrimaryHueDarkBrush}" Padding="0" Margin="0,25,0,0" />
+                <Label   Content="Compiler (gcc-arm-none-eabi):" FontWeight="SemiBold" FontSize="12"  Foreground="{DynamicResource PrimaryHueDarkBrush}" Padding="0" Margin="0,20,0,0" />
                 <local:PSelector SelectedPath="{Binding compilerPath, ValidatesOnDataErrors=True}" Style="{DynamicResource ValidatingControl}" isFolderDialog="True" />
 
                 <Label Content="Teensyduino core" FontSize="12" FontWeight="SemiBold"  Foreground="{DynamicResource PrimaryHueDarkBrush}" Padding="0" Margin="0,20,0,5"  />
@@ -132,6 +133,14 @@ d:DesignHeight="800" d:DesignWidth="1000">
                     GroupName="core"  
                     Margin="10,5,0.4,0"
                     IsChecked="{Binding coreStragegy, ConverterParameter={x:Static if:LibStrategy.clone}, Converter={StaticResource EnumBooleanConverter}}"/>
+
+                <Label   Content="Override standard libraries (libc and libc++)" FontWeight="SemiBold" FontSize="12"  Foreground="{DynamicResource PrimaryHueDarkBrush}" Padding="0" Margin="0,15,0,0" />
+                <RadioButton                     
+                    Content="Use newlib (standard setting)" Margin="10,5,0,0" 
+                   IsChecked="{Binding stdLib, ConverterParameter={x:Static if:StdLibType.newlib}, Converter={StaticResource EnumBooleanConverter}}"/>
+                <RadioButton                     
+                    Content="Use newlib-nano (smaller code)" Margin="10,5,0,0" 
+                    IsChecked="{Binding stdLib, ConverterParameter={x:Static if:StdLibType.nanolib}, Converter={StaticResource EnumBooleanConverter}}"/>
                     
                 <Label   Content="Additional entries to makefile:" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource PrimaryHueDarkBrush}" Padding="0" Margin="0,25,0,0" />
             </StackPanel>
