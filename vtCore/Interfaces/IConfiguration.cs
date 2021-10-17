@@ -17,9 +17,9 @@ namespace vtCore.Interfaces
         
         CheckedPath coreBase { get; }       
         LibStrategy coreStrategy { get; set; }
-
         string core { get; }
                
+        StdLibType stdLib { get; set; }
 
         string compiler { get; }
         CheckedPath compilerBase { get; }

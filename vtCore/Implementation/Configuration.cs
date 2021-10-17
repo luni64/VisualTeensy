@@ -74,7 +74,8 @@ namespace vtCore
             }
         }
 
-
+        // newlib nano 
+        public StdLibType stdLib { get; set; }
 
         // makefile  ------------------------
         public string makefile { get; set; }
@@ -117,6 +118,7 @@ namespace vtCore
             {
                 setup = setupData,
                 setupType = SetupTypes.quick,
+                //setupType = SetupTypes.expert,
                 name = "default",
             };
 
@@ -125,6 +127,8 @@ namespace vtCore
             pd.compilerBase.path = setupData.arduinoCompiler;
             pd.parseBoardsTxt(/*setupData.arduinoBoardsTxt*/null);
             pd.logProject();
+            pd.coreStrategy = LibStrategy.copy;
+            pd.stdLib = StdLibType.newlib;
 
             return pd;
         }

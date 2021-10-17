@@ -98,7 +98,16 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append(makeEntry("FLAGS_CPU   := ", "build.flags.cpu", options) + "\n");
-            mf.Append(makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options) + "\n");
+
+
+            string opt = makeEntry("FLAGS_OPT   := ", "build.flags.optimize", options);
+            if (cfg.setupType == SetupTypes.expert && cfg.stdLib == StdLibType.nanolib && !opt.Contains("nano.specs"))
+            {
+                opt += " --specs=nano.specs";
+            }
+            mf.Append( opt + "\n");
+
+
             mf.Append(makeEntry("FLAGS_COM   := ", "build.flags.common", options) + makeEntry(" ", "build.flags.dep", options) + "\n");
             mf.Append(makeEntry("FLAGS_LSP   := ", "build.flags.ldspecs", options) + "\n");
 
@@ -428,7 +437,9 @@ namespace vtCore
 
         private static string makeEntry(String txt, String key, Dictionary<String, String> options)
         {
-            return options.ContainsKey(key) ? $"{txt}{options[key]}" : "";
+            // return options.ContainsKey(key) ? $"{txt}{options[key]}" : "";
+            string s =  options.ContainsKey(key) ? $"{txt}{options[key]}" : "";
+            return s;
         }
 
         private static string colEsc(Color c)

@@ -77,12 +77,16 @@ namespace vtCore
             public LibStrategy coreStrategy { get; set; }
 
             [JsonProperty(Order = 11)]
-            public IEnumerable<string> sharedLibraries { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public StdLibType stdLib { get; set; }
 
             [JsonProperty(Order = 12)]
-            public IEnumerable<string> projectLibraries { get; set; }
+            public IEnumerable<string> sharedLibraries { get; set; }
 
             [JsonProperty(Order = 13)]
+            public IEnumerable<string> projectLibraries { get; set; }
+
+            [JsonProperty(Order = 14)]
             public vtBoard board { get; set; }
             
             public vtConfiguration(IConfiguration configuration)
@@ -106,6 +110,7 @@ namespace vtCore
                 coreBase = configuration.coreBase.path;
                 //copyCore = configuration.copyCore;
                 coreStrategy = configuration.coreStrategy;
+                stdLib = configuration.stdLib;
                 
                 //  boardTxtPath = configuration.boardTxtPath;
                 //  copyBoardTxt = configuration.copyBoardTxt;
