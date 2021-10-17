@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using vtCore.Interfaces;
@@ -110,6 +112,70 @@ namespace vtCore
         readonly FileInfo c_cpp_propertiesFile;
     }
 
+
+    //-----------------------------------------------------------------------
+    // Generate settings.json 
+    //-----------------------------------------------------------------------
+    class GenerateSettingsJson : ITask
+    {
+        public string title => $"Workspace settings";
+        public string description => ".vscode/settings.json";
+        public string status => done ? "OK" : exists ? "Update" : "Generate";
+
+        public GenerateSettingsJson(IProject project, LibManager libManager, SetupData setup)
+        {
+            this.project = project;
+            this.libManager = libManager;
+            this.setup = setup;
+
+            setupJsonFile = new FileInfo(Path.Combine(project.path, ".vscode", "settings.json"));
+            exists = setupJsonFile.Exists;
+            done = false;
+        }
+
+        public Func<Task> action => async () =>
+        {
+            JObject json;
+            if (setupJsonFile.Exists)
+            {                
+                using (StreamReader file = setupJsonFile.OpenText())
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {                    
+                    json = (JObject)JToken.ReadFrom(reader);
+                }
+            }
+            else
+            {
+                json = new JObject();
+            }
+            
+            bool dirty = vcSettingsJson.generate(json);
+
+            if (dirty)
+            {
+                using (TextWriter outFile = setupJsonFile.CreateText())
+                {
+                    var jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
+                    outFile.Write(jsonString);
+                }
+            }
+
+
+            //File.WriteAllText(setupJsonFile.FullName, properties);
+            done = true;
+            await Task.CompletedTask;
+        };
+
+        private readonly bool exists;
+        private bool done;
+        readonly IProject project;
+        readonly LibManager libManager;
+        readonly SetupData setup;
+        readonly FileInfo setupJsonFile;
+    }
+
+
+
     //-----------------------------------------------------------------------
     // Generate Settings
     //-----------------------------------------------------------------------
@@ -125,10 +191,7 @@ namespace vtCore
         public GenerateSettings(IProject project)
         {
             this.project = project;
-
-
             settingsFile = new FileInfo(Path.Combine(project.path, ".vsteensy", "vsteensy.json"));
-
             exists = settingsFile.Exists;
             done = false;
         }
