@@ -96,10 +96,10 @@ namespace VisualTeensy
             //{
             //    setupData.makefile_fixed = reader.ReadToEnd();
             //}
-            //using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
-            //{
-            //    setupData.makefile_builder = reader.ReadToEnd();
-            //}
+            using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualTeensy.Embedded.makefile_builder")))
+            {
+                setupData.makefile_builder = reader.ReadToEnd();
+            }
 
 
 
