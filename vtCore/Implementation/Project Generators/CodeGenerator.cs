@@ -15,9 +15,9 @@ namespace vtCore
                 case Target.vsCode:
                     tasks.Add(new PrepareFolders(project));
                     tasks.Add(new GenerateSettings(project));
-                    tasks.Add(new GenerateIntellisense(project, libManager, setup));
                     tasks.Add(new GenerateMakefile(project, libManager, setup));
                     tasks.Add(new GenerateTasks(project, setup));
+                    tasks.Add(new GenerateIntellisense(project, libManager, setup)); // needs to be added after libraries (checks for existence)
                     if (project.buildSystem == BuildSystem.makefile)
                     {
                         tasks.Add(new CopyLibs(project));

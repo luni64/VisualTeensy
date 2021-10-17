@@ -226,11 +226,11 @@ namespace vtCore
             mf.Append("\n");
             mf.Append("# User library sources (see https://github.com/arduino/arduino/wiki/arduino-ide-1.5:-library-specification)\n");
             mf.Append("LIB_DIRS_SHARED := $(foreach d, $(LIBS_SHARED), $(LIBS_SHARED_BASE)/$d/ $(LIBS_SHARED_BASE)/$d/utility/)      # base and /utility\n");
-            mf.Append("LIB_DIRS_SHARED += $(foreach d, $(LIBS_SHARED), $(LIBS_SHARED_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_SHARED_BASE)/$d/src/,*/.)))                          # src and all subdirs of base\n");
+            mf.Append("LIB_DIRS_SHARED += $(foreach d, $(LIBS_SHARED), $(LIBS_SHARED_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_SHARED_BASE)/$d/src/,*/.)))        # src and all subdirs of base\n");
 
             mf.Append("\n");
-            mf.Append("LIB_DIRS_LOCAL  := $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/ $(LIBS_LOCAL_BASE)/$d/utility/ )        # base and /utility\n");
-            mf.Append("LIB_DIRS_LOCAL  += $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_LOCAL_BASE)/$d/src/,*/.)))                          # src and all subdirs of base\n");
+            mf.Append("LIB_DIRS_LOCAL  := $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/ $(LIBS_LOCAL_BASE)/$d/utility/ )                                       # base and /utility\n");
+            mf.Append("LIB_DIRS_LOCAL  += $(foreach d, $(LIBS_LOCAL), $(LIBS_LOCAL_BASE)/$d/src/ $(dir $(call rwildcard,$(LIBS_LOCAL_BASE)/$d/src/,*/.)))           # src and all subdirs of base\n");
 
             mf.Append("\n");
             mf.Append("LIB_CPP_SHARED  := $(foreach d, $(LIB_DIRS_SHARED),$(call wildcard,$d*.cpp))\n");
@@ -249,9 +249,10 @@ namespace vtCore
 
             mf.Append("\n");
             mf.Append("# Includes -------------------------------------------------------------\n");
-            mf.Append("INCLUDE         := -I./$(USR_SRC) -I$(CORE_SRC)\n");
-            mf.Append("INCLUDE         += $(foreach d, $(LIB_DIRS_SHARED), -I$d)\n");
-            mf.Append("INCLUDE         += $(foreach d, $(LIB_DIRS_LOCAL), -I$d)\n");
+            mf.Append("INCLUDE         := -I./$(USR_SRC) -I$(CORE_SRC)\n");           
+            mf.Append("INCLUDE         += $(foreach d, $(LIBS_LOCAL),-I$(LIBS_LOCAL_BASE)/$d/ -I$(LIBS_LOCAL_BASE)/$d/src -I$(LIBS_LOCAL_BASE)/$d/utility/)\n");
+            mf.Append("INCLUDE         += $(foreach d, $(LIBS_SHARED), -I$(LIBS_SHARED_BASE)/$d/ -I$(LIBS_SHARED_BASE)/$d/src -I$(LIBS_SHARED_BASE)/$d/utility/)\n");
+
 
             mf.Append("\n");
             mf.Append("# Generate directories --------------------------------------------------------\n");
