@@ -137,10 +137,10 @@ namespace vtCore
         {
             JObject json;
             if (setupJsonFile.Exists)
-            {                
+            {
                 using (StreamReader file = setupJsonFile.OpenText())
                 using (JsonTextReader reader = new JsonTextReader(file))
-                {                    
+                {
                     json = (JObject)JToken.ReadFrom(reader);
                 }
             }
@@ -148,7 +148,7 @@ namespace vtCore
             {
                 json = new JObject();
             }
-            
+
             bool dirty = vcSettingsJson.generate(json);
 
             if (dirty)
@@ -232,10 +232,10 @@ namespace vtCore
 
             if (!file.Exists)
                 status = "Generate";
-            else if (String.Equals(oldMakefile.Substring(400), newMakefile.Substring(400)))
-                status = "Up-To-Date";
-            else
-                status = "Overwrite";
+            else if (oldMakefile.Length > 400 && newMakefile.Length > 400 && String.Equals(oldMakefile.Substring(400), newMakefile.Substring(400)))
+                    status = "Up-To-Date";
+                else
+                    status = "Overwrite";
         }
 
         public Func<Task> action => async () =>
@@ -359,7 +359,7 @@ namespace vtCore
     class CloneCore : ITask
     {
         public string title => $"Clone teensyduino core";
-        public string description { get; } 
+        public string description { get; }
         public string status { get; private set; }
 
         public CloneCore(IProject project)
@@ -380,10 +380,10 @@ namespace vtCore
             {
                 await project.gitInitAsync();
                 await coreLib.clone();
-            }            
+            }
             status = "OK";
         };
-               
+
         GitLibrary coreLib;
         IProject project;
     }
