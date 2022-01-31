@@ -161,7 +161,7 @@ namespace vtCore
 
             ProjectTransferData.vtBoard tmp = new ProjectTransferData.vtBoard(selectedBoard);
             //  boards = BoardsTxt.parse(bt ?? boardTxtPath).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
-            boards = BoardsTxt.parse(btp).Where(b => b.core == "teensy3" || b.core == "teensy4").ToList();
+            boards = BoardsTxt.parse(btp)/*.Where(b => b.core == "teensy3" || b.core == "teensy4")*/.ToList();
             setBoardOptions(tmp);
         }
 

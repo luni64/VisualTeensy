@@ -135,28 +135,34 @@ namespace vtCore
 
         public Func<Task> action => async () =>
         {
-            JObject json;
-            if (setupJsonFile.Exists)
+            var cfg = project.selectedConfiguration;
+            if (cfg.isOk)
             {
-                using (StreamReader file = setupJsonFile.OpenText())
-                using (JsonTextReader reader = new JsonTextReader(file))
+                JObject workspaceSettings;
+                if (setupJsonFile.Exists)
                 {
-                    json = (JObject)JToken.ReadFrom(reader);
+                    using (StreamReader file = setupJsonFile.OpenText())
+                    using (JsonTextReader reader = new JsonTextReader(file))
+                    {
+                        workspaceSettings = (JObject)JToken.ReadFrom(reader);
+                    }
                 }
-            }
-            else
-            {
-                json = new JObject();
-            }
-
-            bool dirty = vcSettingsJson.generate(json);
-
-            if (dirty)
-            {
-                using (TextWriter outFile = setupJsonFile.CreateText())
+                else
                 {
-                    var jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
-                    outFile.Write(jsonString);
+                    workspaceSettings = new JObject();
+                }
+
+
+                
+                bool dirty = vcSettingsJson.generate(workspaceSettings, cfg, project);
+
+                if (dirty)
+                {
+                    using (TextWriter outFile = setupJsonFile.CreateText())
+                    {
+                        var jsonString = JsonConvert.SerializeObject(workspaceSettings, Formatting.Indented);
+                        outFile.Write(jsonString);
+                    }
                 }
             }
 
@@ -233,9 +239,9 @@ namespace vtCore
             if (!file.Exists)
                 status = "Generate";
             else if (oldMakefile.Length > 400 && newMakefile.Length > 400 && String.Equals(oldMakefile.Substring(400), newMakefile.Substring(400)))
-                    status = "Up-To-Date";
-                else
-                    status = "Overwrite";
+                status = "Up-To-Date";
+            else
+                status = "Overwrite";
         }
 
         public Func<Task> action => async () =>

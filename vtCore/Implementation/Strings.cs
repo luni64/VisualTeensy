@@ -12,8 +12,8 @@
 
             "void loop()\n" +
             "{\n" +
-            "  digitalWriteFast(LED_BUILTIN,!digitalReadFast(LED_BUILTIN));\n" +
-            "  delay(500);\n" +
+            "  digitalToggleFast(LED_BUILTIN);\n" +
+            "  delay(250);\n" +
             "}\n";
 
         public static string sketchIno { get; } =
