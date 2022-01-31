@@ -135,28 +135,34 @@ namespace vtCore
 
         public Func<Task> action => async () =>
         {
-            JObject json;
-            if (setupJsonFile.Exists)
-            {                
-                using (StreamReader file = setupJsonFile.OpenText())
-                using (JsonTextReader reader = new JsonTextReader(file))
-                {                    
-                    json = (JObject)JToken.ReadFrom(reader);
-                }
-            }
-            else
+            var cfg = project.selectedConfiguration;
+            if (cfg.isOk)
             {
-                json = new JObject();
-            }
-            
-            bool dirty = vcSettingsJson.generate(json);
-
-            if (dirty)
-            {
-                using (TextWriter outFile = setupJsonFile.CreateText())
+                JObject workspaceSettings;
+                if (setupJsonFile.Exists)
                 {
-                    var jsonString = JsonConvert.SerializeObject(json, Formatting.Indented);
-                    outFile.Write(jsonString);
+                    using (StreamReader file = setupJsonFile.OpenText())
+                    using (JsonTextReader reader = new JsonTextReader(file))
+                    {
+                        workspaceSettings = (JObject)JToken.ReadFrom(reader);
+                    }
+                }
+                else
+                {
+                    workspaceSettings = new JObject();
+                }
+
+
+                
+                bool dirty = vcSettingsJson.generate(workspaceSettings, cfg, project);
+
+                if (dirty)
+                {
+                    using (TextWriter outFile = setupJsonFile.CreateText())
+                    {
+                        var jsonString = JsonConvert.SerializeObject(workspaceSettings, Formatting.Indented);
+                        outFile.Write(jsonString);
+                    }
                 }
             }
 
@@ -232,7 +238,7 @@ namespace vtCore
 
             if (!file.Exists)
                 status = "Generate";
-            else if (String.Equals(oldMakefile.Substring(400), newMakefile.Substring(400)))
+            else if (oldMakefile.Length > 400 && newMakefile.Length > 400 && String.Equals(oldMakefile.Substring(400), newMakefile.Substring(400)))
                 status = "Up-To-Date";
             else
                 status = "Overwrite";
@@ -359,7 +365,7 @@ namespace vtCore
     class CloneCore : ITask
     {
         public string title => $"Clone teensyduino core";
-        public string description { get; } 
+        public string description { get; }
         public string status { get; private set; }
 
         public CloneCore(IProject project)
@@ -380,10 +386,10 @@ namespace vtCore
             {
                 await project.gitInitAsync();
                 await coreLib.clone();
-            }            
+            }
             status = "OK";
         };
-               
+
         GitLibrary coreLib;
         IProject project;
     }
