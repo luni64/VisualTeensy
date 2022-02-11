@@ -177,7 +177,7 @@ $(TARGET_ELF): $(CORE_LIB) $(LIB_OBJ) $(USR_OBJ)
 	@echo $(COL_LINK)
 	@echo [LST] $@ $(COL_ERR)
 	@$(OBJDUMP) -d -S --demangle --no-show-raw-insn --syms "$<"  > "$@"	
-	@echo $(COL_OK)Sucessfully built project$(COL_RESET) &&echo.
+	@echo $(COL_OK)Successfully built project$(COL_RESET) &&echo.
 
 %.hex: %.elf
 	@echo $(COL_LINK)[HEX] $@ 
