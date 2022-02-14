@@ -170,19 +170,19 @@ $(USR_BIN)/%.o: $(USR_SRC)/%.cpp
 $(TARGET_ELF): $(CORE_LIB) $(LIB_OBJ) $(USR_OBJ)
 	@echo $(COL_LINK)
 	@echo [LD]  $@ $(COL_ERR)
-	@$(CC) $(LD_FLAGS) -o "$@" $(USR_OBJ) $(LIB_OBJ) $(CORE_LIB) $(LIBS)
+	@"$(CC)" $(LD_FLAGS) -o "$@" $(USR_OBJ) $(LIB_OBJ) $(CORE_LIB) $(LIBS)
 	@echo $(COL_OK)User code built and linked to libraries &&echo.
 
 %.lst: %.elf
 	@echo $(COL_LINK)
 	@echo [LST] $@ $(COL_ERR)
-	@$(OBJDUMP) -d -S --demangle --no-show-raw-insn --syms "$<"  > "$@"	
-	@echo $(COL_OK)Sucessfully built project$(COL_RESET) &&echo.
+	@"$(OBJDUMP)" -d -S --demangle --no-show-raw-insn --syms "$<"  > "$@"	
+	@echo $(COL_OK)Successfully built project$(COL_RESET) &&echo.
 
 %.hex: %.elf
 	@echo $(COL_LINK)[HEX] $@ 
 #	@$(SIZE) "$<"
-	@$(OBJCOPY) -O ihex -R.eeprom "$<" "$@"
+	@"$(OBJCOPY)" -O ihex -R.eeprom "$<" "$@"
 	
 	
 # Cleaning --------------------------------------------------------------------
