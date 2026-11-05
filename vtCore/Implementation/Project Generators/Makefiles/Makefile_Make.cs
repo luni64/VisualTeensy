@@ -17,7 +17,7 @@ namespace vtCore
             var board = cfg.selectedBoard;
             var options = board.getAllOptions();
 
-            var v = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+            var v = (System.Reflection.Assembly.GetEntryAssembly() ?? typeof(Makefile_Make).Assembly).GetName().Version;  // no entry assembly if hosted by a native process (e.g. powershell.exe)
 
             StringBuilder mf = new StringBuilder();
             mf.Append($"#******************************************************************************\n");
