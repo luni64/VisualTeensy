@@ -34,32 +34,52 @@ namespace vtCore
 
                     if (arduinoBaseError == null)
                     {
-                        string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr");
-                        arduinoCoreBase = Directory.Exists(path) ? path : null;
+                        isArduino15 = Arduino15.isArduino15Folder(arduinoBase);
+                        if (isArduino15)  // Teensyduino >= 1.58, installed by the boards manager (IDE 2.x, arduino-cli)
+                        {
+                            var a15 = new Arduino15(arduinoBase);
+                            arduinoCoreBase = a15.platformFolder;
+                            arduinoBoardsTxt = a15.boardsTxt;
+                            arduinoTools = a15.toolsFolder;
+                            arduinoCompiler = a15.compilerFolder;
+                            teensyduinoVersion = a15.platformVersion;
+                        }
+                        else             // classic Arduino IDE 1.x with Teensyduino installer
+                        {
+                            string path = Path.Combine(arduinoBase, "hardware", "teensy", "avr");
+                            arduinoCoreBase = Directory.Exists(path) ? path : null;
 
-                        path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
-                        arduinoBoardsTxt = File.Exists(path) ? path : null;
+                            path = Path.Combine(arduinoBase, "hardware", "teensy", "avr", "boards.txt");
+                            arduinoBoardsTxt = File.Exists(path) ? path : null;
 
-                        path = Path.Combine(arduinoBase, "hardware", "tools");
-                        arduinoTools = Directory.Exists(path) ? path : null;
+                            path = Path.Combine(arduinoBase, "hardware", "tools");
+                            arduinoTools = Directory.Exists(path) ? path : null;
 
-                        path = Path.Combine(arduinoBase, "hardware", "tools", "arm");
-                        arduinoCompiler = Directory.Exists(path) ? path : null;
+                            path = Path.Combine(arduinoBase, "hardware", "tools", "arm");
+                            arduinoCompiler = Directory.Exists(path) ? path : null;
+                            teensyduinoVersion = null;
+                        }
 
                         uplPjrcBase.path = arduinoTools;
+                        tdLibBase = arduinoCoreBase != null ? Path.Combine(arduinoCoreBase, "libraries") : null;
 
                         preferencesPath = Helpers.getPreferencesPath(arduinoBase);
                         isPortable = Path.GetDirectoryName(preferencesPath).EndsWith("portable");
                         
                         var sketchBookFolder = Helpers.getSketchbookFolder(arduinoBase);
-                        if (sketchBookFolder != null)
+                        if (String.IsNullOrEmpty(sketchBookFolder) && isArduino15)
+                        {
+                            sketchBookFolder = Arduino15.findSketchbookFolder(arduinoBase);  // IDE 2.x / arduino-cli don't write preferences.txt
+                        }
+                        if (!String.IsNullOrEmpty(sketchBookFolder))
                         {                           
                             sharedLibrariesFolder = Path.Combine(sketchBookFolder, "libraries");
                         }
                     }
                     else
                     {
-                        arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = null;
+                        arduinoCoreBase = arduinoBoardsTxt = arduinoTools = arduinoCompiler = teensyduinoVersion = null;
+                        isArduino15 = false;
                         errors.Add($"Error checking Arduino folder: {arduinoBaseError}");
                     }
                 }
@@ -75,10 +95,15 @@ namespace vtCore
                     return $"Folder empty or doesn't exist ({arduinoBase})";
                 }
 
+                if (Arduino15.isArduino15Folder(arduinoBase))
+                {
+                    return new Arduino15(arduinoBase).error;
+                }
+
                 string arduinoExe = Path.Combine(arduinoBase, "arduino.exe");
                 if (!File.Exists(arduinoExe))
                 {
-                    return "Arduino folder doesn't contain arduino.exe. Not a valid arduino folder";
+                    return "Neither an Arduino 1.x folder (arduino.exe missing) nor an Arduino15 folder with a Teensy platform (packages/teensy)";
                 }
 
                 string teensyduino = Path.Combine(arduinoBase, "hardware", "teensy");
@@ -102,6 +127,8 @@ namespace vtCore
         public string arduinoBoardsTxt { get; private set; }
         public string arduinoTools { get; private set; }
         public string arduinoCompiler { get; private set; }
+        public bool isArduino15 { get; private set; }
+        public string teensyduinoVersion { get; private set; }   // only known for Arduino15 installations
 
         // misc
         public string makefile_fixed { get; set; }

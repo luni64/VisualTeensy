@@ -22,7 +22,7 @@ namespace vtCore
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler ,"arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-arm",
-                        cppStandard = "gnu++14", // hack: might be better to extract from boards.txt
+                        cppStandard = Helpers.getCppStandard(cfg.selectedBoard?.getAllOptions()),
                         includePath = new List<string>()
                         {
                             $"{Path.Combine(setup.arduinoCoreBase,"cores",cfg.core).Replace('\\', '/') + "/**"}",
@@ -54,7 +54,7 @@ namespace vtCore
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
-            props.configurations[0].defines.Add("ARDUINO=10813");
+            props.configurations[0].defines.Add(Helpers.arduinoVersionDefine);
 
             return JsonConvert.SerializeObject(props, Formatting.Indented);
         }

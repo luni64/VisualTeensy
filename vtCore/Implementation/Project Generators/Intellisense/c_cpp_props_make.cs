@@ -26,7 +26,6 @@ namespace vtCore
                         name = "VisualTeensy",
                         compilerPath =  Path.Combine(cfg.compiler,"arm-none-eabi-gcc.exe").Replace('\\','/'),
                         intelliSenseMode = "gcc-arm",
-                        cppStandard = "gnu++14", // hack: might be better to extract from boards.txt
                         includePath = new List<string>(),
                         defines = new List<string>()
                     }
@@ -64,6 +63,8 @@ namespace vtCore
 
             var options = project.selectedConfiguration?.selectedBoard?.getAllOptions();
             if (options == null) return "";
+            cfgp.cppStandard = Helpers.getCppStandard(options);
+
             var defines = options.FirstOrDefault(o => o.Key == "build.flags.defs");
             if (defines.Value != null)
             {
@@ -79,7 +80,7 @@ namespace vtCore
             addConfigOption(options, props, "F_CPU=", "build.fcpu");
             addConfigOption(options, props, "", "build.usbtype");
             addConfigOption(options, props, "LAYOUT_", "build.keylayout");
-            props.configurations[0].defines.Add("ARDUINO=10813");
+            props.configurations[0].defines.Add(Helpers.arduinoVersionDefine);
 
 
             return JsonConvert.SerializeObject(props, Formatting.Indented);

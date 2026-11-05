@@ -82,7 +82,7 @@ namespace vtCore
             flags.Add(getCfgOption(brdOpt, "-D", "build.usbtype"));
             flags.Add(getCfgOption(brdOpt, "-DLAYOUT_", "build.keylayout"));            
             flags.Add("-DARDUINO_" + brdOpt.FirstOrDefault(o => o.Key == "build.board").Value);
-            flags.Add("-DARDUINO=10815");
+            flags.Add($"-D{Helpers.arduinoVersionDefine}");
 
             // compiler flags
             flags.Add(brdOpt.FirstOrDefault(o => o.Key == "build.flags.cpp").Value);            

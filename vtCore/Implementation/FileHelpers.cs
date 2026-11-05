@@ -22,6 +22,18 @@ namespace vtCore
 
         public static string arduinoPath { set; get; }
 
+        // value of the ARDUINO define passed to the compiler and IntelliSense
+        public const string arduinoVersionDefine = "ARDUINO=10813";
+
+        // C++ standard used by the core (-std=... in build.flags.cpp of boards.txt), e.g. gnu++17 for Teensyduino >= 1.59
+        public static string getCppStandard(Dictionary<string, string> options, string fallback = "gnu++14")
+        {
+            if (options == null || !options.TryGetValue("build.flags.cpp", out var cppFlags) || cppFlags == null) return fallback;
+
+            var match = System.Text.RegularExpressions.Regex.Match(cppFlags, @"-std=((?:gnu|c)\+\+\w+)");
+            return match.Success ? match.Groups[1].Value : fallback;
+        }
+
         //Folders ----------------------------------------
 
         public static string arduinoAppPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arduino15");
@@ -72,6 +84,13 @@ namespace vtCore
             }
 
             folder = checkFolder(@"C:\Program Files (x86)", f => isTyToolsFolder(f));
+            if (folder != null)
+            {
+                return folder;
+            }
+
+            // per user installation, e.g. unpacked zip
+            folder = checkFolder(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"), f => isTyToolsFolder(f));
             if (folder != null)
             {
                 return folder;

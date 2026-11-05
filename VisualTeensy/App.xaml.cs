@@ -43,8 +43,8 @@ namespace VisualTeensy
                 new StartupSettingsView(new StartupSettingsVM(setupData)).ShowDialog();
 
                 setupData.projectBaseDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "source");
-                setupData.uplPjrcBase.path = Helpers.findTyToolsFolder();
-                setupData.uplTyBase.path = setupData.arduinoTools;
+                setupData.uplPjrcBase.path = setupData.arduinoTools;
+                setupData.uplTyBase.path = Helpers.findTyToolsFolder();
                 setupData.uplCLIBase.path = Helpers.findCLIFolder();
                 setupData.uplJLinkBase.path = Helpers.findJLinkFolder();
                 setupData.makeExeBase.path = Directory.GetCurrentDirectory();
@@ -206,6 +206,7 @@ namespace VisualTeensy
             {
                 log.Fatal("Unhandled exception", ex);
                 MessageBox.Show(ex.Message + "\n" + ex.ToString(), "VisualTeensy, unhandled Exception");
+                Shutdown(1);  // ShutdownMode.OnExplicitShutdown, the process would keep running otherwise
             }
         }
 

@@ -44,6 +44,12 @@ namespace ViewModel
         public StartupSettingsVM(SetupData setup)
         {
             this.setup = setup;
+
+            // preselect the boards manager installation if it contains a usable Teensy platform
+            if (String.IsNullOrWhiteSpace(setup.arduinoBase) && Arduino15.isArduino15Folder(Arduino15.defaultFolder) && new Arduino15(Arduino15.defaultFolder).error == null)
+            {
+                setup.arduinoBase = Arduino15.defaultFolder;
+            }
         }
 
         SetupData setup;
